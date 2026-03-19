@@ -2005,6 +2005,21 @@ window.addEventListener('scroll', closeMenu, { passive: true });
 // Init - apply saved language (KZ default)
 setLang(currentLang);
 
+// ── AUTO-REDIRECT logged-in users back to their platform ─────────────────────
+// Uses localStorage cache — no heavy Supabase call. Fast and silent.
+(function checkSessionRedirect() {
+  try {
+    const cached = localStorage.getItem('ecobala-user-cache');
+    if (!cached) return;
+    const user = JSON.parse(cached);
+    if (!user || !user.role) return;
+    // Redirect to their platform
+    if (user.role === 'kids') { window.location.replace('kids.html'); return; }
+    if (user.role === 'teen') { window.location.replace('teen.html'); return; }
+    if (user.role === 'admin') { window.location.replace('admin.html'); return; }
+  } catch(e) {}
+})();
+
 // ── EcoGame modal (defined early so inline onclick works) ────────────────────
 function openEcoGameDemo() {
   const m = document.getElementById('ecoGameModal');
@@ -2099,8 +2114,14 @@ let videoData = [];
 
 async function loadVideoLessons() {
   try {
-    if (window.supabase) {
-      const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    // Prefer shared Supabase client from supabase2.js to avoid missing SUPABASE_URL/SUPABASE_ANON
+    const sb = (window.getSupabaseClient && typeof window.getSupabaseClient === 'function')
+      ? window.getSupabaseClient()
+      : (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON
+          ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON)
+          : null);
+
+    if (sb) {
 
       // 1. Try site_banners first (admin-managed banners shown in index carousel)
       const { data: banners } = await sb

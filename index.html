@@ -2189,16 +2189,22 @@ function renderVideoCarousel() {
 
   track.innerHTML = videoData.map((v, i) => {
     const title = typeof v.title === 'object' ? (v.title[lang] || v.title.ru) : v.title;
-    const thumb = v.imageUrl || (v.ytId ? `https://img.youtube.com/vi/${v.ytId}/mqdefault.jpg` : '');
+    const ytId = (v && v.ytId) ? String(v.ytId).trim() : '';
+    const ytValid = /^[a-zA-Z0-9_-]{11}$/.test(ytId);
+    const thumb = v.imageUrl || (ytValid ? `https://img.youtube.com/vi/${ytId}/mqdefault.jpg` : '');
+    const click = ytValid
+      ? `openVideoModal('${ytId}')`
+      : (v.imageUrl ? `window.open('${v.imageUrl}','_blank')` : '');
     return `
       <div class="video-card">
-        <div class="video-thumb" onclick="${v.ytId ? `openVideoModal('${v.ytId}')` : v.imageUrl ? `window.open('${v.imageUrl}','_blank')` : ''}">
-          <img src="${thumb}" alt="${title}" loading="lazy">
+        <div class="video-thumb" onclick="${click}">
+          ${thumb ? `<img src="${thumb}" alt="${title}" loading="lazy">` : `<div style="height:100%;width:100%;background:linear-gradient(135deg,#E8F5E9,#C8E6C9);"></div>`}
+          ${ytValid ? `
           <div class="video-play-btn">
             <div class="video-play-circle">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="#2E7D32"><path d="M8 5v14l11-7z"/></svg>
             </div>
-          </div>
+          </div>` : ''}
           <div class="video-tag">${v.tag || 'Kids'}${v.pts ? ' • +' + v.pts + ' pts' : ''}</div>
         </div>
         <div class="video-body">
@@ -2415,7 +2421,9 @@ async function loadIndexStats() {
     
     const sb = (window.getSupabaseClient && typeof window.getSupabaseClient === 'function')
       ? window.getSupabaseClient()
-      : null;
+      : (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON
+          ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON)
+          : null);
 
     if (!sb) {
       // Retry after 500ms (wait for supabase2.js)
@@ -2426,6 +2434,10 @@ async function loadIndexStats() {
       sb.from('users').select('id, role, points, school'),
       sb.from('teen_reports').select('id', { count: 'exact', head: true })
     ]);
+
+    if (usersRes && usersRes.error) console.warn('Index stats users error:', usersRes.error);
+    if (reportsRes && reportsRes.error) console.warn('Index stats reports error:', reportsRes.error);
+
     const users = usersRes.data || [];
     const reportsCount = reportsRes.count || 0;
     const totalPts = users.reduce((a, u) => a + (u.points || 0), 0);

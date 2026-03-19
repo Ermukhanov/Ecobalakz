@@ -1336,16 +1336,9 @@ async function loadGameStats() {
 
     // Wins: try teen_quest_reviews or kids_games, fallback to estimate
     let wins = 0;
-    try {
-      const { count } = await sb
-        .from('kids_games')
-        .select('id', { count: 'exact', head: true })
-        .eq('winner_id', cu.id);
-      wins = count || 0;
-    } catch(e) {
-      // No kids_games table yet - estimate ~35% win rate
-      wins = played > 0 ? Math.floor(played * 0.35) : 0;
-    }
+    // NOTE: kids_games is a content table (admin adds games) and doesn't contain winner_id.
+    // Estimate wins locally (~35% win rate) to avoid invalid REST filters (400 errors).
+    wins = played > 0 ? Math.floor(played * 0.35) : 0;
 
     const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
     setEl('gameStatPlayed', played);

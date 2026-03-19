@@ -1142,6 +1142,10 @@ function selectAvatar(e) {
 }
 async function saveProfile() {
   const name = document.getElementById('editName').value.trim();
+  if (name && typeof _enforceNoProfanitySb === 'function') {
+    try { _enforceNoProfanitySb([name]); }
+    catch (e) { alert((e && e.message) ? e.message : profanityMsg(lang)); return; }
+  }
   if (name && containsProfanity(name)) {
     alert(profanityMsg(lang));
     return;
@@ -1281,6 +1285,10 @@ function sendChat() {
   const input = document.getElementById('chatInput');
   const txt = input.value.trim();
   if(!txt) return;
+  if (typeof _enforceNoProfanitySb === 'function') {
+    try { _enforceNoProfanitySb([txt]); }
+    catch (e) { addMsg(chatProfanityMsg(lang), 'bot'); input.value=''; return; }
+  }
   if(containsProfanity(txt)){addMsg(chatProfanityMsg(lang),'bot');input.value='';return;}
   addMsg(txt,'user');
   input.value = '';

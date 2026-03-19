@@ -872,7 +872,8 @@ function renderRecentQuests(){
 
 // MY REPORTS
 function renderMyReports(){
-  document.getElementById('myReportsList').innerHTML = myReports.map(r=>`
+  const list = window._myReports || [];
+  document.getElementById('myReportsList').innerHTML = list.map(r=>`
     <div class="report-list-item">
       <div class="rli-icon">${r.icon}</div>
       <div style="flex:1;">
@@ -1357,31 +1358,24 @@ async function loadReportsFromDB() {
   try {
     if (!cu) return;
     const sb = window.getSupabaseClient();
-    const { data } = await sb.from('teen_reports').select('*, quest:teen_quests(title,icon)').eq('user_id', cu.id).order('created_at', { ascending: false });
-    if (!data || !data.length) { renderMyReports(); return; }
+    // Avoid joins here: if FK/relationship is not defined in Supabase, embedded select causes 400.
+    // We already store quest_title/quest_icon in teen_reports during submit.
+    const { data } = await sb
+      .from('teen_reports')
+      .select('id, quest_id, quest_title, quest_icon, description, status, created_at')
+      .eq('user_id', cu.id)
+      .order('created_at', { ascending: false });
 
-    window._myReports = data.map(r => ({
+    window._myReports = (data || []).map(r => ({
       id: r.id,
-      quest: r.quest ? (typeof r.quest.title === 'object' ? r.quest.title[lang]||r.quest.title.ru : r.quest.title) : 'Квест',
-      icon: r.quest?.icon || '📋',
+      quest: r.quest_title || 'Квест',
+      icon: r.quest_icon || '📋',
       desc: r.description || '',
-      date: new Date(r.created_at).toLocaleDateString('ru'),
+      date: r.created_at ? new Date(r.created_at).toLocaleDateString('ru') : '',
       status: r.status || 'pending'
     }));
 
-    const el = document.getElementById('myReportsList');
-    el.innerHTML = window._myReports.map(r => `
-      <div class="report-list-item">
-        <div class="rli-icon">${r.icon}</div>
-        <div style="flex:1;">
-          <div class="rli-quest">${r.quest}</div>
-          <div class="rli-desc">${r.desc.substring(0,60)}${r.desc.length>60?'…':''}</div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">📅 ${r.date}</div>
-        </div>
-        <div class="rli-status">
-          <span class="status-pill sp-${r.status}">${{pending:lang==='ru'?'На проверке':'Тексерілуде',approved:lang==='ru'?'Принят':'Қабылданды',rejected:lang==='ru'?'Отклонён':'Қабылданбады'}[r.status]||r.status}</span>
-        </div>
-      </div>`).join('');
+    renderMyReports();
 
     // Счётчик отчётов
     const statNums = document.querySelectorAll('.stat-num');

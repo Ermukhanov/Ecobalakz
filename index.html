@@ -2191,14 +2191,15 @@ function renderVideoCarousel() {
     const title = typeof v.title === 'object' ? (v.title[lang] || v.title.ru) : v.title;
     const ytId = (v && v.ytId) ? String(v.ytId).trim() : '';
     const ytValid = /^[a-zA-Z0-9_-]{11}$/.test(ytId);
-    const thumb = v.imageUrl || (ytValid ? `https://img.youtube.com/vi/${ytId}/mqdefault.jpg` : '');
+    const ytThumbOk = !window.__ytThumbFail;
+    const thumb = v.imageUrl || (ytValid && ytThumbOk ? `https://i.ytimg.com/vi/${ytId}/mqdefault.jpg` : '');
     const click = ytValid
       ? `openVideoModal('${ytId}')`
       : (v.imageUrl ? `window.open('${v.imageUrl}','_blank')` : '');
     return `
       <div class="video-card">
         <div class="video-thumb" onclick="${click}">
-          ${thumb ? `<img src="${thumb}" alt="${title}" loading="lazy">` : `<div style="height:100%;width:100%;background:linear-gradient(135deg,#E8F5E9,#C8E6C9);"></div>`}
+          ${thumb ? `<img src="${thumb}" alt="${title}" loading="lazy" onerror="window.__ytThumbFail=1;if(!this.dataset.fbk){this.dataset.fbk='1';this.src='https://i.ytimg.com/vi/${ytId}/hqdefault.jpg';}else{this.onerror=null;this.remove();}">` : `<div style="height:100%;width:100%;background:linear-gradient(135deg,#E8F5E9,#C8E6C9);"></div>`}
           ${ytValid ? `
           <div class="video-play-btn">
             <div class="video-play-circle">

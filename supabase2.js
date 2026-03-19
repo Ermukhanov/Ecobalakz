@@ -4,6 +4,39 @@
 const SUPABASE_URL  = 'https://zngfwsuaaygryzpmynuv.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZ2Z3c3VhYXlncnl6cG15bnV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjA1NDksImV4cCI6MjA4ODUzNjU0OX0.M8Xx4DxYzWVN94ChFM5LDWrUdEi1jv1kk2JopcfpfrA';
 
+const _PF_EXTRA_SB = [
+    // RU roots
+    'бля', 'бляд', 'блять', 'пизд', 'пизда', 'пиздец', 'хуй', 'хуё', 'хуе', 'хуя', 'хуйн', 'еба', 'ёба', 'ебл', 'ебан', 'сука', 'суч', 'мраз', 'гандон',
+    // KZ / RU-KZ common
+    'шлюха', 'простит', 'твар',
+    // KZ roots (common obscene)
+    'сик', 'сік', 'сикир', 'секс', 'боқ', 'бок', 'шошқа', 'шошка'
+];
+
+function _normProfanitySb(t) {
+    if (t == null) return '';
+    var s = String(t).toLowerCase();
+    // map common latin lookalikes -> cyrillic to reduce bypasses
+    s = s
+      .replace(/a/g, 'а')
+      .replace(/b/g, 'в')
+      .replace(/c/g, 'с')
+      .replace(/e/g, 'е')
+      .replace(/k/g, 'к')
+      .replace(/m/g, 'м')
+      .replace(/h/g, 'н')
+      .replace(/o/g, 'о')
+      .replace(/p/g, 'р')
+      .replace(/t/g, 'т')
+      .replace(/x/g, 'х')
+      .replace(/y/g, 'у');
+    // keep only letters/digits
+    s = s.replace(/[^0-9\p{L}]+/gu, '');
+    // leetspeak digits
+    s = s.replace(/0/g, 'о').replace(/3/g, 'з').replace(/4/g, 'а').replace(/6/g, 'б').replace(/8/g, 'в');
+    return s;
+}
+
 const _PF_SB = (function(){
     try {
         return atob('0YXRg9C5LNGF0YPRjyzRhdGD0Y4s0YXRg9GP0Lws0YXRg9GP0LzQuCzRhdGD0LXQsizRhdGD0LnQvdGPLNGF0YPQudC90Y4s0L/QuNC30LTQsCzQv9C40LfQtNGLLNC/0LjQt9C00LXRhizQv9C40LfQtNCw0YIs0L/QuNC30LTQsNC90YPQuyzQv9C40LfQtNCw0L3Rg9GCLNC10LHQsNGC0Yws0LXQsdCw0Lss0LXQsdCw0LvQuCzQtdCx0LDQvdGL0Lks0LXQsdCw0L3Rg9GCLNC10LHQsNC90LDRjyzQtdCx0LDQvdGM0LrQvizRgdGD0LrQsCzRgdGD0LrQuCzRgdGD0LrQsNC8LNGB0YPQutC1LNGB0YPRh9C60LAs0YHRg9GH0LDRgCzQsdC70Y/RgtGMLNCx0LvRj9C00Yws0LHQu9GP0LTQtdC5LNCx0LvRj9C00LjQvSzQsdC70Y/QtNGB0Los0LHQu9GP0LTQuNC90LAs0LHQu9GP0LTRgdGC0LLQvizQvNGD0LTQsNC6LNC80YPQtNCw0LrQuCzQvNGD0LTQsNC60LDQvCzQvNGD0LTQuNC70LAs0LzRg9C00LjQuyzQt9Cw0LvRg9C/0LAs0LfQsNC70YPQv9C40L0s0ZHQsdCw0L0s0ZHQsdCw0L3Ri9C5LNGR0LEs0ZHQsdC90YPRgizRkdCx0L3Rg9C7LNGR0LHQvdGD0YLRjCzQv9C40LfQtNC10YLRjCzQv9C40LfQtNC40YIs0L/QuNC30LTQsNCx0L7QuyzQv9C40LfQtNCw0L3Rg9GC0Yws0YjQu9GO0YXQsCzRiNC70Y7RhdC4LNGI0LvRjtGF0LDQvCzQvNGA0LDQt9GMLNC80YDQsNC30Lgs0YPQtdCx0LDQvSzRg9GR0LHQsNC9LNGD0ZHQsSzQv9C40LfQtNGO0Los0L/QuNC30LfRjtC60Lgs0LPQsNC90LTQvtC9LNCz0LDQvdC00L7QvdGLLNC90LDRhdGD0Lks0L/QvtGF0YPQuSzQvdCw0YXQtdGALGFzcyxmdWNrLHNoaXQsYml0Y2gsY29jayxkaWNrLHB1c3N5LGN1bnQsbmlnZ2VyLGZhZ2dvdCzRgdC40LrQsNC6LNGB0LjQutGW0L0s0YHQuNC60Lgs0YHQuNC60LBxLNCx0L7SmyzQsdC+0LrRgtGLLNGI0LXRiNGW0qMs0YjQtdGI0LXSo9C00ZYs0YjQtdGI0LXSo9C90ZbSoyzQsdCw0LnSk9GL0Lcs0LHQsNC50pPRi9C30YvQvSzQuNGC0ZbSoyzQuNGC0YHRltKjLNC40YLRgtC10Lks0LjRgtC/0ZbQvSzQtdGB0LXQuizQtdGB0LXQs9GW0qMs0LXRgdC10LrRgdGW0qMs0L/Ri9GB0YvSmyzQv9GL0YjRi9C6LNC/0LXQt9C00LXRgizQv9GW0LfQtNC10YIs0LbQtdGB0ZbRgCzQttC10YHRltGA0LTQtdC5LNGB0LLQvtC70L7Rh9GMLNGD0LHQu9GO0LTQvtC6LNGD0LHQu9GO0LTQutC4LNC70L7RiNCw0Lo=').split(',');
@@ -14,9 +47,13 @@ const _PF_SB = (function(){
 
 function _containsProfanitySb(t) {
     if (!t) return false;
-    const l = String(t).toLowerCase().replace(/[\s\-\.]+/g, '');
-    return _PF_SB.some(function(w){
-        return l.includes(String(w).toLowerCase().replace(/[\s\-\.]+/g, ''));
+    const l = _normProfanitySb(t);
+    if (!l) return false;
+    if (_PF_SB.some(function(w){
+        return l.includes(_normProfanitySb(w));
+    })) return true;
+    return _PF_EXTRA_SB.some(function(w){
+        return l.includes(_normProfanitySb(w));
     });
 }
 

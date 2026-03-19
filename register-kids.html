@@ -287,6 +287,17 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
   if (submitting) return;
   const t = T[lang];
   const fd = new FormData(this);
+  const parentName = String(fd.get('parent_name') || '').trim();
+  const childName = String(fd.get('child_name') || '').trim();
+  const childSurname = String(fd.get('child_surname') || '').trim();
+  const nickname = String(fd.get('nickname') || '').trim();
+  if ((parentName && containsProfanity(parentName)) ||
+      (childName && containsProfanity(childName)) ||
+      (childSurname && containsProfanity(childSurname)) ||
+      (nickname && containsProfanity(nickname))) {
+    se(profanityMsg(lang));
+    return;
+  }
   const pass = fd.get('password'), pass2 = fd.get('confirm_password');
   if (pass !== pass2) { se(t.errPw); return; }
   if (!fd.get('consent')) { se(t.errConsent); return; }

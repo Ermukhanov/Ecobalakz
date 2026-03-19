@@ -4,6 +4,12 @@
 const SUPABASE_URL  = 'https://zngfwsuaaygryzpmynuv.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZ2Z3c3VhYXlncnl6cG15bnV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjA1NDksImV4cCI6MjA4ODUzNjU0OX0.M8Xx4DxYzWVN94ChFM5LDWrUdEi1jv1kk2JopcfpfrA';
 
+// Expose for pages that create their own client (index.html carousel/stats)
+try {
+    window.SUPABASE_URL = SUPABASE_URL;
+    window.SUPABASE_ANON = SUPABASE_ANON;
+} catch(e) {}
+
 const _PF_EXTRA_SB = [
     // RU roots
     'бля', 'бляд', 'блять', 'пизд', 'пизда', 'пиздец', 'хуй', 'хуё', 'хуе', 'хуя', 'хуйн', 'еба', 'ёба', 'ебл', 'ебан', 'сука', 'суч', 'мраз', 'гандон',

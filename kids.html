@@ -1099,13 +1099,17 @@ const suggestions = {
   kz:['Экология дегеніміз не?','Суды қалай үнемдейді?','Ағаш неліктен маңызды?','Деңгейлер туралы','Ұпай қалай алуға болады?']
 };
 
-function setLang(l) {
-  lang = l;
+function setLang(l){
+  lang=l;
   localStorage.setItem('selectedLanguage', l);
   document.querySelectorAll('.lang-sm').forEach(b => b.classList.toggle('active', (b.getAttribute('onclick')||'').includes(`'${l}'`)));
   document.querySelectorAll('[data-ru]').forEach(el => el.style.display = l==='ru' ? '' : 'none');
   document.querySelectorAll('[data-kz]').forEach(el => el.style.display = l==='kz' ? '' : 'none');
-  renderLessons(); loadRatingFromDB && loadRatingFromDB(); renderSuggestions();
+  renderLessons();
+  if (typeof renderBadgesFromDB === 'function' && cu) { renderBadgesFromDB(cu.badges || []); }
+  renderAchievements();
+  loadRatingFromDB && loadRatingFromDB();
+  renderSuggestions();
   document.getElementById('chatInput').placeholder = l==='ru' ? 'Спроси хомяка...' : 'Хомяктан сұра...';
 }
 

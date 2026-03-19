@@ -2413,12 +2413,15 @@ async function loadIndexStats() {
   try {
     // Supabase configured in supabase2.js
     
-    if (!window.supabase) {
-      // Retry after 500ms
+    const sb = (window.getSupabaseClient && typeof window.getSupabaseClient === 'function')
+      ? window.getSupabaseClient()
+      : null;
+
+    if (!sb) {
+      // Retry after 500ms (wait for supabase2.js)
       setTimeout(loadIndexStats, 500);
       return;
     }
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
     const [usersRes, reportsRes] = await Promise.all([
       sb.from('users').select('id, role, points, school'),
       sb.from('teen_reports').select('id', { count: 'exact', head: true })

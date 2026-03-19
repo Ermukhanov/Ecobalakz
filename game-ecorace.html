@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>EcoBala — EcoGame</title>
+<link rel="icon" href="iconca.jpg" type="image/jpeg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Unbounded:wght@700;900&family=Noto+Sans:wght@400;700;800&display=swap&subset=cyrillic,cyrillic-ext" rel="stylesheet">
+<style>
+*, body { font-family: 'Nunito', 'Noto Sans', sans-serif; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --g:#2E7D32;--gd:#1B5E20;--gm:#43A047;--gl:#C8E6C9;--gp:#E8F5E9;
+  --bg: #0a1a0a;
+}
+html,body { height:100%; overflow:hidden; background:var(--bg); }
+
+.screen { display:none; position:fixed; inset:0; flex-direction:column; align-items:center; justify-content:center; padding:16px; }
+.screen.active { display:flex; }
+
+/* ── SETUP ── */
+#setupScreen { background: linear-gradient(160deg,#0a1a0a,#1a3a1a); }
+.setup-wrap { width:100%;max-width:700px; }
+.sg-logo { text-align:center;margin-bottom:28px; }
+.sg-logo-emoji { font-size:56px;margin-bottom:8px; }
+.sg-logo-title { font-family:'Unbounded','Noto Sans',sans-serif;font-size:clamp(22px,4vw,36px);font-weight:900;color:#fff;text-shadow:0 0 30px rgba(105,240,174,0.4); }
+.sg-logo-sub { font-size:14px;color:rgba(255,255,255,0.55);margin-top:6px;font-weight:600; }
+
+.sg-steps { display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px; }
+@media(max-width:500px){.sg-steps{grid-template-columns:1fr;}}
+.sg-step { background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);border-radius:16px;padding:16px; }
+.sg-step-num { font-size:11px;font-weight:800;color:rgba(105,240,174,0.7);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px; }
+.sg-step-text { font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6; }
+
+.sg-players-label { font-size:12px;font-weight:800;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px; }
+.sg-players-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px; }
+@media(max-width:500px){.sg-players-grid{grid-template-columns:1fr;}}
+.sg-player-row { display:flex;align-items:center;gap:8px; }
+.sg-player-avatar { font-size:22px;width:36px;text-align:center; }
+.sg-player-input { flex:1;padding:10px 12px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.07);color:#fff;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;outline:none; }
+.sg-player-input::placeholder { color:rgba(255,255,255,0.3); }
+.sg-player-input:focus { border-color:rgba(105,240,174,0.5);background:rgba(255,255,255,0.1); }
+
+.sg-track-label { font-size:12px;font-weight:800;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px; }
+.sg-track-btns { display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap; }
+.sg-track-btn { padding:8px 18px;border-radius:50px;border:1.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.6);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all .2s; }
+.sg-track-btn.on { background:rgba(105,240,174,0.2);border-color:rgba(105,240,174,0.5);color:#fff; }
+
+.sg-lang-row { display:flex;gap:8px;margin-bottom:22px; }
+.sg-lang-btn { flex:1;padding:10px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.6);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all .2s; }
+.sg-lang-btn.on { background:rgba(105,240,174,0.2);border-color:rgba(105,240,174,0.5);color:#fff; }
+
+.sg-start-btn { width:100%;padding:16px;border-radius:50px;border:none;background:linear-gradient(135deg,#2E7D32,#43A047);color:#fff;font-family:'Unbounded','Noto Sans',sans-serif;font-size:16px;font-weight:900;cursor:pointer;transition:all .2s;box-shadow:0 8px 30px rgba(46,125,50,0.4); }
+.sg-start-btn:hover { transform:translateY(-2px); }
+
+/* ── GAME SCREEN ── */
+#gameScreen { background:var(--bg); justify-content:flex-start; overflow-y:auto; }
+.game-wrap { width:100%;max-width:1100px;padding:12px 0;flex-shrink:0; }
+
+.game-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px; }
+.game-title-badge { display:flex;align-items:center;gap:8px; }
+.game-title { font-family:'Unbounded','Noto Sans',sans-serif;font-size:15px;font-weight:900;color:#fff; }
+.game-round-info { font-size:12px;font-weight:700;color:rgba(255,255,255,0.5); }
+.game-exit { background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;color:rgba(255,255,255,0.6);cursor:pointer; }
+
+/* Players bar */
+.players-bar { display:flex;gap:10px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px; }
+.player-chip {
+  display:flex;align-items:center;gap:6px;padding:8px 14px;
+  background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);
+  border-radius:50px;white-space:nowrap;transition:all .2s;flex-shrink:0;
+}
+.player-chip.active-player { border-color:rgba(105,240,174,0.6);background:rgba(105,240,174,0.12);box-shadow:0 0 16px rgba(105,240,174,0.2); }
+.player-chip.finished { border-color:rgba(255,215,64,0.5);background:rgba(255,215,64,0.1); }
+.pc-avatar { font-size:18px; }
+.pc-name { font-size:13px;font-weight:800;color:#fff; }
+.pc-pos { font-size:11px;color:rgba(255,255,255,0.5);font-weight:700; }
+.pc-penalty { font-size:10px;color:#FF6E6E;font-weight:800; }
+
+/* Track */
+.track-scroll { overflow-x:auto;margin-bottom:16px;padding-bottom:8px; }
+.track-inner { display:flex;align-items:center;gap:0;min-width:max-content;padding:12px 0; }
+
+.track-cell {
+  width:62px;height:62px;border-radius:12px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;font-size:22px;transition:all .3s;
+}
+.track-cell.normal { background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1); }
+.track-cell.bonus  { background:rgba(105,240,174,0.15);border:1.5px solid rgba(105,240,174,0.3); }
+.track-cell.penalty{ background:rgba(255,82,82,0.12);border:1.5px solid rgba(255,82,82,0.25); }
+.track-cell.finish { background:rgba(255,215,64,0.2);border:2px solid rgba(255,215,64,0.5);animation:finish-pulse 1.5s infinite; }
+.track-cell.start  { background:rgba(105,240,174,0.2);border:2px solid rgba(105,240,174,0.4); }
+@keyframes finish-pulse{0%,100%{box-shadow:0 0 10px rgba(255,215,64,0.3)}50%{box-shadow:0 0 22px rgba(255,215,64,0.6)}}
+
+.track-connector { width:16px;height:3px;background:rgba(255,255,255,0.12);flex-shrink:0; }
+.track-connector.done { background:rgba(105,240,174,0.4); }
+
+/* Player tokens on track */
+.player-tokens { position:absolute;bottom:2px;left:0;right:0;display:flex;justify-content:center;gap:2px;flex-wrap:wrap; }
+.p-token { font-size:14px;line-height:1;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5)); }
+.p-token.ahead { animation:token-bounce .6s ease-in-out; }
+@keyframes token-bounce { 0%,100%{transform:translateY(0)} 40%{transform:translateY(-8px)} }
+
+/* Question panel */
+.q-panel {
+  background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.12);
+  border-radius:20px;padding:22px;
+}
+.q-panel-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px; }
+.q-panel-who { display:flex;align-items:center;gap:8px; }
+.q-panel-avatar { font-size:22px; }
+.q-panel-name { font-size:14px;font-weight:800;color:#fff; }
+.q-panel-type { font-size:11px;font-weight:800;border-radius:50px;padding:3px 10px; }
+.q-panel-type.main  { background:rgba(105,240,174,0.15);color:#69F0AE; }
+.q-panel-type.penalty { background:rgba(255,82,82,0.15);color:#FF6E6E; }
+
+.q-timer-bar { height:5px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;margin-bottom:14px; }
+.q-timer-fill { height:100%;background:linear-gradient(90deg,#69F0AE,#40C4FF);border-radius:3px;transition:width 1s linear; }
+.q-timer-fill.urgent { background:linear-gradient(90deg,#FF5252,#FF8A80); }
+
+.q-text { font-size:clamp(15px,2.5vw,20px);font-weight:800;color:#fff;line-height:1.45;margin-bottom:16px; }
+.q-emoji-big { font-size:36px;margin-bottom:10px; }
+
+.q-opts-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
+@media(max-width:480px){.q-opts-grid{grid-template-columns:1fr;}}
+.qo {
+  padding:13px 14px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.05);color:#fff;
+  font-family:'Nunito','Noto Sans',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:8px;text-align:left;
+}
+.qo:hover { border-color:rgba(105,240,174,0.4);background:rgba(105,240,174,0.08); }
+.qo.correct { border-color:#69F0AE;background:rgba(105,240,174,0.15);animation:pop .4s; }
+.qo.wrong   { border-color:#FF5252;background:rgba(255,82,82,0.12); }
+.qo-letter  { width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0; }
+.qo.correct .qo-letter { background:#69F0AE;color:#0a1a0a; }
+.qo.wrong   .qo-letter { background:#FF5252;color:#fff; }
+@keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+
+.q-feedback { text-align:center;margin:12px 0;font-size:14px;font-weight:800;min-height:20px; }
+.q-feedback.good { color:#69F0AE; }
+.q-feedback.bad  { color:#FF6E6E; }
+
+.q-next-row { text-align:center;margin-top:10px; }
+.q-next-btn2 { padding:12px 32px;border-radius:50px;border:none;background:linear-gradient(135deg,#2E7D32,#43A047);color:#fff;font-family:'Unbounded','Noto Sans',sans-serif;font-size:14px;font-weight:900;cursor:pointer;transition:all .2s;display:none; }
+
+/* ── RESULTS SCREEN ── */
+#resultsScreen { background:linear-gradient(160deg,#0a1a0a,#1a3a1a); }
+.results-wrap { text-align:center;width:100%;max-width:600px; }
+.results-trophy { font-size:72px;margin-bottom:14px;animation:trophy-b 1.2s ease-in-out infinite alternate; }
+@keyframes trophy-b{from{transform:translateY(0)}to{transform:translateY(-10px)}}
+.results-title { font-family:'Unbounded','Noto Sans',sans-serif;font-size:clamp(22px,4vw,36px);font-weight:900;color:#69F0AE;margin-bottom:6px; }
+.results-sub { font-size:14px;color:rgba(255,255,255,0.55);margin-bottom:28px;font-weight:600; }
+.results-list { display:flex;flex-direction:column;gap:10px;margin-bottom:28px; }
+.result-row {
+  display:flex;align-items:center;gap:12px;padding:14px 18px;
+  background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);
+  border-radius:14px;
+}
+.result-row.r1 { border-color:rgba(255,215,64,0.4);background:rgba(255,215,64,0.08); }
+.result-row.r2 { border-color:rgba(192,192,192,0.3); }
+.result-row.r3 { border-color:rgba(161,136,127,0.3); }
+.rr-medal { font-size:24px; }
+.rr-avatar { font-size:24px; }
+.rr-name { flex:1;font-size:15px;font-weight:800;color:#fff;text-align:left; }
+.rr-steps { font-size:13px;color:rgba(255,255,255,0.5);font-weight:700; }
+.rr-badge { font-size:11px;font-weight:800;padding:3px 10px;border-radius:50px;background:rgba(105,240,174,0.15);color:#69F0AE; }
+.results-play-again { padding:14px 36px;border-radius:50px;border:none;background:linear-gradient(135deg,#2E7D32,#43A047);color:#fff;font-family:'Unbounded','Noto Sans',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:all .2s;box-shadow:0 8px 30px rgba(46,125,50,0.4); }
+.confetti-piece{position:fixed;width:10px;height:10px;border-radius:2px;animation:confetti-fall linear forwards;pointer-events:none;z-index:9999;}
+@keyframes confetti-fall{0%{transform:translateY(-100px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div class="screen active" id="setupScreen">
+  <div class="setup-wrap">
+    <div class="sg-logo">
+      <div class="sg-logo-emoji">🌿</div>
+      <div class="sg-logo-title">EcoGame</div>
+      <div class="sg-logo-sub" id="sgSub">Гонка по эко-карте</div>
+    </div>
+
+    <div class="sg-lang-row">
+      <button class="sg-lang-btn on" data-l="ru" onclick="setLang('ru')">🇷🇺 Русский</button>
+      <button class="sg-lang-btn" data-l="kz" onclick="setLang('kz')">🇰🇿 Қазақша</button>
+    </div>
+
+    <div class="sg-steps" id="sgSteps">
+      <div class="sg-step"><div class="sg-step-num">Шаг 1</div><div class="sg-step-text">Отвечай на вопрос об экологии</div></div>
+      <div class="sg-step"><div class="sg-step-num">Шаг 2</div><div class="sg-step-text">Правильно → продвигаешься по карте</div></div>
+      <div class="sg-step"><div class="sg-step-num">Штраф</div><div class="sg-step-text">Ошибка → штрафной вопрос. Ответь — иди дальше</div></div>
+      <div class="sg-step"><div class="sg-step-num">Финиш</div><div class="sg-step-text">Первым дойди до 🏆 — стань Эко-чемпионом!</div></div>
+    </div>
+
+    <div class="sg-players-label" id="sgPlayersLabel">Игроки (до 6 человек)</div>
+    <div class="sg-players-grid" id="sgPlayersGrid"></div>
+
+    <div class="sg-track-label" id="sgTrackLabel">Длина трассы</div>
+    <div class="sg-track-btns">
+      <button class="sg-track-btn" onclick="setTrackLen(10)" data-len="10">10</button>
+      <button class="sg-track-btn on" onclick="setTrackLen(12)" data-len="12">12</button>
+      <button class="sg-track-btn" onclick="setTrackLen(15)" data-len="15">15</button>
+    </div>
+
+    <button class="sg-start-btn" onclick="startGame()" id="sgStartBtn">🌿 Начать гонку</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="gameScreen">
+  <div class="game-wrap">
+    <div class="game-header">
+      <div class="game-title-badge">
+        <span style="font-size:20px;">🌿</span>
+        <span class="game-title">EcoGame</span>
+      </div>
+      <div class="game-round-info" id="gRoundInfo">Ход 1</div>
+      <button class="game-exit" onclick="showSetup()">✕</button>
+    </div>
+
+    <div class="players-bar" id="playersBar"></div>
+
+    <div class="track-scroll">
+      <div class="track-inner" id="trackInner"></div>
+    </div>
+
+    <div class="q-panel">
+      <div class="q-panel-header">
+        <div class="q-panel-who">
+          <span class="q-panel-avatar" id="qWhoAvatar">🌿</span>
+          <span class="q-panel-name" id="qWhoName">Игрок</span>
+        </div>
+        <span class="q-panel-type main" id="qTypeLabel">Основной вопрос</span>
+      </div>
+      <div class="q-timer-bar"><div class="q-timer-fill" id="qTimerFill" style="width:100%"></div></div>
+      <div class="q-emoji-big" id="qEmojiG">🌿</div>
+      <div class="q-text" id="qTextG">Загрузка...</div>
+      <div class="q-opts-grid" id="qOptsG"></div>
+      <div class="q-feedback" id="qFeedback"></div>
+      <div class="q-next-row"><button class="q-next-btn2" id="qNextBtn2" onclick="nextTurn()"><span id="qNextText2">Следующий ход →</span></button></div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="resultsScreen">
+  <div class="results-wrap">
+    <div class="results-trophy">🏆</div>
+    <div class="results-title" id="rTitle">Эко-чемпион!</div>
+    <div class="results-sub" id="rSub">Гонка завершена</div>
+    <div class="results-list" id="resultsList"></div>
+    <button class="results-play-again" onclick="showSetup()" id="rPlayAgain">🔄 Играть снова</button>
+  </div>
+</div>
+
+<script>
+// ── TRANSLATIONS ─────────────────────────────────────────────────────────────
+const L = {
+  ru:{sub:'Гонка по эко-карте',steps:['Шаг 1','Шаг 2','Штраф','Финиш'],stepsText:['Отвечай на вопрос об экологии','Правильно → продвигаешься по карте','Ошибка → штрафной вопрос. Ответь — иди дальше','Первым дойди до 🏆 — стань Эко-чемпионом!'],playersLabel:'Игроки (до 6 человек)',trackLabel:'Длина трассы',startBtn:'🌿 Начать гонку',turnInfo:'Ход {n}',mainQ:'Основной вопрос',penaltyQ:'Штрафной вопрос',correct:'Правильно! Идёшь вперёд 🎉',correctBonus:'Бонус! +2 шага 🌟',wrong:'Неверно. Штрафной вопрос...',wrongStay:'Остаёшься на месте',penaltyPass:'Штраф пройден! Идёшь дальше',penaltyFail:'Остаёшься на месте',nextTurn:'Следующий ход →',champion:'Эко-чемпион!',raceOver:'Гонка завершена',playAgain:'🔄 Играть снова',finishedBadge:'Финишировал',medals:['🥇','🥈','🥉','4','5','6'],defaultNames:['Игрок 1','Игрок 2','Игрок 3','Игрок 4'],exit:'✕'},
+  kz:{sub:'Экологиялық картамен жарыс',steps:['Қадам 1','Қадам 2','Айыппұл','Финиш'],stepsText:['Экология туралы сұраққа жауап бер','Дұрыс → картамен алға жылжисың','Қате → айыппұл сұрағы. Жауап бер — алға жүр','Бірінші жет 🏆 — Эко-чемпион бол!'],playersLabel:'Ойыншылар (6-ға дейін)',trackLabel:'Трасса ұзындығы',startBtn:'🌿 Жарысты бастау',turnInfo:'{n}-ші ойын',mainQ:'Негізгі сұрақ',penaltyQ:'Айыппұл сұрағы',correct:'Дұрыс! Алға жылжисың 🎉',correctBonus:'Бонус! +2 қадам 🌟',wrong:'Қате. Айыппұл сұрағы...',wrongStay:'Орнында қаласың',penaltyPass:'Айыппұл өтті! Алға жүр',penaltyFail:'Орнында қаласың',nextTurn:'Келесі ойын →',champion:'Эко-чемпион!',raceOver:'Жарыс аяқталды',playAgain:'🔄 Қайта ойнау',finishedBadge:'Финишке жетті',medals:['🥇','🥈','🥉','4','5','6'],defaultNames:['1-ойыншы','2-ойыншы','3-ойыншы','4-ойыншы'],exit:'✕'}
+};
+
+// ── QUESTIONS ────────────────────────────────────────────────────────────────
+const QQ = {
+  ru:[
+    {e:'💧',q:'Что загрязняет воду больше всего?',opts:['Дождь','Заводы и пластик','Рыбы','Деревья'],c:1},
+    {e:'🌱',q:'Что нужно растению для роста?',opts:['Темнота','Свет, вода, почва','Только вода','Только воздух'],c:1},
+    {e:'♻️',q:'Какой мусор можно переработать?',opts:['Пластик и бумага','Еда','Всё что угодно','Ядерные отходы'],c:0},
+    {e:'🌍',q:'Сколько % Земли покрыто лесами?',opts:['10%','31%','60%','80%'],c:1},
+    {e:'🐝',q:'Что делают пчёлы для экосистемы?',opts:['Едят растения','Опыляют цветы','Загрязняют воздух','Добывают нефть'],c:1},
+    {e:'☀️',q:'Солнечная энергия — это...',opts:['Вредная','Возобновляемая','Ядерная','Уголь'],c:1},
+    {e:'🌊',q:'Откуда берётся кислотный дождь?',opts:['Из гор','Из выбросов заводов','Из рек','Из океана'],c:1},
+    {e:'🗑️',q:'Куда нельзя выбрасывать батарейки?',opts:['В специальный ящик','В обычный мусор','На завод','В лес никогда'],c:1},
+    {e:'🦁',q:'Что такое "красная книга"?',opts:['Список лучших животных','Список исчезающих видов','Список вредных растений','Рецепты блюд'],c:1},
+    {e:'💡',q:'LED-лампа потребляет энергии...',opts:['В 10 раз больше','В 10 раз меньше','Столько же','Не потребляет вообще'],c:1},
+    {e:'🌿',q:'Что такое биоразнообразие?',opts:['Разные виды животных и растений','Разные виды пластика','Много цветов','Виды почвы'],c:0},
+    {e:'🚗',q:'Что выбрасывают машины?',opts:['Кислород','CO₂ и угарный газ','Воду','Азот'],c:1},
+    {e:'🌡️',q:'Из-за чего повышается температура Земли?',opts:['Из-за ветра','Парниковый эффект','Из-за дождя','Из-за Луны'],c:1},
+    {e:'🐋',q:'Почему киты важны для океана?',opts:['Вкусные','Регулируют экосистему','Красивые','Плавают'],c:1},
+    {e:'🌲',q:'Сколько деревьев вырубают в год?',opts:['1 тысяча','15 миллиардов','100 штук','50 тысяч'],c:1},
+    {e:'💦',q:'Что сберегает воду лучше всего?',opts:['Длинный душ','Короткий душ и кран выключен','Ванна','Всё равно'],c:1},
+  ],
+  kz:[
+    {e:'💧',q:'Суды ең көп ластайтын нәрсе?',opts:['Жаңбыр','Зауыттар мен пластик','Балықтар','Ағаштар'],c:1},
+    {e:'🌱',q:'Өсімдікке өсу үшін не керек?',opts:['Қараңғылық','Жарық, су, топырақ','Тек су','Тек ауа'],c:1},
+    {e:'♻️',q:'Қандай қоқысты қайта өңдеуге болады?',opts:['Пластик пен қағаз','Тамақ','Кез келген нәрсе','Ядролық қалдықтар'],c:0},
+    {e:'🌍',q:'Жердің қанша %-ы ормандармен жабылған?',opts:['10%','31%','60%','80%'],c:1},
+    {e:'🐝',q:'Аралар экожүйе үшін не істейді?',opts:['Өсімдіктерді жейді','Гүлдерді тозаңдандырады','Ауаны ластайды','Мұнай алады'],c:1},
+    {e:'☀️',q:'Күн энергиясы — бұл...',opts:['Зиянды','Жаңартылатын','Ядролық','Көмір'],c:1},
+    {e:'🌊',q:'Қышқыл жаңбыр қайдан келеді?',opts:['Таулардан','Зауыт шығарындыларынан','Өзендерден','Мұхиттан'],c:1},
+    {e:'🗑️',q:'Батареяларды қайда тастауға болмайды?',opts:['Арнайы жәшікке','Кәдімгі қоқысқа','Зауытқа','Ормандарға ешқашан'],c:1},
+    {e:'🦁',q:'"Қызыл кітап" деген не?',opts:['Үздік жануарлар тізімі','Жойылып бара жатқан түрлер тізімі','Зиянды өсімдіктер тізімі','Рецептер'],c:1},
+    {e:'💡',q:'LED шам қанша энергия жұмсайды?',opts:['10 есе көп','10 есе аз','Сонша','Жұмсамайды'],c:1},
+    {e:'🌿',q:'Биоалуантүрлілік дегеніміз не?',opts:['Жан-жануарлар мен өсімдіктердің түрлері','Пластик түрлері','Көп гүл','Топырақ түрлері'],c:0},
+    {e:'🚗',q:'Машиналар не шығарады?',opts:['Оттегі','CO₂ және улы газ','Су','Азот'],c:1},
+    {e:'🌡️',q:'Жер температурасы неліктен жоғарылайды?',opts:['Желден','Жылыжай эффектісінен','Жаңбырдан','Айдан'],c:1},
+    {e:'🐋',q:'Киттер мұхит үшін неліктен маңызды?',opts:['Дәмді','Экожүйені реттейді','Сұлу','Жүзеді'],c:1},
+    {e:'🌲',q:'Жылына қанша ағаш кесіледі?',opts:['1 мың','15 миллиард','100 дана','50 мың'],c:1},
+    {e:'💦',q:'Суды ең жақсы қалай үнемдейді?',opts:['Ұзын душ','Қысқа душ және кран жабық','Ванна','Маңызы жоқ'],c:1},
+  ]
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let lang = localStorage.getItem('selectedLanguage') || 'ru';
+let trackLen = 12;
+let players = [], trackCells = [], turnIndex = 0, totalTurns = 0;
+let currentQ = null, isPenalty = false, timerInterval = null, timerVal = 20, answered = false;
+const AVATARS = ['🌿','🌊','🔥','⚡','🌸','🦋'];
+
+function setLang(l) {
+  lang = l; localStorage.setItem('selectedLanguage', l);
+  document.querySelectorAll('.sg-lang-btn').forEach(b => b.classList.toggle('on', b.dataset.l === l));
+  const t = L[l];
+  document.getElementById('sgSub').textContent = t.sub;
+  document.getElementById('sgPlayersLabel').textContent = t.playersLabel;
+  document.getElementById('sgTrackLabel').textContent = t.trackLabel;
+  document.getElementById('sgStartBtn').textContent = t.startBtn;
+  buildPlayersSetup();
+  // Update steps
+  const steps = document.querySelectorAll('.sg-step');
+  steps.forEach((s,i) => {
+    s.querySelector('.sg-step-num').textContent = t.steps[i];
+    s.querySelector('.sg-step-text').textContent = t.stepsText[i];
+  });
+}
+
+function setTrackLen(n) {
+  trackLen = n;
+  document.querySelectorAll('.sg-track-btn').forEach(b => b.classList.toggle('on', parseInt(b.dataset.len) === n));
+}
+
+function buildPlayersSetup() {
+  const t = L[lang];
+  const grid = document.getElementById('sgPlayersGrid');
+  grid.innerHTML = [0,1,2,3].map(i => `
+    <div class="sg-player-row">
+      <span class="sg-player-avatar">${AVATARS[i]}</span>
+      <input class="sg-player-input" id="sp${i}" placeholder="${t.defaultNames[i]}" value="${t.defaultNames[i]}">
+    </div>`).join('');
+}
+
+// ── GAME SETUP ────────────────────────────────────────────────────────────────
+function generateTrack(len) {
+  const cells = [{type:'start',emoji:'🚀'}];
+  const bonusPositions = new Set();
+  const penaltyPositions = new Set();
+  // Place 2-3 bonus and 2-3 penalty cells
+  while (bonusPositions.size < Math.floor(len/5)) bonusPositions.add(Math.floor(Math.random()*(len-2))+1);
+  while (penaltyPositions.size < Math.floor(len/5)) {
+    const p = Math.floor(Math.random()*(len-2))+1;
+    if (!bonusPositions.has(p)) penaltyPositions.add(p);
+  }
+  const bonusEmojis = ['🌟','⭐','✨','💫'];
+  const penaltyEmojis = ['🌪️','❌','⚠️','🚧'];
+  const normalEmojis = ['🌿','🍃','🌱','💧','☀️','♻️','🌍','🦋','🌸','🌊'];
+  for (let i = 1; i < len; i++) {
+    if (bonusPositions.has(i)) cells.push({type:'bonus', emoji:bonusEmojis[Math.floor(Math.random()*bonusEmojis.length)]});
+    else if (penaltyPositions.has(i)) cells.push({type:'penalty', emoji:penaltyEmojis[Math.floor(Math.random()*penaltyEmojis.length)]});
+    else cells.push({type:'normal', emoji:normalEmojis[Math.floor(Math.random()*normalEmojis.length)]});
+  }
+  cells.push({type:'finish', emoji:'🏆'});
+  return cells;
+}
+
+function startGame() {
+  const t = L[lang];
+  players = [0,1,2,3].map(i => ({
+    id: i, avatar: AVATARS[i],
+    name: document.getElementById('sp'+i).value.trim() || t.defaultNames[i],
+    pos: 0, finished: false, finishOrder: -1
+  }));
+  trackCells = generateTrack(trackLen);
+  turnIndex = 0; totalTurns = 0;
+  showScreen('gameScreen');
+  renderTrack();
+  renderPlayersBar();
+  loadNextQuestion();
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function renderTrack() {
+  const inner = document.getElementById('trackInner');
+  inner.innerHTML = trackCells.map((cell, i) => {
+    const tokensHere = players.filter(p => p.pos === i);
+    const isPassed = players.some(p => p.pos > i);
+    return `
+      <div class="track-cell ${cell.type}" title="${cell.type === 'bonus' ? '+2' : cell.type === 'penalty' ? '−1' : ''}">
+        <span>${cell.emoji}</span>
+        ${tokensHere.length ? `<div class="player-tokens">${tokensHere.map(p=>`<span class="p-token" title="${p.name}">${p.avatar}</span>`).join('')}</div>` : ''}
+        <span style="position:absolute;top:2px;left:4px;font-size:8px;color:rgba(255,255,255,0.3);font-weight:700;">${i}</span>
+      </div>
+      ${i < trackCells.length-1 ? `<div class="track-connector${isPassed?' done':''}"></div>` : ''}
+    `;
+  }).join('');
+  // Scroll to show current player
+  const currentPlayer = players[turnIndex % players.length];
+  if (currentPlayer) {
+    const cellWidth = 78; // 62 + 16
+    const scroll = Math.max(0, currentPlayer.pos * cellWidth - 200);
+    document.querySelector('.track-scroll').scrollLeft = scroll;
+  }
+}
+
+function renderPlayersBar() {
+  const bar = document.getElementById('playersBar');
+  bar.innerHTML = players.map((p, i) => {
+    const isActive = (i === turnIndex % players.length) && !checkAllFinished();
+    return `<div class="player-chip ${isActive?'active-player':''} ${p.finished?'finished':''}">
+      <span class="pc-avatar">${p.avatar}</span>
+      <span class="pc-name">${p.name}</span>
+      <span class="pc-pos">${p.pos}/${trackCells.length-1}</span>
+      ${p.finished ? `<span class="pc-penalty">🏁</span>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── QUESTION LOGIC ────────────────────────────────────────────────────────────
+function loadNextQuestion() {
+  const t = L[lang];
+  // Skip finished players
+  let tries = 0;
+  while (players[turnIndex % players.length].finished && tries < players.length) {
+    turnIndex++;
+    tries++;
+  }
+  if (checkAllFinished()) { showResults(); return; }
+
+  const player = players[turnIndex % players.length];
+  currentQ = pickQuestion();
+  isPenalty = false;
+  answered = false;
+  totalTurns++;
+
+  document.getElementById('gRoundInfo').textContent = t.turnInfo.replace('{n}', totalTurns);
+  document.getElementById('qWhoAvatar').textContent = player.avatar;
+  document.getElementById('qWhoName').textContent = player.name;
+  document.getElementById('qTypeLabel').textContent = t.mainQ;
+  document.getElementById('qTypeLabel').className = 'q-panel-type main';
+  document.getElementById('qFeedback').textContent = '';
+  document.getElementById('qNextBtn2').style.display = 'none';
+  renderQuestion();
+  startQTimer();
+}
+
+function pickQuestion() {
+  const pool = QQ[lang];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function renderQuestion() {
+  const q = currentQ;
+  const letters = ['A','B','C','D'];
+  document.getElementById('qEmojiG').textContent = q.e;
+  document.getElementById('qTextG').textContent = q.q;
+  document.getElementById('qOptsG').innerHTML = q.opts.map((o,i) =>
+    `<button class="qo" onclick="answerGame(${i})" id="go${i}">
+      <span class="qo-letter">${letters[i]}</span>${o}
+    </button>`).join('');
+}
+
+function startQTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerVal = 20;
+  document.getElementById('qTimerFill').style.width = '100%';
+  document.getElementById('qTimerFill').className = 'q-timer-fill';
+
+  timerInterval = setInterval(() => {
+    timerVal--;
+    const pct = (timerVal/20*100);
+    document.getElementById('qTimerFill').style.width = pct+'%';
+    if (timerVal <= 5) document.getElementById('qTimerFill').className = 'q-timer-fill urgent';
+    if (timerVal <= 0) { clearInterval(timerInterval); if (!answered) timeOutGame(); }
+  }, 1000);
+}
+
+function timeOutGame() {
+  answered = true;
+  highlightAnswer(-1);
+  const t = L[lang];
+  if (!isPenalty) {
+    document.getElementById('qFeedback').textContent = t.wrongStay;
+    document.getElementById('qFeedback').className = 'q-feedback bad';
+  } else {
+    document.getElementById('qFeedback').textContent = t.penaltyFail;
+    document.getElementById('qFeedback').className = 'q-feedback bad';
+  }
+  document.getElementById('qNextBtn2').style.display = 'block';
+  document.getElementById('qNextText2').textContent = t.nextTurn;
+}
+
+function answerGame(idx) {
+  if (answered) return;
+  answered = true;
+  clearInterval(timerInterval);
+  const t = L[lang];
+  const correct = idx === currentQ.c;
+  highlightAnswer(idx);
+  const player = players[turnIndex % players.length];
+
+  if (correct) {
+    if (!isPenalty) {
+      const cell = trackCells[player.pos];
+      if (cell.type === 'bonus') {
+        player.pos = Math.min(player.pos + 2, trackCells.length-1);
+        document.getElementById('qFeedback').textContent = t.correctBonus;
+      } else {
+        player.pos = Math.min(player.pos + 1, trackCells.length-1);
+        document.getElementById('qFeedback').textContent = t.correct;
+      }
+      document.getElementById('qFeedback').className = 'q-feedback good';
+      if (player.pos >= trackCells.length-1) {
+        player.finished = true;
+        player.finishOrder = players.filter(p=>p.finished).length;
+      }
+    } else {
+      player.pos = Math.min(player.pos + 1, trackCells.length-1);
+      document.getElementById('qFeedback').textContent = t.penaltyPass;
+      document.getElementById('qFeedback').className = 'q-feedback good';
+    }
+  } else {
+    if (!isPenalty) {
+      // Load penalty question
+      document.getElementById('qFeedback').textContent = t.wrong;
+      document.getElementById('qFeedback').className = 'q-feedback bad';
+      document.getElementById('qNextBtn2').style.display = 'block';
+      document.getElementById('qNextText2').textContent = '⚠️ Штрафной вопрос...';
+      renderTrack(); renderPlayersBar();
+      setTimeout(() => loadPenaltyQ(player), 1200);
+      return;
+    } else {
+      document.getElementById('qFeedback').textContent = t.penaltyFail;
+      document.getElementById('qFeedback').className = 'q-feedback bad';
+    }
+  }
+  renderTrack(); renderPlayersBar();
+  document.getElementById('qNextBtn2').style.display = 'block';
+  document.getElementById('qNextText2').textContent = t.nextTurn;
+}
+
+function loadPenaltyQ(player) {
+  const t = L[lang];
+  currentQ = pickQuestion();
+  isPenalty = true;
+  answered = false;
+  document.getElementById('qTypeLabel').textContent = t.penaltyQ;
+  document.getElementById('qTypeLabel').className = 'q-panel-type penalty';
+  document.getElementById('qFeedback').textContent = '';
+  document.getElementById('qNextBtn2').style.display = 'none';
+  renderQuestion();
+  startQTimer();
+}
+
+function highlightAnswer(chosen) {
+  document.querySelectorAll('.qo').forEach((el,i) => {
+    if (i === currentQ.c) el.classList.add('correct');
+    else if (i === chosen) el.classList.add('wrong');
+    el.onclick = null;
+  });
+}
+
+function nextTurn() {
+  if (checkAllFinished()) { showResults(); return; }
+  turnIndex++;
+  loadNextQuestion();
+}
+
+function checkAllFinished() {
+  return players.every(p => p.finished);
+}
+
+// ── RESULTS ───────────────────────────────────────────────────────────────────
+function showResults() {
+  const t = L[lang];
+  const sorted = [...players].sort((a,b) => {
+    if (a.finished && !b.finished) return -1;
+    if (!a.finished && b.finished) return 1;
+    if (a.finished && b.finished) return a.finishOrder - b.finishOrder;
+    return b.pos - a.pos;
+  });
+
+  document.getElementById('rTitle').textContent = sorted[0].name + ' — ' + t.champion;
+  document.getElementById('rSub').textContent = t.raceOver;
+  document.getElementById('rPlayAgain').textContent = t.playAgain;
+
+  const medals = ['🥇','🥈','🥉','4️⃣'];
+  const rowCls = ['r1','r2','r3',''];
+  document.getElementById('resultsList').innerHTML = sorted.map((p,i) => `
+    <div class="result-row ${rowCls[i]||''}">
+      <span class="rr-medal">${medals[i]||i+1}</span>
+      <span class="rr-avatar">${p.avatar}</span>
+      <span class="rr-name">${p.name}</span>
+      <span class="rr-steps">${p.pos}/${trackCells.length-1}</span>
+      ${p.finished ? `<span class="rr-badge">${t.finishedBadge}</span>` : ''}
+    </div>`).join('');
+
+  showScreen('resultsScreen');
+  launchConfetti();
+}
+
+function launchConfetti() {
+  const colors=['#69F0AE','#40C4FF','#FFD740','#FF6E6E','#fff'];
+  for(let i=0;i<60;i++){
+    setTimeout(()=>{
+      const el=document.createElement('div');
+      el.className='confetti-piece';
+      el.style.cssText=`left:${Math.random()*100}vw;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${2+Math.random()*2}s;width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;`;
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(),4000);
+    },i*40);
+  }
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function showSetup() { clearInterval(timerInterval); showScreen('setupScreen'); }
+
+// Init
+setLang(lang); setTrackLen(12); buildPlayersSetup();
+</script>
+</body>
+</html>

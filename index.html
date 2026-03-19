@@ -1,0 +1,2555 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" href="iconca.jpg" type="image/jpeg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoBala - Экологическое образование Казахстана</title>
+<!-- Preconnect для быстрой загрузки шрифтов -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap&subset=cyrillic,cyrillic-ext" rel="stylesheet">
+<style>
+  /* ── Казахский шрифт фикс ───────────────────────────────────────────
+     Noto Sans покрывает казахские буквы: Ә Ғ Қ Ң Ө Ұ Ү І
+     unicode-range заставляет браузер использовать Noto Sans ТОЛЬКО
+     для символов которых нет в Nunito (казахский расширенный кириллица)
+  ─────────────────────────────────────────────────────────────────── */
+  @font-face {
+    font-family: 'KazFont';
+    src: local('Noto Sans');
+    unicode-range: U+0400-045F, U+04D9, U+04E9, U+04B1, U+04A3, U+04BB,
+                   U+049B, U+04A2, U+04E8, U+04B0, U+0456, U+04AF, U+049A,
+                   U+04BA, U+04D8; /* казахский кириллический диапазон */
+  }
+  /* Глобальный стек: сначала Nunito (латиница/цифры), потом Noto Sans (казахский) */
+  *, body, input, textarea, select, button, span, div, p, h1, h2, h3, h4, h5, h6, a, li {
+    font-family: 'Nunito', 'Noto Sans', 'Segoe UI', system-ui, -apple-system, sans-serif !important;
+  }
+
+  /* Universal Kazakh alphabet support */
+  *, input, textarea, select, button { font-family: 'Nunito', 'Noto Sans', sans-serif; }
+  .nav-logo, .hero-title, .section-title, .footer-logo, .sp-logo-text,
+  .hero-stat-num, .stat-num { font-family: 'Unbounded', 'Noto Sans', sans-serif !important; }
+  :root {
+    --green: #2E7D32;
+    --green-mid: #43A047;
+    --green-light: #C8E6C9;
+    --green-pale: #E8F5E9;
+    --green-dark: #1B5E20;
+    --blue: #1565C0;
+    --blue-light: #E3F2FD;
+    --amber: #F57F17;
+    --white: #FFFFFF;
+    --text: #1A2E1A;
+    --text-muted: #4A6741;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Nunito', 'Noto Sans', sans-serif; background: var(--white); color: var(--text); overflow-x: hidden; }
+
+  /* ===== SPLASH SCREEN ===== */
+  #splash {
+    position: fixed; inset: 0; z-index: 9999;
+    background: linear-gradient(160deg, #1B5E20 0%, #2E7D32 50%, #388E3C 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+    will-change: opacity;
+  }
+  #splash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+
+  .splash-plant {
+    position: relative; width: 120px; height: 160px; margin-bottom: 28px;
+  }
+  .sp-ground {
+    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 80px; height: 12px; background: #4CAF50; border-radius: 50%;
+    opacity: 0; animation: fadeUp 0.3s 0.1s forwards;
+  }
+  .sp-stem {
+    position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+    width: 6px; border-radius: 3px; background: #66BB6A;
+    height: 0; animation: growStem 0.4s 0.2s forwards;
+  }
+  @keyframes growStem { to { height: 80px; } }
+
+  .sp-leaf1 {
+    position: absolute; bottom: 55px; left: 50%;
+    width: 0; height: 0; border-radius: 50% 0 50% 0;
+    background: #A5D6A7; transform-origin: left bottom;
+    opacity: 0; animation: growLeaf1 0.35s 0.55s forwards;
+  }
+  @keyframes growLeaf1 { to { width: 44px; height: 28px; opacity: 1; left: calc(50% - 40px); } }
+
+  .sp-leaf2 {
+    position: absolute; bottom: 70px; left: 50%;
+    width: 0; height: 0; border-radius: 0 50% 0 50%;
+    background: #81C784; transform-origin: right bottom;
+    opacity: 0; animation: growLeaf2 0.35s 0.75s forwards;
+  }
+  @keyframes growLeaf2 { to { width: 44px; height: 28px; opacity: 1; } }
+
+  .sp-crown {
+    position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%);
+    width: 0; height: 0; border-radius: 50%;
+    background: #4CAF50; opacity: 0;
+    animation: growCrown 0.4s 0.95s forwards;
+  }
+  @keyframes growCrown { to { width: 90px; height: 90px; opacity: 1; left: calc(50% - 45px); } }
+
+  .sp-logo {
+    opacity: 0; animation: fadeUp 0.4s 1.35s forwards;
+    text-align: center;
+  }
+  .sp-logo-text {
+    font-family: 'Unbounded', 'Noto Sans', sans-serif;
+    font-size: 36px; font-weight: 900;
+    color: #fff; letter-spacing: -1px;
+  }
+  .sp-logo-sub {
+    font-size: 13px; color: rgba(255,255,255,0.75);
+    letter-spacing: 3px; text-transform: uppercase; margin-top: 4px;
+    font-family: 'Nunito', 'Noto Sans', sans-serif;
+  }
+  .sp-dots {
+    display: flex; gap: 8px; margin-top: 20px;
+    opacity: 0; animation: fadeUp 0.3s 1.6s forwards;
+  }
+  .sp-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.4);
+    animation: pulse 0.8s infinite alternate;
+  }
+  .sp-dot:nth-child(2) { animation-delay: 0.15s; }
+  .sp-dot:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes pulse { to { background: rgba(255,255,255,0.9); transform: scale(1.3); } }
+  @keyframes fadeUp { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+
+  /* ===== NAV ===== */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5%; height: 70px;
+    background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--green-light);
+  }
+  .nav-logo {
+    font-family: 'Unbounded', 'Noto Sans', sans-serif; font-weight: 900; font-size: 20px;
+    color: var(--green-dark); letter-spacing: -0.5px; text-decoration: none;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .nav-logo-icon {
+    width: 36px; height: 36px; background: var(--green);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links a { font-size: 14px; font-weight: 600; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--green); }
+  .nav-lang {
+    display: flex; gap: 4px; background: var(--green-pale);
+    border-radius: 20px; padding: 3px;
+  }
+  .lang-btn {
+    padding: 4px 12px; border-radius: 16px; font-size: 12px; font-weight: 700;
+    border: none; cursor: pointer; background: transparent; color: var(--text-muted);
+    transition: all 0.2s;
+  }
+  .lang-btn.active { background: var(--green); color: #fff; }
+  .nav-cta {
+    background: linear-gradient(135deg, var(--green), var(--green-mid)); color: #fff; padding: 10px 20px;
+    border-radius: 50px; font-size: 14px; font-weight: 700;
+    text-decoration: none; transition: all 0.25s; border: none; cursor: pointer;
+    box-shadow: 0 2px 10px rgba(46,125,50,0.2);
+  }
+  .nav-cta:hover {
+    background: linear-gradient(135deg, var(--green-dark), var(--green));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(46,125,50,0.32);
+  }
+  .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; border: none; background: none; }
+  .nav-hamburger span { width: 24px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s; display: block; }
+  .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  /* Mobile dropdown menu */
+  .mobile-menu {
+    display: none; position: fixed; top: 70px; left: 0; right: 0; z-index: 99;
+    background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--green-light);
+    padding: 12px 5% 20px; flex-direction: column; gap: 2px;
+    box-shadow: 0 8px 32px rgba(46,125,50,0.1);
+    animation: slideDown 0.2s ease;
+  }
+  .mobile-menu.open { display: flex; }
+  @keyframes slideDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+  .mobile-menu a {
+    font-size: 15px; font-weight: 700; color: var(--text-muted); text-decoration: none;
+    padding: 11px 0; border-bottom: 1px solid rgba(200,230,201,0.5); transition: color 0.2s;
+    display: block;
+  }
+  .mobile-menu a:last-of-type { border-bottom: none; }
+  .mobile-menu a:hover { color: var(--green); }
+  .mobile-menu .m-lang { display: flex; gap: 8px; padding: 12px 0 4px; }
+  .mobile-menu .m-cta {
+    background: var(--green) !important; color: #fff !important; border-radius: 50px !important;
+    padding: 12px 20px !important; text-align: center; font-weight: 800 !important;
+    border-bottom: none !important; margin-top: 8px;
+  }
+  @media(max-width:480px) { .mobile-menu { top: 60px; } }
+
+  /* ===== HERO ===== */
+  .hero {
+    min-height: 100vh; padding-top: 70px;
+    background: linear-gradient(165deg, #E8F5E9 0%, #E3F2FD 35%, #F1F8E9 65%, #FFFFFF 100%);
+    background-size: 300% 300%;
+    animation: heroGradient 12s ease infinite;
+    display: flex; align-items: center; position: relative; overflow: hidden;
+  }
+  @keyframes heroGradient {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .hero-bg-circles {
+    position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+  }
+  .hero-circle {
+    position: absolute; border-radius: 50%;
+    background: rgba(76,175,80,0.07);
+    animation: circlePulse 8s ease-in-out infinite;
+  }
+  .hero-circle:nth-child(1) { width: 500px; height: 500px; right: -100px; top: -100px; animation-delay: 0s; }
+  .hero-circle:nth-child(2) { width: 300px; height: 300px; right: 200px; bottom: -50px; background: rgba(21,101,192,0.05); animation-delay: -3s; }
+  .hero-circle:nth-child(3) { width: 200px; height: 200px; left: -50px; bottom: 100px; background: rgba(102,187,106,0.06); animation-delay: -6s; }
+  @keyframes circlePulse {
+    0%,100% { transform: scale(1); opacity: 0.7; }
+    50%      { transform: scale(1.08); opacity: 1; }
+  }
+
+  .hero-inner {
+    max-width: 1200px; margin: 0 auto; padding: 80px 5%;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--green-pale); border: 1px solid var(--green-light);
+    border-radius: 50px; padding: 6px 14px; font-size: 13px; font-weight: 700;
+    color: var(--green-dark); margin-bottom: 24px;
+    animation: fadeSlideDown 0.6s ease both;
+  }
+  .hero-badge-dot {
+    width: 8px; height: 8px; background: var(--green-mid); border-radius: 50%;
+    animation: dotPulse 2s ease-in-out infinite;
+  }
+  @keyframes dotPulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(67,160,71,0.6); }
+    50%      { box-shadow: 0 0 0 6px rgba(67,160,71,0); }
+  }
+  .hero-title {
+    font-family: 'Unbounded', 'Noto Sans', sans-serif;
+    font-size: clamp(32px, 5vw, 56px); font-weight: 900;
+    line-height: 1.1; color: var(--text); margin-bottom: 20px;
+    animation: fadeSlideDown 0.7s 0.1s ease both;
+  }
+  .hero-title span { color: var(--green); }
+  .hero-desc {
+    font-size: 17px; color: var(--text-muted); line-height: 1.7; margin-bottom: 36px;
+    animation: fadeSlideDown 0.7s 0.2s ease both;
+  }
+  .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; animation: fadeSlideDown 0.7s 0.3s ease both; }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--green), var(--green-mid)); color: #fff; padding: 14px 28px;
+    border-radius: 50px; font-size: 15px; font-weight: 800;
+    text-decoration: none; border: none; cursor: pointer;
+    transition: all 0.25s; display: inline-flex; align-items: center; gap: 8px;
+    box-shadow: 0 4px 16px rgba(46,125,50,0.22);
+  }
+  .btn-primary:hover {
+    background: linear-gradient(135deg, var(--green-dark), var(--green));
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(46,125,50,0.35);
+  }
+  .btn-primary:active { transform: translateY(-1px); }
+  .btn-outline {
+    background: transparent; color: var(--blue);
+    border: 2px solid var(--blue); padding: 14px 28px;
+    border-radius: 50px; font-size: 15px; font-weight: 800;
+    text-decoration: none; cursor: pointer; transition: all 0.25s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-outline:hover {
+    background: var(--blue); color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(21,101,192,0.25);
+  }
+  .btn-outline:active { transform: translateY(-1px); }
+
+  @keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-stats {
+    display: flex; gap: 32px; margin-top: 40px;
+    animation: fadeSlideDown 0.7s 0.4s ease both;
+  }
+  .hero-stat { text-align: left; }
+  .hero-stat-num {
+    font-family: 'Unbounded', 'Noto Sans', sans-serif; font-size: 28px; font-weight: 900; color: var(--green);
+  }
+  .hero-stat-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+
+  .hero-visual {
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    animation: fadeSlideUp 0.8s 0.2s ease both;
+  }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero-card-main {
+    background: #fff; border-radius: 24px; padding: 28px;
+    box-shadow: 0 20px 60px rgba(46,125,50,0.15);
+    width: 100%; max-width: 360px; position: relative; z-index: 2;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+  .hero-card-main:hover {
+    box-shadow: 0 32px 80px rgba(46,125,50,0.2);
+    transform: translateY(-4px);
+  }
+  .hero-card-top {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  }
+  .hc-avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: linear-gradient(135deg, #A5D6A7, #4CAF50);
+    display: flex; align-items: center; justify-content: center; font-size: 22px;
+  }
+  .hc-name { font-weight: 800; font-size: 15px; }
+  .hc-role { font-size: 12px; color: var(--text-muted); }
+  .hc-level {
+    margin-left: auto; background: var(--green-pale); border-radius: 20px;
+    padding: 4px 10px; font-size: 12px; font-weight: 800; color: var(--green-dark);
+  }
+  .hc-progress-label {
+    font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 6px;
+    display: flex; justify-content: space-between;
+  }
+  .hc-progress-bar {
+    height: 8px; background: var(--green-light); border-radius: 4px; margin-bottom: 16px; overflow: hidden;
+  }
+  .hc-progress-fill {
+    height: 100%; background: linear-gradient(90deg, #43A047, #66BB6A);
+    border-radius: 4px; width: 0%; transition: width 1.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .hc-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .hc-badge {
+    background: var(--green-pale); border-radius: 20px; padding: 4px 10px;
+    font-size: 11px; font-weight: 700; color: var(--green-dark);
+    transition: background 0.2s, transform 0.2s;
+  }
+  .hc-badge:hover { background: var(--green-light); transform: scale(1.06); cursor: default; }
+  .hc-quest {
+    background: linear-gradient(135deg, var(--green-pale), #E3F2FD); border-radius: 12px; padding: 12px;
+    display: flex; align-items: center; gap: 10px;
+    border: 1px solid rgba(46,125,50,0.1);
+  }
+  .hc-quest-icon { font-size: 24px; }
+  .hc-quest-title { font-size: 13px; font-weight: 700; }
+  .hc-quest-pts { font-size: 11px; color: var(--green); font-weight: 600; }
+
+  .hero-card-float1 {
+    position: absolute; top: -20px; right: -30px; z-index: 3;
+    background: #fff; border-radius: 16px; padding: 12px 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700;
+    animation: float1 3s ease-in-out infinite;
+    border: 1px solid rgba(46,125,50,0.08);
+  }
+  .hero-card-float2 {
+    position: absolute; bottom: -20px; left: -30px; z-index: 3;
+    background: #fff; border-radius: 16px; padding: 12px 16px;
+    box-shadow: 0 8px 24px rgba(21,101,192,0.12);
+    display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700;
+    animation: float2 3.5s ease-in-out infinite;
+    border: 1px solid rgba(21,101,192,0.08);
+  }
+  @keyframes float1 { 0%,100%{transform:translateY(0) rotate(-1deg)} 50%{transform:translateY(-10px) rotate(1deg)} }
+  @keyframes float2 { 0%,100%{transform:translateY(0) rotate(1deg)} 50%{transform:translateY(10px) rotate(-1deg)} }
+
+  /* ===== SCROLL REVEAL ===== */
+  .reveal {
+    opacity: 0; transform: translateY(28px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* ===== SECTIONS COMMON ===== */
+  section { padding: 80px 5%; }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+  .section-label {
+    font-size: 12px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--green); margin-bottom: 10px;
+  }
+  .section-title {
+    font-family: 'Unbounded', 'Noto Sans', sans-serif; font-size: clamp(24px, 4vw, 38px);
+    font-weight: 900; color: var(--text); line-height: 1.2; margin-bottom: 16px;
+  }
+  .section-desc { font-size: 16px; color: var(--text-muted); line-height: 1.7; max-width: 560px; }
+
+  /* ===== WHO WE ARE ===== */
+  .whowe { background: var(--white); }
+  .whowe-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; margin-top: 48px;
+  }
+  .whowe-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .whowe-card {
+    background: var(--green-pale); border-radius: var(--radius); padding: 24px;
+    border: 1px solid var(--green-light); transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .whowe-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(46,125,50,0.12);
+    border-color: var(--green-mid);
+    background: #fff;
+  }
+  .whowe-icon { font-size: 32px; margin-bottom: 12px; transition: transform 0.3s ease; }
+  .whowe-card:hover .whowe-icon { transform: scale(1.15) rotate(-5deg); }
+  .whowe-card-title { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+  .whowe-card-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+  .who-users { margin-top: 32px; }
+  .who-users-title { font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 12px; }
+  .who-user-pills { display: flex; gap: 10px; flex-wrap: wrap; }
+  .who-pill {
+    padding: 8px 16px; border-radius: 50px; font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .pill-kids { background: #E3F2FD; color: #1565C0; }
+  .pill-teen { background: var(--green-pale); color: var(--green-dark); }
+  .pill-teacher { background: #FFF3E0; color: #E65100; }
+  .pill-admin-hidden { background: #EDE7F6; color: #4527A0; }
+
+  /* ===== FEATURES ===== */
+  .features { background: linear-gradient(180deg, #F9FBF9 0%, var(--white) 100%); }
+  .features-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px; margin-top: 48px;
+  }
+  .feat-card {
+    background: #fff; border-radius: var(--radius); padding: 28px;
+    border: 1px solid var(--green-light); transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    position: relative; overflow: hidden; cursor: default;
+  }
+  .feat-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--green), var(--green-mid));
+    transition: height 0.3s ease;
+  }
+  .feat-card:nth-child(3n)::before { background: linear-gradient(90deg, var(--blue), #42A5F5); }
+  .feat-card:nth-child(3n+2)::before { background: linear-gradient(90deg, #00897B, #26A69A); }
+  .feat-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 48px rgba(46,125,50,0.13);
+    border-color: var(--green-mid);
+  }
+  .feat-card:hover::before { height: 6px; }
+  .feat-icon {
+    width: 52px; height: 52px; background: var(--green-pale); border-radius: 14px;
+    display: flex; align-items: center; justify-content: center; font-size: 26px;
+    margin-bottom: 16px; transition: transform 0.3s ease;
+  }
+  .feat-card:hover .feat-icon { transform: scale(1.12) rotate(-4deg); }
+  .feat-title { font-size: 17px; font-weight: 800; margin-bottom: 8px; }
+  .feat-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+  /* ===== REVIEWS ===== */
+  .reviews { background: var(--green-dark); }
+  .reviews .section-label { color: #A5D6A7; }
+  .reviews .section-title { color: #fff; }
+  .reviews .section-desc { color: rgba(255,255,255,0.7); }
+  .reviews-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 48px; }
+  .review-card {
+    background: rgba(255,255,255,0.07); border-radius: var(--radius); padding: 24px;
+    border: 1px solid rgba(255,255,255,0.12);
+    transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+  }
+  .review-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255,255,255,0.12);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+  }
+  .review-stars { color: #FFD54F; font-size: 16px; margin-bottom: 12px; }
+  .review-text { font-size: 14px; color: rgba(255,255,255,0.85); line-height: 1.7; margin-bottom: 16px; }
+  .review-author { display: flex; align-items: center; gap: 10px; }
+  .rev-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; background: var(--green-mid); color: #fff;
+  }
+  .rev-name { font-size: 13px; font-weight: 700; color: #fff; }
+  .rev-role { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+  /* ===== LEAVE REVIEW ===== */
+  .leave-review { background: var(--green-pale); }
+  .review-form {
+    background: #fff; border-radius: var(--radius); padding: 36px;
+    max-width: 560px; margin-top: 36px;
+    box-shadow: 0 8px 32px rgba(46,125,50,0.08);
+  }
+  .form-group { margin-bottom: 18px; }
+  .form-label { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; display: block; }
+  .form-input, .form-textarea {
+    width: 100%; padding: 12px 16px; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--green-light); font-family: 'Nunito', sans-serif;
+    font-size: 14px; color: var(--text); background: var(--green-pale);
+    outline: none; transition: border-color 0.2s;
+  }
+  .form-input:focus, .form-textarea:focus { border-color: var(--green); background: #fff; }
+  .form-textarea { min-height: 100px; resize: vertical; }
+  .stars-input { display: flex; gap: 6px; margin-bottom: 4px; }
+  .star-btn {
+    font-size: 28px; background: none; border: none; cursor: pointer;
+    color: #ddd; transition: color 0.15s; line-height: 1;
+  }
+  .star-btn.active { color: #FFD54F; }
+
+  /* ===== FAQ ===== */
+  .faq { background: #fff; }
+  .faq-list { max-width: 720px; margin-top: 48px; }
+  .faq-item {
+    border-bottom: 1px solid var(--green-light); overflow: hidden;
+  }
+  .faq-question {
+    width: 100%; text-align: left; background: none; border: none;
+    padding: 20px 0; font-family: 'Nunito', sans-serif;
+    font-size: 15px; font-weight: 700; color: var(--text); cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  }
+  .faq-arrow { color: var(--green); font-size: 20px; transition: transform 0.25s; flex-shrink: 0; }
+  .faq-answer {
+    font-size: 14px; color: var(--text-muted); line-height: 1.7;
+    max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.3s;
+    padding-bottom: 0;
+  }
+  .faq-item.open .faq-arrow { transform: rotate(45deg); }
+  .faq-item.open .faq-answer { max-height: 200px; padding-bottom: 18px; }
+
+  /* ===== SOCIAL ===== */
+  .social-section { background: var(--green-pale); }
+  .social-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 36px; }
+  @media(max-width:600px){ .social-grid{ grid-template-columns:1fr; } }
+  .social-card {
+    padding: 14px 16px !important;
+    display: flex; align-items: center; gap: 16px;
+    background: #fff; border-radius: var(--radius); padding: 20px 22px;
+    text-decoration: none; border: 1.5px solid var(--green-light);
+    transition: all 0.22s; box-shadow: 0 2px 8px rgba(46,125,50,0.06);
+  }
+  .social-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(46,125,50,0.14); border-color: var(--green-mid); }
+  .social-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0;
+  }
+  .sc-tg { background: #E3F2FD; }
+  .sc-yt { background: #FFEBEE; }
+  .sc-ig { background: #FCE4EC; }
+  .social-name { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+  .social-handle { font-size: 13px; color: var(--text-muted); font-weight: 600; }
+  .social-arrow { margin-left: auto; font-size: 18px; color: var(--green-mid); opacity: 0; transition: opacity 0.2s; }
+  .social-card:hover .social-arrow { opacity: 1; }
+
+  /* ===== CONTACT ===== */
+  .contact-section { background: #fff; }
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; margin-top: 48px; }
+  @media(max-width:768px){ .contact-grid{ grid-template-columns:1fr; } }
+  .contact-info { display: flex; flex-direction: column; gap: 0; }
+  .contact-item {
+    display: flex; align-items: center; gap: 16px;
+    padding: 18px 0; border-bottom: 1px solid var(--green-light);
+  }
+  .contact-item:first-child { padding-top: 0; }
+  .contact-icon {
+    width: 48px; height: 48px; background: var(--green-pale); border-radius: 14px;
+    display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+  }
+  .contact-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 3px; }
+  .contact-val { font-size: 16px; font-weight: 700; color: var(--text); }
+  .contact-val a { color: var(--green); text-decoration: none; }
+  .contact-val a:hover { text-decoration: underline; }
+  .made-by {
+    margin-top: 28px; padding: 20px; background: var(--green-pale);
+    border-radius: var(--radius); border: 1px solid var(--green-light);
+  }
+  .made-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px; }
+  .made-names { display: flex; gap: 10px; flex-wrap: wrap; }
+  .made-name-pill {
+    background: #fff; border-radius: 50px; padding: 8px 16px;
+    font-size: 14px; font-weight: 700; color: var(--green-dark);
+    border: 1px solid var(--green-light); cursor: default;
+  }
+  .map-frame {
+    border-radius: var(--radius); overflow: hidden;
+    border: 1.5px solid var(--green-light); height: 420px;
+    box-shadow: 0 4px 16px rgba(46,125,50,0.08);
+  }
+  .map-frame iframe { width: 100%; height: 100%; border: none; }
+
+  /* ===== TEACHER SECTION ===== */
+  .teacher-section { background: linear-gradient(180deg,#E3F2FD 0%,#fff 100%); }
+  .teacher-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; margin-top: 40px; }
+  @media(max-width:768px){ .teacher-grid{ grid-template-columns:1fr; } }
+  .teacher-info-cards { display: flex; flex-direction: column; gap: 14px; }
+  .t-info-card {
+    background: #fff; border-radius: var(--radius); padding: 18px 20px;
+    border: 1.5px solid #BBDEFB; display: flex; align-items: flex-start; gap: 14px;
+    transition: transform 0.2s;
+  }
+  .t-info-card:hover { transform: translateX(4px); }
+  .t-info-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+  .t-info-title { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  .t-info-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+  .teacher-login-box {
+    background: #fff; border-radius: var(--radius); padding: 28px;
+    border: 1.5px solid #BBDEFB; box-shadow: 0 8px 32px rgba(21,101,192,0.08);
+  }
+  .tlb-title { font-size: 18px; font-weight: 900; color: #1565C0; margin-bottom: 6px; }
+  .tlb-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
+  .tg-banner {
+    display: flex; align-items: center; gap: 14px;
+    background: linear-gradient(135deg, #1565C0, #1E88E5);
+    border-radius: var(--radius); padding: 18px 22px;
+    text-decoration: none; margin-top: 16px; transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(21,101,192,0.25);
+  }
+  .tg-banner:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(21,101,192,0.3); }
+  .tg-banner-icon {
+    width: 48px; height: 48px; background: rgba(255,255,255,0.2);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;
+  }
+  .tg-banner-text { flex: 1; }
+  .tg-banner-title { font-size: 16px; font-weight: 900; color: #fff; margin-bottom: 2px; }
+  .tg-banner-sub { font-size: 12px; color: rgba(255,255,255,0.8); }
+  .tg-banner-arrow { font-size: 20px; color: #fff; opacity: 0.8; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    background: var(--green-dark); color: rgba(255,255,255,0.75);
+    padding: 48px 5% 32px;
+  }
+  .footer-inner { max-width: 1200px; margin: 0 auto; }
+  .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; margin-bottom: 32px; }
+  @media(max-width:768px){ .footer-top{ grid-template-columns:1fr; gap:24px; } }
+  .footer-logo { font-family: 'Unbounded', 'Noto Sans', sans-serif; font-weight: 900; font-size: 22px; color: #fff; margin-bottom: 10px; }
+  .footer-tagline { font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.6; margin-bottom: 16px; }
+  .footer-col-title { font-size: 12px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 12px; }
+  .footer-col-links { display: flex; flex-direction: column; gap: 8px; }
+  .footer-col-links a { font-size: 14px; color: rgba(255,255,255,0.7); text-decoration: none; font-weight: 600; transition: color 0.2s; }
+  .footer-col-links a:hover { color: #fff; }
+  .footer-divider { border: none; border-top: 1px solid rgba(255,255,255,0.12); margin-bottom: 20px; }
+  .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .footer-copy { font-size: 12px; color: rgba(255,255,255,0.4); }
+  .footer-made { font-size: 12px; color: rgba(255,255,255,0.45); cursor: default; user-select: none; }
+  .footer-made span { transition: color 0.1s; }
+  .footer-made.flashing span { color: #A5D6A7; }
+
+  /* ===== LANG HIDDEN ===== */
+  [data-kz] { display: none; }
+  body.kz [data-ru] { display: none; }
+  body.kz [data-kz] { display: block; }
+
+  /* ===== RESPONSIVE ===== */
+  @media(max-width: 768px) {
+    .nav-links, .nav-lang { display: none; }
+    .nav-hamburger { display: flex; }
+    nav .nav-cta { display: none; }
+
+    .hero-inner { grid-template-columns: 1fr; gap: 32px; padding: 48px 5% 40px; }
+    .hero-visual { display: none; }
+    .hero-badge { font-size: 11px; }
+    .hero-title { font-size: clamp(26px, 7vw, 42px); }
+    .hero-desc { font-size: 14px; margin-bottom: 24px; }
+    .hero-btns { flex-direction: column; gap: 10px; }
+    .btn-primary, .btn-outline { width: 100%; justify-content: center; padding: 13px 20px; font-size: 14px; }
+    .hero-stats { gap: 16px; margin-top: 28px; }
+    .hero-stat-num { font-size: 22px; }
+    .hero-stat-label { font-size: 10px; }
+
+    section { padding: 52px 5%; }
+    .section-title { font-size: clamp(20px, 5vw, 30px); }
+
+    .whowe-grid { grid-template-columns: 1fr; gap: 32px; }
+    .whowe-cards { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .whowe-card { padding: 18px 16px; }
+    .whowe-icon { font-size: 26px; margin-bottom: 8px; }
+    .who-user-pills { gap: 8px; }
+    .who-pill { padding: 7px 13px; font-size: 12px; }
+
+    .features-grid { grid-template-columns: 1fr; gap: 14px; }
+    .feat-card { padding: 22px 18px; }
+    .feat-icon { width: 46px; height: 46px; font-size: 22px; }
+
+    .reviews-grid { grid-template-columns: 1fr; gap: 14px; }
+    .review-card { padding: 20px; }
+    .review-text { font-size: 13px; }
+
+    .review-form { padding: 24px 18px; }
+
+    .social-grid { grid-template-columns: 1fr; gap: 12px; }
+    .social-card { padding: 16px 18px; }
+    .social-icon { width: 44px; height: 44px; font-size: 22px; }
+
+    .contact-grid { grid-template-columns: 1fr; gap: 28px; }
+    .contact-val { font-size: 14px; }
+    .map-frame { height: 260px; }
+
+    .teacher-grid { grid-template-columns: 1fr; gap: 24px; }
+    .t-info-card { padding: 14px 16px; }
+    .teacher-login-box { padding: 22px 18px; }
+
+    .footer-top { grid-template-columns: 1fr; gap: 20px; }
+    .footer-bottom { flex-direction: column; align-items: flex-start; gap: 8px; }
+
+    .faq-question { font-size: 14px; }
+
+    .hero-card-float1, .hero-card-float2 { display: none; }
+  }
+
+  @media(max-width: 480px) {
+    nav { padding: 0 4%; height: 60px; }
+    .nav-logo { font-size: 17px; }
+    .nav-logo-icon { width: 30px; height: 30px; font-size: 15px; }
+
+    .hero-inner { padding: 36px 4% 32px; }
+    .hero-title { font-size: clamp(22px, 8vw, 36px); line-height: 1.15; }
+    .hero-stats { flex-direction: row; flex-wrap: wrap; gap: 12px; }
+
+    .whowe-cards { grid-template-columns: 1fr; }
+
+    .review-form { padding: 18px 14px; }
+    .form-input, .form-textarea { font-size: 14px; }
+
+    .tg-banner { padding: 14px 16px; gap: 10px; }
+    .tg-banner-icon { width: 40px; height: 40px; font-size: 20px; }
+    .tg-banner-title { font-size: 14px; }
+
+    .made-name-pill { font-size: 13px; padding: 7px 13px; }
+  }
+
+  /* ===== VIDEO LESSONS CAROUSEL ===== */
+  .video-section { background: linear-gradient(180deg, #E8F5E9 0%, #fff 100%); padding: 72px 5%; }
+  .video-section .section-inner { max-width: 1200px; margin: 0 auto; }
+  .video-track-wrap {
+    position: relative; margin-top: 40px;
+  }
+  .video-track {
+    display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory;
+    scrollbar-width: none; padding-bottom: 12px; cursor: grab;
+    -webkit-overflow-scrolling: touch;
+  }
+  .video-track::-webkit-scrollbar { display: none; }
+  .video-track.grabbing { cursor: grabbing; }
+  .video-card {
+    flex: 0 0 300px; scroll-snap-align: start;
+    background: #fff; border-radius: 18px;
+    border: 1.5px solid var(--green-light);
+    overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 12px rgba(46,125,50,0.07);
+  }
+  .video-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(46,125,50,0.14); }
+  .video-thumb {
+    position: relative; aspect-ratio: 16/9; background: #111; overflow: hidden;
+    cursor: pointer;
+  }
+  .video-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s; }
+  .video-card:hover .video-thumb img { transform: scale(1.04); }
+  .video-play-btn {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.25); transition: background 0.2s;
+  }
+  .video-play-btn:hover { background: rgba(0,0,0,0.4); }
+  .video-play-circle {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: rgba(255,255,255,0.95); display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  .video-play-circle svg { margin-left: 4px; }
+  .video-tag {
+    position: absolute; top: 10px; left: 10px;
+    background: var(--green); color: #fff;
+    border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 800;
+  }
+  .video-body { padding: 16px; }
+  .video-title { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 6px; line-height: 1.4; }
+  .video-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); font-weight: 600; }
+  .video-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--green-light); }
+  /* Nav arrows */
+  .video-nav {
+    display: flex; gap: 10px; position: absolute; right: 0; top: -56px;
+  }
+  .vn-btn {
+    width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--green-light);
+    background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; transition: all 0.2s; color: var(--green);
+  }
+  .vn-btn:hover { background: var(--green); color: #fff; border-color: var(--green); }
+  /* Dots */
+  .video-dots { display: flex; gap: 6px; justify-content: center; margin-top: 16px; }
+  .vd { width: 8px; height: 8px; border-radius: 50%; background: var(--green-light); transition: all 0.2s; cursor: pointer; }
+  .vd.active { background: var(--green); width: 22px; border-radius: 4px; }
+
+  /* Modal video player */
+  .video-modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 9995;
+    background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 16px;
+  }
+  .video-modal-overlay.open { display: flex; }
+  .video-modal-box {
+    background: #000; border-radius: 16px; overflow: hidden;
+    width: 100%; max-width: 860px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    position: relative;
+  }
+  .video-modal-box iframe { width: 100%; aspect-ratio: 16/9; display: block; border: none; }
+  .video-modal-close {
+    position: absolute; top: -44px; right: 0;
+    background: rgba(255,255,255,0.15); border: none; border-radius: 50%;
+    width: 36px; height: 36px; font-size: 18px; cursor: pointer; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .video-modal-close:hover { background: rgba(255,255,255,0.3); }
+
+  @media (max-width: 768px) {
+    .video-card { flex: 0 0 260px; }
+    .video-nav { display: none; }
+  }
+  @media (max-width: 480px) {
+    .video-card { flex: 0 0 80vw; }
+    .video-section { padding: 52px 4%; }
+  }
+
+  /* Hamster chat button */
+  .hamster-chat-btn {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: linear-gradient(135deg, #FFF8E1, #FFF3E0);
+    border: 1.5px solid #FFE082;
+    border-radius: 16px; padding: 12px 18px;
+    cursor: pointer; transition: all 0.2s;
+    font-family: 'Nunito', 'Noto Sans', sans-serif;
+    box-shadow: 0 2px 12px rgba(255,179,0,0.15);
+    text-align: left;
+  }
+  .hamster-chat-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,179,0,0.25);
+    border-color: #FFB300;
+  }
+  .hamster-chat-icon { font-size: 28px; flex-shrink: 0; }
+  .hamster-chat-text { display: flex; flex-direction: column; gap: 2px; }
+  .hamster-chat-title { font-size: 14px; font-weight: 800; color: #E65100; display: block; }
+  .hamster-chat-sub   { font-size: 11px; font-weight: 600; color: #A1887F; display: block; }
+  .hamster-chat-arrow { font-size: 18px; color: #FFB300; font-weight: 800; margin-left: 4px; transition: transform 0.2s; }
+  .hamster-chat-btn:hover .hamster-chat-arrow { transform: translateX(4px); }
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-plant">
+    <div class="sp-ground"></div>
+    <div class="sp-stem"></div>
+    <div class="sp-leaf1"></div>
+    <div class="sp-leaf2"></div>
+    <div class="sp-crown"></div>
+  </div>
+  <div class="sp-logo">
+    <div class="sp-logo-text">EcoBala</div>
+    <div class="sp-logo-sub" id="splashSub">Экологическое образование</div>
+  </div>
+  <div class="sp-dots">
+    <div class="sp-dot"></div>
+    <div class="sp-dot"></div>
+    <div class="sp-dot"></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-icon">🌱</div>
+    EcoBala
+  </a>
+  <div class="nav-links">
+    <a href="#whowe" data-ru>Кто мы</a>
+    <a href="#whowe" data-kz>Біз кімбіз</a>
+    <a href="#features" data-ru>Функции</a>
+    <a href="#features" data-kz>Мүмкіндіктер</a>
+    <a href="#faq">FAQ</a>
+    <a href="#teacher" data-ru>Учителям</a>
+    <a href="#teacher" data-kz>Мұғалімдерге</a>
+    <a href="#contact" data-ru>Контакты</a>
+    <a href="#contact" data-kz>Байланыс</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="nav-lang">
+      <button class="lang-btn" onclick="setLang('ru')">RU</button>
+      <button class="lang-btn active" onclick="setLang('kz')">KZ</button>
+    </div>
+    <a class="nav-cta" href="login.html" data-ru>Войти</a>
+    <a class="nav-cta" href="login.html" data-kz>Кіру</a>
+    <button class="nav-hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#whowe" onclick="closeMenu()" data-ru>Кто мы</a>
+  <a href="#whowe" onclick="closeMenu()" data-kz>Біз кімбіз</a>
+  <a href="#features" onclick="closeMenu()" data-ru>Функции</a>
+  <a href="#features" onclick="closeMenu()" data-kz>Мүмкіндіктер</a>
+  <a href="#faq" onclick="closeMenu()">FAQ</a>
+  <a href="#teacher" onclick="closeMenu()" data-ru>Учителям</a>
+  <a href="#teacher" onclick="closeMenu()" data-kz>Мұғалімдерге</a>
+  <a href="#contact" onclick="closeMenu()" data-ru>Контакты</a>
+  <a href="#contact" onclick="closeMenu()" data-kz>Байланыс</a>
+  <div class="m-lang">
+    <button class="lang-btn" onclick="setLang('ru');closeMenu()">RU</button>
+    <button class="lang-btn" onclick="setLang('kz');closeMenu()">KZ</button>
+  </div>
+  <a href="login.html" class="m-cta" onclick="closeMenu()" data-ru>Войти →</a>
+  <a href="login.html" class="m-cta" onclick="closeMenu()" data-kz>Кіру →</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-circles">
+    <div class="hero-circle"></div>
+    <div class="hero-circle"></div>
+    <div class="hero-circle"></div>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <div class="hero-badge-dot"></div>
+        <span data-ru>Экологическая платформа Казахстана</span>
+        <span data-kz>Қазақстанның экологиялық платформасы</span>
+      </div>
+      <h1 class="hero-title" data-ru>
+        Учим детей<br><span>любить природу</span><br>через игру
+      </h1>
+      <h1 class="hero-title" data-kz style="display:none">
+        Балаларды <span>табиғатты</span><br>сүюге үйретеміз
+      </h1>
+      <p class="hero-desc" data-ru>
+        EcoBala - это платформа экологического образования для школьников Казахстана. Уроки, квесты, игры и живая карта добрых дел.
+      </p>
+      <p class="hero-desc" data-kz style="display:none">
+        EcoBala - Қазақстан мектеп оқушылары үшін экологиялық білім беру платформасы.
+      </p>
+      <div class="hero-btns">
+        <a class="btn-primary" href="register.html">
+          <span data-ru>Начать бесплатно</span>
+          <span data-kz>Тегін бастау</span>
+          →
+        </a>
+        <button class="btn-outline" onclick="openEcoGameDemo()">
+          🎮 <span data-ru>Попробовать EcoGame</span>
+          <span data-kz>EcoGame көру</span>
+        </button>
+      </div>
+      <div style="margin-top:16px;">
+        <button onclick="openHamsterChat()" class="hamster-chat-btn">
+          <span class="hamster-chat-icon">🐹</span>
+          <span class="hamster-chat-text">
+            <span class="hamster-chat-title" data-ru>Пообщаться с Экохомяком</span>
+            <span class="hamster-chat-title" data-kz>Экохомякпен сөйлесу</span>
+            <span class="hamster-chat-sub" data-ru>Спроси что угодно об экологии</span>
+            <span class="hamster-chat-sub" data-kz>Экология туралы кез келген сұрақ қой</span>
+          </span>
+          <span class="hamster-chat-arrow">→</span>
+        </button>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-num">Kids+Teen</div>
+          <div class="hero-stat-label" data-ru>Две стороны платформы</div>
+          <div class="hero-stat-label" data-kz>Платформаның екі жағы</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">1–11</div>
+          <div class="hero-stat-label" data-ru>Все классы</div>
+          <div class="hero-stat-label" data-kz>Барлық сыныптар</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">RU+KZ</div>
+          <div class="hero-stat-label" data-ru>Два языка</div>
+          <div class="hero-stat-label" data-kz>Екі тіл</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card-float1">🌱 +25 Eco Points</div>
+      <div class="hero-card-main">
+        <div class="hero-card-top">
+          <div class="hc-avatar">🐣</div>
+          <div>
+            <div class="hc-name">Алия К.</div>
+            <div class="hc-role">Kids • 4 класс</div>
+          </div>
+          <div class="hc-level">🌿 Ур. 5</div>
+        </div>
+        <div class="hc-progress-label">
+          <span data-ru>Прогресс уровня</span>
+          <span data-kz>Деңгей прогресі</span>
+          <span>720 / 1000</span>
+        </div>
+        <div class="hc-progress-bar"><div class="hc-progress-fill"></div></div>
+        <div class="hc-badges">
+          <div class="hc-badge">🏆 Эко-герой</div>
+          <div class="hc-badge">🌳 Садовод</div>
+          <div class="hc-badge">♻️ Чистота</div>
+        </div>
+        <div class="hc-quest">
+          <div class="hc-quest-icon">🗺️</div>
+          <div>
+            <div class="hc-quest-title" data-ru>Посади дерево</div>
+            <div class="hc-quest-title" data-kz>Ағаш отырғыз</div>
+            <div class="hc-quest-pts">+50 Eco Points</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-card-float2">🏫 Школа #7 - #1 рейтинг</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO WE ARE -->
+<section class="whowe" id="whowe">
+  <div class="section-inner">
+    <div class="section-label" data-ru>О НАС</div>
+    <div class="section-label" data-kz>БІЗ ТУРАЛЫ</div>
+    <h2 class="section-title" data-ru>Кто мы такие?</h2>
+    <h2 class="section-title" data-kz>Біз кімбіз?</h2>
+    <p class="section-desc" data-ru>EcoBala - стартап из Хромтау, Казахстан. Мы создаём цифровую платформу, которая делает экологическое образование доступным, интерактивным и по-настоящему интересным для детей.</p>
+    <p class="section-desc" data-kz>EcoBala - Хромтаудағы стартап. Біз экологиялық білімді балалар үшін қызықты ете отырып, цифрлық платформа жасаймыз.</p>
+    <div class="whowe-grid">
+      <div>
+        <div class="whowe-cards">
+          <div class="whowe-card">
+            <div class="whowe-icon">🎓</div>
+            <div class="whowe-card-title" data-ru>Уроки</div>
+            <div class="whowe-card-title" data-kz>Сабақтар</div>
+            <div class="whowe-card-desc" data-ru>Видео-уроки с тестами для детей 6–12 лет</div>
+            <div class="whowe-card-desc" data-kz>6-12 жас балалар үшін бейне сабақтар</div>
+          </div>
+          <div class="whowe-card">
+            <div class="whowe-icon">🗺️</div>
+            <div class="whowe-card-title" data-ru>Квесты</div>
+            <div class="whowe-card-title" data-kz>Квесттер</div>
+            <div class="whowe-card-desc" data-ru>Реальные эко-задания с картой добрых дел</div>
+            <div class="whowe-card-desc" data-kz>Нақты экологиялық тапсырмалар</div>
+          </div>
+          <div class="whowe-card">
+            <div class="whowe-icon">🎮</div>
+            <div class="whowe-card-title" data-ru>Игры</div>
+            <div class="whowe-card-title" data-kz>Ойындар</div>
+            <div class="whowe-card-desc" data-ru>EcoGame-викторины и игры для доски</div>
+            <div class="whowe-card-desc" data-kz>EcoGame-викториналар және тақта ойындары</div>
+          </div>
+          <div class="whowe-card">
+            <div class="whowe-icon">🤖</div>
+            <div class="whowe-card-title" data-ru>Чат-бот</div>
+            <div class="whowe-card-title" data-kz>Чат-бот</div>
+            <div class="whowe-card-desc" data-ru>Хомяк-помощник отвечает на вопросы</div>
+            <div class="whowe-card-desc" data-kz>Хомяк-көмекші сұрақтарға жауап береді</div>
+          </div>
+        </div>
+        <div class="who-users">
+          <div class="who-users-title" data-ru>Для кого платформа:</div>
+          <div class="who-users-title" data-kz>Платформа кімдер үшін:</div>
+          <div class="who-user-pills">
+            <div class="who-pill pill-kids">Kids</div>
+            <div class="who-pill pill-teen">Teen</div>
+            <div class="who-pill pill-teacher"><span data-ru>Учитель</span><span data-kz>Мұғалім</span></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="background:linear-gradient(135deg,#1B5E20,#2E7D32,#1565C0);border-radius:24px;padding:40px 32px;text-align:center;position:relative;overflow:hidden;">
+          <!-- Animated background circles -->
+          <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:rgba(255,255,255,0.06);border-radius:50%;"></div>
+          <div style="position:absolute;bottom:-30px;left:-30px;width:120px;height:120px;background:rgba(255,255,255,0.04);border-radius:50%;"></div>
+          <!-- KZ SVG map — accurate outline with flag colors -->
+          <div style="margin-bottom:18px;position:relative;z-index:1;">
+<style>
+@keyframes kzPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.35);opacity:0.7}}
+@keyframes kzRing{0%{r:10;opacity:0.6}100%{r:22;opacity:0}}
+.kz-pulse{transform-origin:96px 108px;animation:kzPulse 1.8s ease-in-out infinite;}
+.kz-ring{transform-origin:96px 108px;animation:kzRing 1.8s ease-out infinite;}
+</style>
+<svg viewBox="0 0 560 340" width="100%" style="max-width:380px;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.4));border-radius:12px;">
+  <defs>
+    <!-- Gradient for steppe landscape feel -->
+    <linearGradient id="kzLand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00ACC1"/>
+      <stop offset="100%" stop-color="#0097A7"/>
+    </linearGradient>
+    <!-- Mountain region gradient (east/south-east) -->
+    <linearGradient id="kzMtn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00838F"/>
+      <stop offset="100%" stop-color="#006064"/>
+    </linearGradient>
+    <!-- Steppe variation (north/center) -->
+    <linearGradient id="kzSteppe" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00BCD4"/>
+      <stop offset="100%" stop-color="#0097A7"/>
+    </linearGradient>
+  </defs>
+
+  <!-- === ACCURATE KAZAKHSTAN OUTLINE === -->
+  <!-- Based on real geographic data, viewBox 560x340 -->
+  <!-- West: Caspian ~x=28; East: Altai ~x=530; North: Russia ~y=22; South: Central Asia ~y=295 -->
+  <path id="kz-main" fill="url(#kzLand)" stroke="#FFD700" stroke-width="1.4" stroke-linejoin="round" d="
+    M 86,248
+    L 74,238 L 62,226 L 52,214 L 44,202 L 36,190
+    L 30,178 L 28,168 L 30,158 L 34,150 L 40,144
+    L 48,140 L 52,132 L 50,122 L 46,114 L 44,104
+    L 46,96  L 52,90  L 60,86  L 70,82  L 82,78
+    L 96,74  L 110,70 L 124,66 L 138,62 L 152,58
+    L 166,54 L 180,52 L 194,50 L 208,48 L 222,46
+    L 238,44 L 254,42 L 270,40 L 286,38 L 302,36
+    L 318,34 L 334,32 L 350,30 L 364,30 L 378,32
+    L 390,34 L 400,36 L 410,40 L 418,46 L 424,54
+    L 428,62 L 432,70 L 438,76 L 446,80 L 456,82
+    L 466,84 L 476,88 L 484,94 L 490,102 L 494,110
+    L 498,118 L 504,124 L 512,128 L 520,132 L 526,138
+    L 530,146 L 532,156 L 530,166 L 526,174 L 520,180
+    L 514,186 L 508,192 L 504,200 L 500,208 L 498,218
+    L 496,228 L 494,238 L 492,248 L 488,256 L 482,262
+    L 474,266 L 464,268 L 454,270 L 444,270 L 434,268
+    L 424,266 L 414,264 L 404,262 L 394,260 L 384,260
+    L 374,262 L 364,264 L 354,268 L 344,272 L 334,276
+    L 322,280 L 310,284 L 298,288 L 286,290 L 274,292
+    L 262,292 L 250,290 L 240,286 L 230,282 L 220,278
+    L 210,276 L 200,278 L 192,282 L 186,288 L 182,294
+    L 176,298 L 168,300 L 158,298 L 148,292 L 140,284
+    L 134,276 L 128,268 L 120,262 L 110,258 L 100,254
+    L 90,250 Z
+  "/>
+
+  <!-- Caspian Sea notch (west coast) -->
+  <path fill="rgba(0,60,80,0.35)" stroke="none" d="
+    M 28,158 L 22,148 L 18,136 L 16,122 L 18,110
+    L 24,102 L 30,98 L 36,100 L 42,106 L 44,114
+    L 46,122 L 44,132 L 40,140 L 34,148 L 30,156 Z
+  "/>
+  <text x="14" y="130" fill="rgba(255,255,255,0.55)" font-size="7" font-family="Nunito,sans-serif" transform="rotate(-70,14,130)">Каспий</text>
+
+  <!-- Aral Sea -->
+  <ellipse cx="196" cy="210" rx="22" ry="28" fill="rgba(0,60,80,0.4)" stroke="rgba(255,255,255,0.3)" stroke-width="0.8"/>
+  <text x="196" y="214" fill="rgba(255,255,255,0.6)" font-size="7" font-family="Nunito,sans-serif" text-anchor="middle">Арал</text>
+
+  <!-- Balkhash Lake -->
+  <path fill="rgba(0,60,80,0.45)" stroke="rgba(255,255,255,0.3)" stroke-width="0.8" d="
+    M 390,168 Q 420,160 450,164 Q 472,170 474,180
+    Q 456,188 428,186 Q 404,180 390,174 Z
+  "/>
+  <text x="432" y="198" fill="rgba(255,255,255,0.6)" font-size="7" font-family="Nunito,sans-serif" text-anchor="middle">Балхаш</text>
+
+  <!-- Mountain region tint (east — Altai, Tian Shan) -->
+  <path fill="rgba(0,50,40,0.22)" stroke="none" d="
+    M 490,102 L 510,130 L 528,148 L 530,166 L 524,178
+    L 514,188 L 502,208 L 494,240 L 490,256 L 482,262
+    L 474,268 L 460,270 L 450,268 L 440,268 L 428,264
+    L 418,260 L 408,260 L 398,262 L 388,262 L 380,262
+    L 372,264 L 358,268 L 344,272 L 330,278 L 318,282
+    L 306,286 L 294,290 L 282,292 L 270,292 L 260,290
+    L 252,288 L 244,284 L 234,280 L 224,278 L 216,278
+    L 210,278 L 200,280 L 192,284 L 186,290 L 182,294
+    L 176,298 L 170,300 L 162,298 L 152,292 L 144,284
+    Q 350,295 480,268 Q 498,250 504,220 Q 510,190 500,160 Z
+  " opacity="0.4"/>
+
+  <!-- Steppe texture lines (north Kazakhstan) -->
+  <line x1="120" y1="70" x2="310" y2="50" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+  <line x1="100" y1="85" x2="340" y2="62" stroke="rgba(255,255,255,0.04)" stroke-width="6"/>
+  <line x1="90" y1="100" x2="370" y2="75" stroke="rgba(255,255,255,0.03)" stroke-width="5"/>
+
+  <!-- === REGIONS subtle dividers === -->
+  <g stroke="rgba(255,255,255,0.12)" stroke-width="0.7" fill="none" stroke-dasharray="4,3">
+    <!-- Aktobe region boundary roughly -->
+    <path d="M 86,248 Q 120,200 130,140 Q 140,90 96,74"/>
+    <!-- West Kazakhstan -->
+    <path d="M 96,74 Q 150,70 200,72 Q 200,120 180,150 Q 160,180 130,200 L 86,248"/>
+    <!-- North Kazakhstan -->
+    <path d="M 200,48 Q 260,44 320,42 Q 320,90 300,120 Q 280,148 240,160 Q 210,168 180,150"/>
+    <!-- Karaganda center -->
+    <path d="M 320,42 Q 380,38 430,52 Q 440,100 430,140 Q 420,180 390,200 Q 350,220 310,220 Q 270,218 240,200 Q 220,180 210,168 Q 220,140 260,120 Q 290,100 300,80 Z"/>
+    <!-- East Kazakhstan -->
+    <path d="M 430,52 Q 490,78 520,130 Q 498,218 480,260 Q 440,270 400,262 Q 360,262 330,278 Q 310,286 290,292 Q 296,250 320,220 Q 350,196 380,200 Q 400,200 420,190 Q 440,170 440,140 Q 440,100 430,52"/>
+  </g>
+
+  <!-- === CITIES === -->
+  <!-- Astana (capital) -->
+  <circle cx="316" cy="88" r="5" fill="#FFD700" stroke="white" stroke-width="1.5"/>
+  <circle cx="316" cy="88" r="3" fill="white"/>
+  <text x="322" y="82" fill="white" font-size="9" font-weight="700" font-family="Nunito,sans-serif">Астана ★</text>
+
+  <!-- Almaty -->
+  <circle cx="426" cy="218" r="4" fill="rgba(255,255,255,0.9)" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+  <text x="433" y="222" fill="rgba(255,255,255,0.85)" font-size="8" font-family="Nunito,sans-serif">Алматы</text>
+
+  <!-- Shymkent -->
+  <circle cx="312" cy="268" r="3.5" fill="rgba(255,255,255,0.8)" stroke="rgba(255,255,255,0.3)" stroke-width="0.8"/>
+  <text x="318" y="272" fill="rgba(255,255,255,0.75)" font-size="7.5" font-family="Nunito,sans-serif">Шымкент</text>
+
+  <!-- Aktobe -->
+  <circle cx="140" cy="146" r="3.5" fill="rgba(255,255,255,0.8)" stroke="rgba(255,255,255,0.3)" stroke-width="0.8"/>
+  <text x="147" y="150" fill="rgba(255,255,255,0.75)" font-size="7.5" font-family="Nunito,sans-serif">Ақтөбе</text>
+
+  <!-- Karaganda -->
+  <circle cx="352" cy="162" r="3.5" fill="rgba(255,255,255,0.8)" stroke="rgba(255,255,255,0.3)" stroke-width="0.8"/>
+  <text x="358" y="158" fill="rgba(255,255,255,0.75)" font-size="7.5" font-family="Nunito,sans-serif">Қарағанды</text>
+
+  <!-- Pavlodar -->
+  <circle cx="406" cy="80" r="3" fill="rgba(255,255,255,0.7)" stroke="rgba(255,255,255,0.3)" stroke-width="0.8"/>
+  <text x="412" y="78" fill="rgba(255,255,255,0.65)" font-size="7" font-family="Nunito,sans-serif">Павлодар</text>
+
+  <!-- Oral -->
+  <circle cx="90" cy="128" r="3" fill="rgba(255,255,255,0.7)" stroke="rgba(255,255,255,0.3)" stroke-width="0.8"/>
+  <text x="96" y="124" fill="rgba(255,255,255,0.65)" font-size="7" font-family="Nunito,sans-serif">Орал</text>
+
+  <!-- === KHROMTAU — HIGHLIGHTED === -->
+  <!-- Хромтау: Aktobe region, ~50.27°N 58.44°E → on this map approx x=96, y=108 -->
+  <!-- Pulsing ring -->
+  <circle class="kz-ring" cx="96" cy="108" r="10" fill="none" stroke="#FFD700" stroke-width="1.5"/>
+  <!-- Main dot -->
+  <circle class="kz-pulse" cx="96" cy="108" r="8" fill="#FFD700" stroke="white" stroke-width="2"/>
+  <circle cx="96" cy="108" r="4" fill="#FF6F00"/>
+  <!-- Callout -->
+  <line x1="104" y1="100" x2="148" y2="76" stroke="#FFD700" stroke-width="1" stroke-dasharray="3,2"/>
+  <rect x="146" y="58" width="90" height="26" rx="6" fill="rgba(0,0,0,0.55)" stroke="#FFD700" stroke-width="1"/>
+  <text x="191" y="70" fill="#FFD700" font-size="10" font-weight="700" font-family="Nunito,sans-serif" text-anchor="middle">Хромтау</text>
+  <text x="191" y="80" fill="rgba(255,255,255,0.7)" font-size="7" font-family="Nunito,sans-serif" text-anchor="middle">Ақтөбе облысы</text>
+
+  <!-- Kazakh ornament strip (left side, like on flag) -->
+  <rect x="4" y="22" width="12" height="298" rx="3" fill="rgba(255,215,0,0.15)" stroke="rgba(255,215,0,0.3)" stroke-width="0.5"/>
+  <line x1="10" y1="30" x2="10" y2="308" stroke="#FFD700" stroke-width="0.5" stroke-dasharray="2,4" opacity="0.5"/>
+
+  <!-- Scale bar -->
+  <line x1="40" y1="316" x2="190" y2="316" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="40" y1="312" x2="40" y2="320" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+  <line x1="190" y1="312" x2="190" y2="320" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+  <text x="115" y="330" fill="rgba(255,255,255,0.6)" font-size="7.5" font-family="Nunito,sans-serif" text-anchor="middle">≈ 1 000 км</text>
+
+  <!-- KZ text bottom right -->
+  <text x="540" y="326" fill="rgba(255,215,0,0.4)" font-size="28" font-weight="900" font-family="Nunito,sans-serif" text-anchor="end">KZ</text>
+</svg>
+          </div>
+          <style>
+@keyframes kzPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:0.75}}
+@keyframes kzRing{0%{r:10;opacity:0.7;stroke-width:1.5}100%{r:24;opacity:0;stroke-width:0.5}}
+.kz-pulse{transform-origin:96px 108px;animation:kzPulse 1.8s ease-in-out infinite;}
+.kz-ring{transform-origin:96px 108px;animation:kzRing 2s ease-out infinite;}
+</style>
+          <div style="font-family:'Unbounded','Noto Sans',sans-serif;font-size:22px;font-weight:900;color:#fff;margin-bottom:8px;line-height:1.2;position:relative;z-index:1;" data-ru>🎯 Цель — весь Казахстан</div>
+          <div style="font-family:'Unbounded','Noto Sans',sans-serif;font-size:22px;font-weight:900;color:#fff;margin-bottom:8px;line-height:1.2;position:relative;z-index:1;display:none;" data-kz>🎯 Мақсат — бүкіл Қазақстан</div>
+          <div style="font-size:14px;color:rgba(255,255,255,0.8);line-height:1.6;margin-bottom:20px;position:relative;z-index:1;" data-ru>Начинаем с Хромтау — масштабируемся на все 14 регионов</div>
+          <div style="font-size:14px;color:rgba(255,255,255,0.8);line-height:1.6;margin-bottom:20px;position:relative;z-index:1;display:none;" data-kz>Хромтаудан бастап — барлық 14 облысқа кеңейтеміз</div>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1;">
+            <div style="background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.25);border-radius:12px;padding:10px 16px;font-size:12px;font-weight:800;color:#fff;">📍 Хромтау — старт</div>
+            <div style="background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.25);border-radius:12px;padding:10px 16px;font-size:12px;font-weight:800;color:#fff;" data-ru>🚀 14 регионов</div>
+            <div style="background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.25);border-radius:12px;padding:10px 16px;font-size:12px;font-weight:800;color:#fff;display:none;" data-kz>🚀 14 облыс</div>
+            <div style="background:rgba(255,213,79,0.25);border:1px solid rgba(255,213,79,0.5);border-radius:12px;padding:10px 16px;font-size:12px;font-weight:800;color:#FFD54F;" data-ru>🌱 2026</div>
+            <div style="background:rgba(255,213,79,0.25);border:1px solid rgba(255,213,79,0.5);border-radius:12px;padding:10px 16px;font-size:12px;font-weight:800;color:#FFD54F;display:none;" data-kz>🌱 2026</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-inner">
+    <div class="section-label" data-ru>ВОЗМОЖНОСТИ</div>
+    <div class="section-label" data-kz>МҮМКІНДІКТЕР</div>
+    <h2 class="section-title" data-ru>Всё для экообразования</h2>
+    <h2 class="section-title" data-kz>Экобілім беру үшін бәрі</h2>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">📚</div>
+        <div class="feat-title" data-ru>Видео-уроки</div>
+        <div class="feat-title" data-kz>Бейне сабақтар</div>
+        <div class="feat-desc" data-ru>YouTube-уроки с конспектом и тестом из 10 вопросов. На русском и казахском.</div>
+        <div class="feat-desc" data-kz>10 сұрақтан тұратын YouTube сабақтары. Орыс және қазақ тілдерінде.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🎮</div>
+        <div class="feat-title" data-ru>EcoGame</div>
+        <div class="feat-title" data-kz>EcoGame</div>
+        <div class="feat-desc" data-ru>Учитель создаёт комнату, ученики заходят по коду. Рейтинг, медали, значки после игры.</div>
+        <div class="feat-desc" data-kz>Мұғалім бөлме жасайды, оқушылар кодпен кіреді. Рейтинг, медальдар.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🌍</div>
+        <div class="feat-title" data-ru>Живая эко-карта</div>
+        <div class="feat-title" data-kz>Тірі эко-карта</div>
+        <div class="feat-desc" data-ru>Каждый выполненный квест добавляет зелёную точку на карту. Видно где убрали мусор, посадили деревья.</div>
+        <div class="feat-desc" data-kz>Әр орындалған квест картаға жасыл нүкте қосады.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🏆</div>
+        <div class="feat-title" data-ru>Геймификация</div>
+        <div class="feat-title" data-kz>Геймификация</div>
+        <div class="feat-desc" data-ru>Eco Points, уровни (🌱🌿🌳), значки и медали. Рейтинг школ по всему Казахстану.</div>
+        <div class="feat-desc" data-kz>Eco Points, деңгейлер, белгілер. Қазақстандағы мектептердің рейтингі.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🐹</div>
+        <div class="feat-title" data-ru>Чат-бот хомяк</div>
+        <div class="feat-title" data-kz>Хомяк чат-боты</div>
+        <div class="feat-desc" data-ru>Маскот-хомяк отвечает на вопросы об экологии и помогает разобраться в платформе.</div>
+        <div class="feat-desc" data-kz>Хомяк маскоты экология туралы сұрақтарға жауап береді.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📋</div>
+        <div class="feat-title" data-ru>Квесты и отчёты</div>
+        <div class="feat-title" data-kz>Квесттер мен есептер</div>
+        <div class="feat-desc" data-ru>Подростки выполняют эко-задания и отправляют фото-отчёты. Система автоматически начисляет баллы после проверки.</div>
+        <div class="feat-desc" data-kz>Жасөспірімдер тапсырмалар орындайды, есептер жібереді. Жүйе ұпайларды автоматты есептейді.</div>
+      </div>
+    </div>
+  </div>
+
+<!-- ===== VIDEO LESSONS CAROUSEL ===== -->
+<section class="video-section" id="video-lessons">
+  <div class="section-inner">
+    <div class="section-label" data-ru>ВИДЕО-УРОКИ</div>
+    <div class="section-label" data-kz>БЕЙНЕ САБАҚТАР</div>
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h2 class="section-title" data-ru>Уроки EcoBala Kids</h2>
+        <h2 class="section-title" data-kz>EcoBala Kids сабақтары</h2>
+        <p class="section-desc" data-ru>Видео-уроки по экологии с тестами. Смотри, учись, зарабатывай Eco Points!</p>
+        <p class="section-desc" data-kz>Тесті бар экология бейне сабақтары. Қара, үйрен, Eco Points жина!</p>
+      </div>
+      <div class="video-nav" id="videoNav">
+        <button class="vn-btn" onclick="scrollVideos(-1)">←</button>
+        <button class="vn-btn" onclick="scrollVideos(1)">→</button>
+      </div>
+    </div>
+    <div class="video-track-wrap">
+      <div class="video-track" id="videoTrack">
+        <!-- Cards injected by JS from Supabase or defaults -->
+      </div>
+    </div>
+    <div class="video-dots" id="videoDots"></div>
+    <div style="text-align:center;margin-top:28px;">
+      <a href="register.html" class="btn-primary" style="display:inline-flex;">
+        <span data-ru>Смотреть все уроки →</span>
+        <span data-kz>Барлық сабақтарды қарау →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Video modal player -->
+<div class="video-modal-overlay" id="videoModal" onclick="closeVideoModal(event)">
+  <div class="video-modal-box">
+    <button class="video-modal-close" onclick="closeVideoModal()">✕</button>
+    <iframe id="videoModalFrame" allowfullscreen></iframe>
+  </div>
+</div>
+
+<!-- TEACHER SECTION -->
+<section class="teacher-section" id="teacher">
+  <div class="section-inner">
+    <div class="section-label" style="color:#1565C0;">ДЛЯ УЧИТЕЛЕЙ / МҰҒАЛІМДЕР ҮШІН</div>
+    <h2 class="section-title" data-ru>Учительская панель</h2>
+    <h2 class="section-title" data-kz>Мұғалімдер панелі</h2>
+    <p class="section-desc" data-ru>Специальный инструмент для учителей: создавайте игровые комнаты, проводите EcoGame-викторины прямо на уроке.</p>
+    <p class="section-desc" data-kz>Мұғалімдерге арналған арнайы құрал: ойын бөлмелерін жасаңыз, EcoGame-викториналар өткізіңіз.</p>
+    <div class="teacher-grid">
+      <div class="teacher-info-cards">
+        <div class="t-info-card">
+          
+          <div>
+            <div class="t-info-title" data-ru>EcoGame сабақта</div>
+            <div class="t-info-title" data-kz>Сыныпта EcoGame</div>
+            <div class="t-info-desc" data-ru>Создайте комнату, получите код - дети заходят по коду со своих устройств и соревнуются в реальном времени.</div>
+            <div class="t-info-desc" data-kz>Бөлме жасаңыз, кодты алыңыз - балалар өз құрылғыларынан кодпен кіреді.</div>
+          </div>
+        </div>
+        <div class="t-info-card">
+          
+          <div>
+            <div class="t-info-title" data-ru>Игра на школьной доске</div>
+            <div class="t-info-title" data-kz>Мектеп тақтасындағы ойын</div>
+            <div class="t-info-desc" data-ru>Вторая игра - для одного большого экрана. Запустите на проекторе или интерактивной доске.</div>
+            <div class="t-info-desc" data-kz>Екінші ойын - бір үлкен экран үшін. Проекторда немесе интерактивті тақтада іске қосыңыз.</div>
+          </div>
+        </div>
+        <div class="t-info-card">
+          
+          <div>
+            <div class="t-info-title" data-ru>Рейтинг и медали после игры</div>
+            <div class="t-info-title" data-kz>Ойыннан кейін рейтинг және медальдар</div>
+            <div class="t-info-desc" data-ru>После каждой игры - автоматический подсчёт баллов, подиум победителей и значки для участников.</div>
+            <div class="t-info-desc" data-kz>Әр ойыннан кейін - автоматты ұпай есебі, жеңімпаздар подиумы.</div>
+          </div>
+        </div>
+        <div class="t-info-card">
+          
+          <div>
+            <div class="t-info-title" data-ru>Kids & Teen - для всех возрастов</div>
+            <div class="t-info-title" data-kz>Kids & Teen - барлық жас үшін</div>
+            <div class="t-info-desc" data-ru>Уроки для детей 6–12 лет (Kids) и квесты для подростков 13–17 лет (Teen) - всё в одной платформе.</div>
+            <div class="t-info-desc" data-kz>6-12 жас балалар үшін сабақтар (Kids) және 13-17 жас үшін квесттер (Teen).</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="teacher-login-box">
+          <div class="tlb-title" data-ru>Вход в учительскую</div>
+          <div class="tlb-title" data-kz>Мұғалімдер панеліне кіру</div>
+          <div class="tlb-desc" data-ru>Доступ в учительскую панель - только для зарегистрированных учителей. Логин и пароль выдаёт Telegram-бот автоматически.</div>
+          <div class="tlb-desc" data-kz>Мұғалімдер панеліне кіру - тек тіркелген мұғалімдерге. Логин мен парольді Telegram-бот автоматты түрде береді.</div>
+          <div style="background:#F3F8FF;border-radius:12px;padding:14px;font-size:13px;color:#1565C0;font-weight:600;line-height:1.6;margin-bottom:16px;border:1px solid #BBDEFB;">
+            <span data-ru>1. Откройте Telegram-бот @Ecobalabot<br>2. Напишите /teacher<br>3. Бот пришлёт логин и пароль<br>4. Войдите в учительскую ниже</span>
+            <span data-kz style="display:none">1. Telegram-боты @Ecobalabot ашыңыз<br>2. /teacher жазыңыз<br>3. Бот логин мен парольді жіберді<br>4. Мұғалімдер панеліне кіріңіз</span>
+          </div>
+          <a href="teacher.html" class="btn-primary" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;background:#1565C0;">
+            <span data-ru>Войти в учительскую →</span>
+            <span data-kz style="display:none">Мұғалімдер панеліне кіру →</span>
+          </a>
+          <a class="tg-banner" href="https://t.me/Ecobalabot" target="_blank">
+            <div class="tg-banner-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+            </div>
+            <div class="tg-banner-text">
+              <div class="tg-banner-title" data-ru>Получить доступ в Telegram</div>
+              <div class="tg-banner-title" data-kz style="display:none">Telegram арқылы кіру</div>
+              <div class="tg-banner-sub">@Ecobalabot - <span data-ru>бот выдаст логин и пароль</span><span data-kz style="display:none">бот логин мен парольді береді</span></div>
+            </div>
+            <div class="tg-banner-arrow">→</div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews" id="reviews">
+  <div class="section-inner">
+    <div class="section-label">ОТЗЫВЫ / ПІКІРЛЕР</div>
+    <h2 class="section-title" data-ru>Что говорят пользователи</h2>
+    <h2 class="section-title" data-kz>Пайдаланушылар не дейді</h2>
+    <div class="reviews-grid">
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-text" data-ru>«EcoBala - это то, чего не хватало! Выполнил уже 8 квестов, посадил деревья и убрал мусор у речки. Теперь наша школа в топ-3 рейтинга!»</div>
+        <div class="review-text" data-kz>«EcoBala - бұл керек нәрсе! 8 квест орындадым, ағаш отырғыздым, өзен жағасын тазаладым. Мектебіміз топ-3-те!»</div>
+        <div class="review-author">
+          <div class="rev-avatar">МС</div>
+          <div>
+            <div class="rev-name">Мұқтар Сайлау</div>
+            <div class="rev-role" data-ru>Teen-пользователь, 16 лет, Хромтау</div>
+            <div class="rev-role" data-kz>Teen-пайдаланушы, 16 жас, Хромтау</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-text" data-ru>«Квесты реально мотивируют выходить на улицу и делать что-то полезное. Eco Points копятся быстро, уже на 4-м уровне. Советую всем!»</div>
+        <div class="review-text" data-kz>«Квесттер шынымен сыртқа шығып, пайдалы іс жасауға ынталандырады. Eco Points жылдам жиналады, 4-деңгейдемін. Барлығына ұсынамын!»</div>
+        <div class="review-author">
+          <div class="rev-avatar">ЕР</div>
+          <div>
+            <div class="rev-name">Ергали Рустембек</div>
+            <div class="rev-role" data-ru>Teen-пользователь, 15 лет, Хромтау</div>
+            <div class="rev-role" data-kz>Teen-пайдаланушы, 15 жас, Хромтау</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-text" data-ru>«Начал с нуля - теперь 12 выполненных квестов и значок "Эко-герой". EcoBala реально меняет отношение к природе!»</div>
+        <div class="review-text" data-kz>«Нөлден бастадым - қазір 12 орындалған квест және "Эко-батыр" белгісі. EcoBala табиғатқа көзқарасты шынымен өзгертеді!»</div>
+        <div class="review-author">
+          <div class="rev-avatar">НА</div>
+          <div>
+            <div class="rev-name">Нурмухан Алихан</div>
+            <div class="rev-role" data-ru>Teen-пользователь, EcoBala Kids выпускник</div>
+            <div class="rev-role" data-kz>Teen-пайдаланушы, EcoBala Kids түлегі</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LEAVE REVIEW -->
+<section class="leave-review">
+  <div class="section-inner">
+    <div class="section-label" data-ru>ПОДЕЛИТЕСЬ</div>
+    <div class="section-label" data-kz>БӨЛІСІҢІЗ</div>
+    <h2 class="section-title" data-ru>Оставить отзыв</h2>
+    <h2 class="section-title" data-kz>Пікір қалдыру</h2>
+    <div class="review-form">
+      <div class="form-group">
+        <label class="form-label" data-ru>Ваше имя</label>
+        <label class="form-label" data-kz>Атыңыз</label>
+        <input class="form-input" type="text" placeholder="Айгуль Мамедова">
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-ru>Оценка</label>
+        <label class="form-label" data-kz>Баға</label>
+        <div class="stars-input" id="starsInput">
+          <button class="star-btn" data-v="1" onclick="setStars(1)">★</button>
+          <button class="star-btn" data-v="2" onclick="setStars(2)">★</button>
+          <button class="star-btn" data-v="3" onclick="setStars(3)">★</button>
+          <button class="star-btn" data-v="4" onclick="setStars(4)">★</button>
+          <button class="star-btn" data-v="5" onclick="setStars(5)">★</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-ru>Ваш отзыв</label>
+        <label class="form-label" data-kz>Пікіріңіз</label>
+        <textarea class="form-textarea" placeholder="..." id="reviewText"></textarea>
+      </div>
+      <button class="btn-primary" onclick="submitReview()" style="width:100%;justify-content:center;">
+        <span data-ru>Отправить отзыв</span>
+        <span data-kz>Пікір жіберу</span>
+        →
+      </button>
+      <div id="reviewSuccess" style="display:none;margin-top:12px;padding:12px;background:var(--green-pale);border-radius:10px;font-size:14px;font-weight:700;color:var(--green-dark);text-align:center;">
+        ✅ <span data-ru>Спасибо за отзыв!</span><span data-kz>Пікіріңіз үшін рахмет!</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== КАК РАБОТАЕТ ===== -->
+<section style="padding:80px 5%;background:#fff;">
+  <div class="section-inner">
+    <div class="section-label" data-ru>КАК ЭТО РАБОТАЕТ</div>
+    <div class="section-label" data-kz>ҚАЛАЙ ЖҰМЫС ІСТЕЙДІ</div>
+    <h2 class="section-title" data-ru>Три простых шага</h2>
+    <h2 class="section-title" data-kz>Үш қарапайым қадам</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;margin-top:48px;">
+      <div style="text-align:center;padding:32px 24px;background:var(--green-pale);border-radius:20px;border:1.5px solid var(--green-light);transition:transform .2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+        <div style="width:64px;height:64px;background:var(--green);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 20px;">📝</div>
+        <div style="font-size:11px;font-weight:800;color:var(--green);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;" data-ru>ШАГ 1</div>
+        <div style="font-size:11px;font-weight:800;color:var(--green);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;" data-kz>1-ҚАДАМ</div>
+        <div style="font-size:18px;font-weight:900;margin-bottom:10px;" data-ru>Регистрация</div>
+        <div style="font-size:18px;font-weight:900;margin-bottom:10px;" data-kz>Тіркелу</div>
+        <div style="font-size:14px;color:var(--text-muted);line-height:1.7;" data-ru>Создай бесплатный аккаунт в Kids (6–12 лет) или Teen (13–18 лет) за 2 минуты</div>
+        <div style="font-size:14px;color:var(--text-muted);line-height:1.7;" data-kz>Kids (6–12 жас) немесе Teen (13–18 жас) аккаунтын 2 минутта жасаңыз</div>
+      </div>
+      <div style="text-align:center;padding:32px 24px;background:#E3F2FD;border-radius:20px;border:1.5px solid #BBDEFB;transition:transform .2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+        <div style="width:64px;height:64px;background:#1565C0;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 20px;">🎮</div>
+        <div style="font-size:11px;font-weight:800;color:#1565C0;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;" data-ru>ШАГ 2</div>
+        <div style="font-size:11px;font-weight:800;color:#1565C0;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;" data-kz>2-ҚАДАМ</div>
+        <div style="font-size:18px;font-weight:900;margin-bottom:10px;" data-ru>Учись и играй</div>
+        <div style="font-size:18px;font-weight:900;margin-bottom:10px;" data-kz>Оқы және ойна</div>
+        <div style="font-size:14px;color:var(--text-muted);line-height:1.7;" data-ru>Проходи уроки, выполняй квесты в реальном мире, играй в EcoGame с классом</div>
+        <div style="font-size:14px;color:var(--text-muted);line-height:1.7;" data-kz>Сабақтарды өт, квесттер орында, EcoGame-де ойна</div>
+      </div>
+      <div style="text-align:center;padding:32px 24px;background:#FFF8E1;border-radius:20px;border:1.5px solid #FFE082;transition:transform .2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+        <div style="width:64px;height:64px;background:#F57F17;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 20px;">🏆</div>
+        <div style="font-size:11px;font-weight:800;color:#F57F17;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;" data-ru>ШАГ 3</div>
+        <div style="font-size:11px;font-weight:800;color:#F57F17;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;" data-kz>3-ҚАДАМ</div>
+        <div style="font-size:18px;font-weight:900;margin-bottom:10px;" data-ru>Расти и побеждай</div>
+        <div style="font-size:18px;font-weight:900;margin-bottom:10px;" data-kz>Өс және жең</div>
+        <div style="font-size:14px;color:var(--text-muted);line-height:1.7;" data-ru>Зарабатывай Eco Points, получай значки, поднимайся в рейтинге школ и учеников</div>
+        <div style="font-size:14px;color:var(--text-muted);line-height:1.7;" data-kz>Eco Points жина, белгілер ал, мектеп рейтингінде жоғарыла</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ЖИВАЯ СТАТИСТИКА ===== -->
+<section style="padding:70px 5%;background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 50%,#388E3C 100%);">
+  <div class="section-inner">
+    <div style="text-align:center;margin-bottom:40px;">
+      <div style="font-size:12px;font-weight:800;letter-spacing:3px;color:rgba(255,255,255,0.7);text-transform:uppercase;margin-bottom:10px;" data-ru>ДОБРЫЕ ДЕЛА СЕГОДНЯ</div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:3px;color:rgba(255,255,255,0.7);text-transform:uppercase;margin-bottom:10px;" data-kz>БҮГІНГІ ЖАҚСЫ ІСТЕР</div>
+      <h2 style="font-family:'Unbounded','Noto Sans',sans-serif;font-size:clamp(22px,4vw,34px);font-weight:900;color:#fff;margin-bottom:8px;" data-ru>Платформа уже работает</h2>
+      <h2 style="font-family:'Unbounded','Noto Sans',sans-serif;font-size:clamp(22px,4vw,34px);font-weight:900;color:#fff;margin-bottom:8px;" data-kz>Платформа жұмыс істеп тұр</h2>
+      <p style="color:rgba(255,255,255,0.75);font-size:15px;" data-ru>Реальные данные из Supabase</p>
+      <p style="color:rgba(255,255,255,0.75);font-size:15px;" data-kz>Нақты деректер</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;">
+      <div style="background:rgba(255,255,255,0.12);border-radius:20px;padding:28px;text-align:center;border:1px solid rgba(255,255,255,0.15);">
+        <div style="font-family:'Unbounded','Noto Sans',sans-serif;font-size:36px;font-weight:900;color:#fff;" id="statTotalUsers">—</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:700;margin-top:6px;" data-ru>Учеников</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:700;margin-top:6px;" data-kz>Оқушылар</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.12);border-radius:20px;padding:28px;text-align:center;border:1px solid rgba(255,255,255,0.15);">
+        <div style="font-family:'Unbounded','Noto Sans',sans-serif;font-size:36px;font-weight:900;color:#69F0AE;" id="statTotalPts">—</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:700;margin-top:6px;">Eco Points</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.12);border-radius:20px;padding:28px;text-align:center;border:1px solid rgba(255,255,255,0.15);">
+        <div style="font-family:'Unbounded','Noto Sans',sans-serif;font-size:36px;font-weight:900;color:#FFD740;" id="statSchools">—</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:700;margin-top:6px;" data-ru>Школ участвует</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:700;margin-top:6px;" data-kz>Мектеп қатысады</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.12);border-radius:20px;padding:28px;text-align:center;border:1px solid rgba(255,255,255,0.15);">
+        <div style="font-family:'Unbounded','Noto Sans',sans-serif;font-size:36px;font-weight:900;color:#80DEEA;" id="statReports">—</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:700;margin-top:6px;" data-ru>Эко-отчётов</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:700;margin-top:6px;" data-kz>Эко-есептер</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ТОП РЕЙТИНГ ===== -->
+<section style="padding:80px 5%;background:#F8FBF8;">
+  <div class="section-inner">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:40px;flex-wrap:wrap;gap:16px;">
+      <div>
+        <div class="section-label" data-ru>ЛИДЕРЫ ПЛАТФОРМЫ</div>
+        <div class="section-label" data-kz>ПЛАТФОРМА КӨШБАСШЫЛАРЫ</div>
+        <h2 class="section-title" data-ru>Топ-3 школы</h2>
+        <h2 class="section-title" data-kz>Топ-3 мектеп</h2>
+      </div>
+      <a href="login.html" style="background:var(--green);color:#fff;padding:12px 24px;border-radius:50px;font-size:14px;font-weight:800;text-decoration:none;display:inline-flex;align-items:center;gap:6px;" data-ru>Войти и участвовать →</a>
+      <a href="login.html" style="background:var(--green);color:#fff;padding:12px 24px;border-radius:50px;font-size:14px;font-weight:800;text-decoration:none;display:inline-flex;align-items:center;gap:6px;" data-kz>Кіру және қатысу →</a>
+    </div>
+    <div id="indexLeaderboard" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">
+      <div style="text-align:center;padding:40px;color:var(--text-muted);font-size:14px;" id="lbLoadingMsg">
+        <span data-ru>⏳ Загружаем рейтинг...</span>
+        <span data-kz>⏳ Рейтинг жүктелуде...</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== СКОРО В ECOBALA ===== -->
+<section style="padding:70px 5%;background:#fff;">
+  <div class="section-inner">
+    <div style="text-align:center;margin-bottom:40px;">
+      <div class="section-label" data-ru>БУДУЩЕЕ</div>
+      <div class="section-label" data-kz>БОЛАШАҚ</div>
+      <h2 class="section-title" data-ru>Скоро в EcoBala</h2>
+      <h2 class="section-title" data-kz>EcoBala-да жақында</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+      <div style="padding:24px;border-radius:16px;background:var(--green-pale);border:1.5px dashed var(--green-light);opacity:.85;">
+        <div style="font-size:32px;margin-bottom:12px;">📱</div>
+        <div style="font-size:15px;font-weight:900;margin-bottom:6px;" data-ru>Мобильное приложение</div>
+        <div style="font-size:15px;font-weight:900;margin-bottom:6px;" data-kz>Мобильді қосымша</div>
+        <div style="font-size:13px;color:var(--text-muted);" data-ru>iOS и Android приложения EcoBala</div>
+        <div style="font-size:13px;color:var(--text-muted);" data-kz>iOS және Android қосымшалары</div>
+      </div>
+      <div style="padding:24px;border-radius:16px;background:#E3F2FD;border:1.5px dashed #BBDEFB;opacity:.85;">
+        <div style="font-size:32px;margin-bottom:12px;">🏫</div>
+        <div style="font-size:15px;font-weight:900;margin-bottom:6px;" data-ru>Турниры школ</div>
+        <div style="font-size:15px;font-weight:900;margin-bottom:6px;" data-kz>Мектеп турнирлері</div>
+        <div style="font-size:13px;color:var(--text-muted);" data-ru>Городские и районные соревнования</div>
+        <div style="font-size:13px;color:var(--text-muted);" data-kz>Қалалық және аудандық жарыстар</div>
+      </div>
+      <div style="padding:24px;border-radius:16px;background:#FFF8E1;border:1.5px dashed #FFE082;opacity:.85;">
+        <div style="font-size:32px;margin-bottom:12px;">🤖</div>
+        <div style="font-size:15px;font-weight:900;margin-bottom:6px;" data-ru>ИИ-наставник</div>
+        <div style="font-size:15px;font-weight:900;margin-bottom:6px;" data-kz>ЖИ-тәлімгер</div>
+        <div style="font-size:13px;color:var(--text-muted);" data-ru>Персональные маршруты обучения</div>
+        <div style="font-size:13px;color:var(--text-muted);" data-kz>Жеке оқу жолдары</div>
+      </div>
+      <div style="padding:24px;border-radius:16px;background:#FCE4EC;border:1.5px dashed #F48FB1;opacity:.85;">
+        <div style="font-size:32px;margin-bottom:12px;">🌍</div>
+        <div style="font-size:15px;font-weight:900;margin-bottom:6px;" data-ru>Масштаб на КЗ</div>
+        <div style="font-size:15px;font-weight:900;margin-bottom:6px;" data-kz>ҚЗ бойынша кеңею</div>
+        <div style="font-size:13px;color:var(--text-muted);" data-ru>Все регионы Казахстана</div>
+        <div style="font-size:13px;color:var(--text-muted);" data-kz>Қазақстанның барлық өңірлері</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="section-inner">
+    <div class="section-label">FAQ</div>
+    <h2 class="section-title" data-ru>Частые вопросы</h2>
+    <h2 class="section-title" data-kz>Жиі қойылатын сұрақтар</h2>
+    <div class="faq-list" id="faqList"></div>
+  </div>
+</section>
+
+<!-- SOCIAL -->
+<section class="social-section" id="social" style="padding:36px 5%;">
+  <div class="section-inner" style="max-width:700px;">
+    <div class="section-label" data-ru>МЫ В СЕТЯХ</div>
+    <div class="section-label" data-kz>БІЗДІҢ ЖЕЛІЛЕР</div>
+    <h2 class="section-title" data-ru>Социальные сети</h2>
+    <h2 class="section-title" data-kz>Әлеуметтік желілер</h2>
+    <div class="social-grid">
+      <a class="social-card" href="https://t.me/Ecobalabot" target="_blank">
+        <div class="social-icon sc-tg">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="#1565C0"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+        </div>
+        <div>
+          <div class="social-name">Telegram</div>
+          <div class="social-handle">@Ecobalabot</div>
+        </div>
+        <div class="social-arrow">→</div>
+      </a>
+      <a class="social-card" href="https://youtube.com/@ecobalakz" target="_blank">
+        <div class="social-icon sc-yt">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="#C62828"><path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg>
+        </div>
+        <div>
+          <div class="social-name">YouTube</div>
+          <div class="social-handle">@ecobalakz</div>
+        </div>
+        <div class="social-arrow">→</div>
+      </a>
+      <a class="social-card" href="https://www.instagram.com/ecobala.kz" target="_blank">
+        <div class="social-icon sc-ig">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="#C2185B"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+        </div>
+        <div>
+          <div class="social-name">Instagram</div>
+          <div class="social-handle">@ecobala.kz</div>
+        </div>
+        <div class="social-arrow">→</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+  <div class="section-inner">
+    <div class="section-label" data-ru>КОНТАКТЫ</div>
+    <div class="section-label" data-kz>БАЙЛАНЫС</div>
+    <h2 class="section-title" data-ru>Свяжитесь с нами</h2>
+    <h2 class="section-title" data-kz>Бізбен байланысыңыз</h2>
+    <div class="contact-grid">
+      <div>
+        <div class="contact-info">
+          <div class="contact-item">
+            <div class="contact-icon">📞</div>
+            <div>
+              <div class="contact-label">Телефон</div>
+              <div class="contact-val"><a href="tel:+77714514717">+7 771 451 4717</a></div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">✉️</div>
+            <div>
+              <div class="contact-label">Email</div>
+              <div class="contact-val"><a href="mailto:ecobalakz@gmail.com">ecobalakz@gmail.com</a></div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">📍</div>
+            <div>
+              <div class="contact-label" data-ru>Адрес</div>
+              <div class="contact-label" data-kz>Мекенжай</div>
+              <div class="contact-val" data-ru>Хромтау, Казахстан</div>
+              <div class="contact-val" data-kz>Хромтау, Қазақстан</div>
+            </div>
+          </div>
+        </div>
+        <div class="made-by">
+          <div class="made-label" data-ru>Создано командой</div>
+          <div class="made-label" data-kz>Команда жасаған</div>
+          <div class="made-names">
+            <div class="made-name-pill">👨‍💻 Ermukhanov M.</div>
+            <div class="made-name-pill">👨‍💻 Amirtay E.</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="map-frame">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d12134.435739800409!2d58.43433668648167!3d50.25550171417464!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sru!2skz!4v1773414341819!5m2!1sru!2skz"
+            allowfullscreen loading="lazy">
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-logo">🌱 EcoBala</div>
+        <div class="footer-tagline" data-ru>Экологическое образование для детей Казахстана. Начинаем с Хромтау - масштабируемся на всю страну.</div>
+        <div class="footer-tagline" data-kz>Қазақстан балалары үшін экологиялық білім беру.</div>
+        <div style="display:flex;gap:10px;margin-top:12px;">
+          <a href="https://t.me/Ecobalabot" target="_blank" style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="rgba(255,255,255,0.8)"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+          </a>
+          <a href="https://youtube.com/@ecobalakz" target="_blank" style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="rgba(255,255,255,0.8)"><path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/ecobala.kz" target="_blank" style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="rgba(255,255,255,0.8)"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title" data-ru>Платформа</div>
+        <div class="footer-col-title" data-kz>Платформа</div>
+        <div class="footer-col-links">
+          <a href="#whowe" data-ru>Кто мы</a>
+          <a href="#whowe" data-kz>Біз кімбіз</a>
+          <a href="#features" data-ru>Возможности</a>
+          <a href="#features" data-kz>Мүмкіндіктер</a>
+          <a href="#teacher" data-ru>Учителям</a>
+          <a href="#teacher" data-kz>Мұғалімдерге</a>
+          <a href="#faq">FAQ</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title" data-ru>Войти</div>
+        <div class="footer-col-title" data-kz>Кіру</div>
+        <div class="footer-col-links">
+          <a href="login.html" data-ru>Kids - вход</a>
+          <a href="login.html" data-kz>Kids - кіру</a>
+          <a href="login.html" data-ru>Teen - вход</a>
+          <a href="login.html" data-kz>Teen - кіру</a>
+          <a href="teacher.html" data-ru>Учительская</a>
+          <a href="teacher.html" data-kz>Мұғалімдер</a>
+          <a href="#contact" data-ru>Контакты</a>
+          <a href="#contact" data-kz>Байланыс</a>
+        </div>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 EcoBala. Хромтау, Казахстан.</div>
+      <div class="footer-made" id="footerMade" title="Click 5 times for admin access">
+        Made by <span id="madeBy1">Ermukhanov M.</span> &amp; <span id="madeBy2">Amirtay E.</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ─── SPLASH SCREEN - двуязычный, без переключателя ────────────────────────────
+(function() {
+  const splash = document.getElementById('splash');
+  if (!splash) return;
+
+  // Язык из localStorage (устанавливается в kids/teen при смене языка)
+  const lang = localStorage.getItem('selectedLanguage') || 'kz';
+
+  // Двуязычные тексты
+  const texts = {
+    ru: { sub: 'Экологическое образование', dots: '' },
+    kz: { sub: 'Экологиялық білім беру', dots: '' }
+  };
+  const t = texts[lang] || texts.ru;
+
+  // Обновляем подпись на нужном языке
+  const subEl = document.getElementById('splashSub');
+  if (subEl) subEl.textContent = t.sub;
+
+  // Скрываем splash после анимации
+  // Не ждём шрифты - анимация CSS работает с системным шрифтом как fallback
+  const ANIM_MS = 2000;
+  let domReady = false, timerDone = false;
+
+  function tryHide() {
+    if (domReady && timerDone) {
+      splash.classList.add('hide');
+    }
+  }
+
+  setTimeout(() => { timerDone = true; tryHide(); }, ANIM_MS);
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => { domReady = true; tryHide(); });
+  } else {
+    domReady = true;
+    tryHide();
+  }
+})();
+
+// Secret admin - click "Made by" 5 times → direct redirect
+let adminClicks = 0, adminTimer;
+document.getElementById('footerMade').addEventListener('click', function() {
+  adminClicks++;
+  this.classList.add('flashing');
+  clearTimeout(adminTimer);
+  adminTimer = setTimeout(() => { adminClicks = 0; this.classList.remove('flashing'); }, 3000);
+  if (adminClicks >= 5) {
+    adminClicks = 0;
+    this.classList.remove('flashing');
+    window.location.href = 'admin.html';
+  }
+});
+
+// FAQ data
+const faqData = {
+  ru: [
+    { q: 'Что такое EcoBala?', a: 'EcoBala - платформа экологического образования для школьников Казахстана. Здесь дети учатся, выполняют квесты и играют в экологические игры.' },
+    { q: 'Для какого возраста платформа?', a: 'Режим Kids - для детей 6–12 лет. Режим Teen - для подростков 13–17 лет. У каждого режима свой интерфейс и функции.' },
+    { q: 'Как зарегистрироваться?', a: 'Нажмите "Начать бесплатно", введите email и пароль, выберите режим (Kids или Teen). Регистрация бесплатная.' },
+    { q: 'Что такое Eco Points?', a: 'Eco Points - баллы за активность: уроки, квесты, игры. Чем больше баллов, тем выше уровень: 🌱 Росток → 🌿 Растение → 🌳 Дерево.' },
+    { q: 'Как работает EcoGame-игра?', a: 'Учитель создаёт игровую комнату и получает код. Ученики вводят код и участвуют в викторине в реальном времени.' },
+    { q: 'Что такое живая эко-карта?', a: 'Уникальная функция: на карте отображаются места выполненных квестов - где убрали мусор, посадили деревья. Каждое действие добавляет зелёную точку.' },
+  ],
+  kz: [
+    { q: 'EcoBala дегеніміз не?', a: 'EcoBala - Қазақстан мектеп оқушылары үшін экологиялық білім беру платформасы.' },
+    { q: 'Платформа қай жас үшін?', a: 'Kids режимі - 6-12 жас. Teen режимі - 13-17 жас.' },
+    { q: 'Қалай тіркелуге болады?', a: '"Тегін бастау" батырмасын басып, email және пароль енгізіңіз.' },
+    { q: 'Eco Points дегеніміз не?', a: 'Eco Points - белсенділік үшін ұпайлар: сабақтар, квесттер, ойындар.' },
+    { q: 'EcoGame ойыны қалай жұмыс істейді?', a: 'Мұғалім бөлме жасайды және кодты алады. Оқушылар кодты енгізіп викторинаға қатысады.' },
+    { q: 'Тірі эко-карта дегеніміз не?', a: 'Орындалған квесттердің орындары картада көрсетіледі. Әр іс-әрекет жасыл нүкте қосады.' },
+  ]
+};
+
+let currentLang = localStorage.getItem('selectedLanguage') || 'kz';
+
+function renderFAQ() {
+  const list = document.getElementById('faqList');
+  if (!list) return;
+  list.innerHTML = '';
+  faqData[currentLang].forEach((item, i) => {
+    list.innerHTML += `
+      <div class="faq-item" id="faq-${i}">
+        <button class="faq-question" onclick="toggleFaq(${i})">
+          ${item.q}
+          <span class="faq-arrow">+</span>
+        </button>
+        <div class="faq-answer">${item.a}</div>
+      </div>`;
+  });
+}
+
+function toggleFaq(i) {
+  const item = document.getElementById('faq-' + i);
+  item.classList.toggle('open');
+}
+
+// Lang switch - saves to localStorage, updates all elements
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('selectedLanguage', lang);
+  document.body.classList.toggle('kz', lang === 'kz');
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    const oc = b.getAttribute('onclick') || '';
+    b.classList.toggle('active', oc.includes(`'${lang}'`));
+  });
+  renderFAQ();
+  document.querySelectorAll('[data-ru]').forEach(el => { el.style.display = lang === 'ru' ? '' : 'none'; });
+  document.querySelectorAll('[data-kz]').forEach(el => { el.style.display = lang === 'kz' ? '' : 'none'; });
+  // Update hamster chat placeholder
+  const ci = document.getElementById('indexChatInput');
+  if (ci) ci.placeholder = lang === 'kz' ? 'Хомяктан сұра...' : 'Спроси хомяка...';
+}
+
+// Stars
+let selectedStars = 0;
+function setStars(n) {
+  selectedStars = n;
+  document.querySelectorAll('.star-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.v) <= n);
+  });
+}
+
+// Submit review
+function submitReview() {
+  const text = document.getElementById('reviewText').value.trim();
+  if (!text || !selectedStars) return;
+  document.getElementById('reviewSuccess').style.display = 'block';
+  document.getElementById('reviewText').value = '';
+  setStars(0);
+  setTimeout(() => { document.getElementById('reviewSuccess').style.display = 'none'; }, 3000);
+}
+
+// Mobile menu
+function toggleMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const hb = document.getElementById('hamburger');
+  if (!menu) return;
+  const isOpen = menu.classList.toggle('open');
+  if (hb) hb.classList.toggle('open', isOpen);
+}
+function closeMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const hb = document.getElementById('hamburger');
+  if (menu) menu.classList.remove('open');
+  if (hb) hb.classList.remove('open');
+}
+document.addEventListener('click', function(e) {
+  const menu = document.getElementById('mobileMenu');
+  const hb = document.getElementById('hamburger');
+  if (menu && menu.classList.contains('open') && !menu.contains(e.target) && hb && !hb.contains(e.target)) {
+    closeMenu();
+  }
+});
+// Close on scroll
+window.addEventListener('scroll', closeMenu, { passive: true });
+
+// Init - apply saved language (KZ default)
+setLang(currentLang);
+
+// ── EcoGame modal (defined early so inline onclick works) ────────────────────
+function openEcoGameDemo() {
+  const m = document.getElementById('ecoGameModal');
+  if (!m) return;
+  m.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeEcoGameDemo() {
+  const m = document.getElementById('ecoGameModal');
+  if (!m) return;
+  m.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// ── Hamster chat modal (defined early so inline onclick works) ───────────────
+function openHamsterChat() {
+  const m = document.getElementById('hamsterModal');
+  if (!m) return;
+  m.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  if (!window._indexChatInited) {
+    window._indexChatInited = true;
+    window._indexChatLang = localStorage.getItem('selectedLanguage') || 'kz';
+    const inp = document.getElementById('indexChatInput');
+    if (inp) inp.placeholder = window._indexChatLang === 'kz' ? 'Хомяктан сұра...' : 'Спроси хомяка...';
+    if (typeof renderIndexSugs === 'function') renderIndexSugs();
+    setTimeout(() => {
+      if (typeof addIndexMsg === 'function') {
+        addIndexMsg(window._indexChatLang === 'kz'
+          ? 'Сәлем! 🐹 Мен Экохомяк! EcoBala, экология немесе тіркелу туралы сұраңыз!'
+          : 'Привет! 🐹 Я Экохомяк - помощник по экологии и EcoBala! О чём хочешь узнать?', 'bot');
+      }
+    }, 300);
+  }
+}
+function closeHamsterChat() {
+  const m = document.getElementById('hamsterModal');
+  if (!m) return;
+  m.style.display = 'none';
+  document.body.style.overflow = '';
+}
+</script>
+
+<!-- ===== COOKIE BANNER ===== -->
+<div id="cookieBanner" style="
+  position:fixed;bottom:0;left:0;right:0;z-index:9998;
+  background:rgba(27,94,32,0.97);backdrop-filter:blur(12px);
+  padding:16px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  box-shadow:0 -4px 24px rgba(0,0,0,0.15);
+  transform:translateY(100%);transition:transform 0.4s ease;
+">
+  <div style="flex:1;min-width:220px;">
+    <div style="font-size:14px;font-weight:800;color:#fff;margin-bottom:3px;" id="cookieTitle">🍪 Мы используем файлы cookie</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.5;" id="cookieText">
+      Мы используем cookie для улучшения работы сайта, сохранения языковых предпочтений и аналитики.
+      <a href="privacy.html" style="color:#A5D6A7;font-weight:700;text-decoration:none;"> Политика конфиденциальности</a>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;flex-shrink:0;">
+    <button onclick="acceptCookies()" style="
+      background:#fff;color:#1B5E20;border:none;border-radius:50px;
+      padding:10px 22px;font-family:'Nunito','Noto Sans',sans-serif;font-size:14px;font-weight:800;
+      cursor:pointer;transition:all 0.2s;
+    " id="cookieAcceptBtn">Принять</button>
+    <button onclick="declineCookies()" style="
+      background:rgba(255,255,255,0.15);color:#fff;border:1.5px solid rgba(255,255,255,0.35);
+      border-radius:50px;padding:10px 18px;font-family:'Nunito','Noto Sans',sans-serif;
+      font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;
+    " id="cookieDeclineBtn">Только необходимые</button>
+  </div>
+</div>
+
+<script>
+
+// ─── VIDEO LESSONS CAROUSEL ───────────────────────────────────────────────────
+const DEFAULT_VIDEOS = [
+  { title: { ru: 'Вода - источник жизни', kz: 'Су - өмір көзі' },
+    ytId: '9qn7C0vkGME', tag: 'Kids', duration: '5:30', thumb: '' },
+  { title: { ru: 'Растения и экосистема', kz: 'Өсімдіктер және экожүйе' },
+    ytId: 'VDZk8R3vR8Q', tag: 'Kids', duration: '6:15', thumb: '' },
+  { title: { ru: 'Переработка отходов', kz: 'Қалдықтарды қайта өңдеу' },
+    ytId: 'KSrUCd2qbHM', tag: 'Kids', duration: '4:50', thumb: '' },
+  { title: { ru: 'Климат Казахстана', kz: 'Қазақстан климаты' },
+    ytId: 'dQw4w9WgXcQ', tag: 'Kids', duration: '7:20', thumb: '' },
+  { title: { ru: 'Животный мир степей', kz: 'Дала жануарлары' },
+    ytId: 'M7lc1UVf-VE', tag: 'Kids', duration: '5:45', thumb: '' },
+  { title: { ru: 'Охрана природы', kz: 'Табиғатты қорғау' },
+    ytId: 'oHg5SJYRHA0', tag: 'Kids', duration: '6:00', thumb: '' },
+];
+
+let videoData = [];
+
+async function loadVideoLessons() {
+  try {
+    if (window.supabase) {
+      const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+      // 1. Try site_banners first (admin-managed banners shown in index carousel)
+      const { data: banners } = await sb
+        .from('site_banners')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
+        .order('created_at', { ascending: false });
+
+      if (banners && banners.length) {
+        videoData = banners.map(b => ({
+          title: typeof b.title === 'object' ? b.title : { ru: b.title || '', kz: b.title || '' },
+          ytId: b.youtube_url
+            ? (b.youtube_url.match(/(?:v=|embed\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/) || [])[1] || ''
+            : '',
+          imageUrl: b.image_url || '',
+          tag: b.tag || 'Kids',
+          duration: b.duration || '',
+          type: b.type || 'video',
+          icon: '📺',
+          pts: 0,
+        })).filter(v => v.ytId || v.imageUrl);
+      }
+
+      // 2. Fallback: kids_lessons youtube videos (if no banners)
+      if (!videoData.length) {
+        const { data: lessons } = await sb
+          .from('kids_lessons')
+          .select('title, youtube_url, icon, points')
+          .order('created_at', { ascending: false });
+        if (lessons && lessons.length) {
+          videoData = lessons.map(l => ({
+            title: typeof l.title === 'object' ? l.title : { ru: l.title || '', kz: l.title || '' },
+            ytId: extractYtIdIndex(l.youtube_url || ''),
+            tag: 'Kids',
+            duration: '',
+            imageUrl: '',
+            pts: l.points || 50,
+            icon: l.icon || '📘',
+          })).filter(v => v.ytId);
+        }
+      }
+    }
+  } catch(e) {
+    console.log('loadVideoLessons: using defaults', e);
+  }
+
+  // 3. Static defaults if still nothing
+  if (!videoData.length) videoData = DEFAULT_VIDEOS;
+  renderVideoCarousel();
+}
+
+function extractYtIdIndex(url) {
+  if (!url) return '';
+  const m = url.match(/(?:v=|embed\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : '';
+}
+
+function renderVideoCarousel() {
+  const track = document.getElementById('videoTrack');
+  const dots  = document.getElementById('videoDots');
+  if (!track) return;
+
+  const lang = localStorage.getItem('selectedLanguage') || 'kz';
+
+  track.innerHTML = videoData.map((v, i) => {
+    const title = typeof v.title === 'object' ? (v.title[lang] || v.title.ru) : v.title;
+    const thumb = v.imageUrl || (v.ytId ? `https://img.youtube.com/vi/${v.ytId}/mqdefault.jpg` : '');
+    return `
+      <div class="video-card">
+        <div class="video-thumb" onclick="${v.ytId ? `openVideoModal('${v.ytId}')` : v.imageUrl ? `window.open('${v.imageUrl}','_blank')` : ''}">
+          <img src="${thumb}" alt="${title}" loading="lazy">
+          <div class="video-play-btn">
+            <div class="video-play-circle">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#2E7D32"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
+          <div class="video-tag">${v.tag || 'Kids'}${v.pts ? ' • +' + v.pts + ' pts' : ''}</div>
+        </div>
+        <div class="video-body">
+          <div class="video-title">${title}</div>
+          <div class="video-meta">
+            <span>${v.icon || '📚'}</span>
+            ${v.duration ? `<div class="video-dot"></div><span>⏱ ${v.duration}</span>` : ''}
+            <div class="video-dot"></div>
+            <span>Eco Points</span>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  if (dots) {
+    const total = Math.ceil(videoData.length / 3);
+    dots.innerHTML = Array.from({ length: Math.max(total, 1) }, (_, i) =>
+      `<div class="vd${i === 0 ? ' active' : ''}" onclick="goToVideoSlide(${i})"></div>`
+    ).join('');
+  }
+
+  initVideoDrag();
+}
+
+function scrollVideos(dir) {
+  const track = document.getElementById('videoTrack');
+  if (!track) return;
+  const cardW = 320;
+  track.scrollBy({ left: dir * cardW * 2, behavior: 'smooth' });
+}
+
+function goToVideoSlide(i) {
+  const track = document.getElementById('videoTrack');
+  if (!track) return;
+  track.scrollTo({ left: i * 320 * 3, behavior: 'smooth' });
+}
+
+function initVideoDrag() {
+  const track = document.getElementById('videoTrack');
+  if (!track) return;
+  let isDown = false, startX = 0, scrollLeft = 0;
+  track.addEventListener('mousedown', e => { isDown = true; track.classList.add('grabbing'); startX = e.pageX - track.offsetLeft; scrollLeft = track.scrollLeft; });
+  track.addEventListener('mouseleave', () => { isDown = false; track.classList.remove('grabbing'); });
+  track.addEventListener('mouseup', () => { isDown = false; track.classList.remove('grabbing'); });
+  track.addEventListener('mousemove', e => { if (!isDown) return; e.preventDefault(); const x = e.pageX - track.offsetLeft; track.scrollLeft = scrollLeft - (x - startX) * 1.5; });
+  // Update dots on scroll
+  track.addEventListener('scroll', () => {
+    const idx = Math.round(track.scrollLeft / (320 * 3));
+    document.querySelectorAll('.vd').forEach((d, i) => d.classList.toggle('active', i === idx));
+  }, { passive: true });
+}
+
+function openVideoModal(ytId) {
+  const modal = document.getElementById('videoModal');
+  const frame = document.getElementById('videoModalFrame');
+  if (!modal || !frame || !ytId) return;
+  frame.src = `https://www.youtube.com/embed/${ytId}?autoplay=1`;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeVideoModal(e) {
+  if (e && e.target !== document.getElementById('videoModal') && !e.target.classList.contains('video-modal-close')) return;
+  const modal = document.getElementById('videoModal');
+  const frame = document.getElementById('videoModalFrame');
+  if (modal) modal.classList.remove('open');
+  if (frame) frame.src = '';
+  document.body.style.overflow = '';
+}
+
+// Load videos after supabase is ready
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(loadVideoLessons, 800);
+
+  // ── Scroll Reveal ──────────────────────────────────────────────────────
+  // Add reveal class to section elements
+  document.querySelectorAll(
+    '.feat-card, .whowe-card, .review-card, .faq-item, ' +
+    '.section-label, .section-title, .section-desc, ' +
+    '.teacher-section .section-inner > *, .social-section .section-inner > *'
+  ).forEach((el, i) => {
+    el.classList.add('reveal');
+    if (i % 4 === 1) el.classList.add('reveal-delay-1');
+    else if (i % 4 === 2) el.classList.add('reveal-delay-2');
+    else if (i % 4 === 3) el.classList.add('reveal-delay-3');
+  });
+
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        revealObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  // ── Hero progress bar animate on load ─────────────────────────────────
+  setTimeout(() => {
+    const fill = document.querySelector('.hc-progress-fill');
+    if (fill) fill.style.width = '72%';
+  }, 800);
+});
+
+// Cookie banner
+(function() {
+  const banner = document.getElementById('cookieBanner');
+  if (!banner) return;
+  if (localStorage.getItem('cookieConsent')) return; // already answered
+
+  // Show after splash hides (~2.2s)
+  setTimeout(() => {
+    banner.style.transform = 'translateY(0)';
+  }, 2400);
+
+  // Language
+  const lang = localStorage.getItem('selectedLanguage') || 'kz';
+  if (lang === 'kz') {
+    const t = document.getElementById('cookieTitle');
+    const tx = document.getElementById('cookieText');
+    const acc = document.getElementById('cookieAcceptBtn');
+    const dec = document.getElementById('cookieDeclineBtn');
+    if (t) t.textContent = '🍪 Біз cookie файлдарын пайдаланамыз';
+    if (tx) tx.innerHTML = 'Сайттың жұмысын жақсарту, тіл параметрлерін сақтау және аналитика үшін cookie пайдаланамыз. <a href="privacy.html" style="color:#A5D6A7;font-weight:700;text-decoration:none;">Құпиялылық саясаты</a>';
+    if (acc) acc.textContent = 'Қабылдау';
+    if (dec) dec.textContent = 'Тек қажеттілері';
+  }
+})();
+
+function acceptCookies() {
+  localStorage.setItem('cookieConsent', 'all');
+  hideCookieBanner();
+}
+function declineCookies() {
+  localStorage.setItem('cookieConsent', 'essential');
+  hideCookieBanner();
+}
+function hideCookieBanner() {
+  const b = document.getElementById('cookieBanner');
+  if (b) { b.style.transform = 'translateY(100%)'; }
+}
+</script>
+<!-- ===== ECOGAME DEMO MODAL ===== -->
+<div id="ecoGameModal" style="display:none;position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#fff;border-radius:24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,0.25);">
+    <div style="background:linear-gradient(135deg,#1B5E20,#43A047);padding:24px;border-radius:24px 24px 0 0;color:#fff;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-size:22px;font-weight:900;" data-ru>🎮 Попробовать EcoGame</div>
+        <div style="font-size:22px;font-weight:900;" data-kz>🎮 EcoGame көру</div>
+        <div style="font-size:13px;opacity:.8;margin-top:4px;" data-ru>Выберите режим игры</div>
+        <div style="font-size:13px;opacity:.8;margin-top:4px;" data-kz>Ойын режимін таңдаңыз</div>
+      </div>
+      <button onclick="closeEcoGameDemo()" style="background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;color:#fff;">✕</button>
+    </div>
+    <div style="padding:24px;display:flex;flex-direction:column;gap:14px;">
+      <a href="game-ecorace.html" style="text-decoration:none;">
+        <div style="border-radius:16px;overflow:hidden;border:2px solid #C8E6C9;display:flex;align-items:center;transition:all .2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+          <div style="background:linear-gradient(135deg,#1B5E20,#43A047);padding:18px;font-size:40px;min-width:80px;text-align:center;">🏁</div>
+          <div style="padding:14px 16px;">
+            <div style="font-size:16px;font-weight:900;color:#1B5E20;" data-ru>EcoRace - Гонка знаний</div>
+            <div style="font-size:16px;font-weight:900;color:#1B5E20;" data-kz>EcoRace - Білім жарысы</div>
+            <div style="font-size:12px;color:#546E7A;margin-top:3px;" data-ru>2–4 игрока, доска вопросов, Eco Points</div>
+            <div style="font-size:12px;color:#546E7A;margin-top:3px;" data-kz>2–4 ойыншы, сұрақтар тақтасы</div>
+          </div>
+        </div>
+      </a>
+      <a href="game-tournament.html" style="text-decoration:none;">
+        <div style="border-radius:16px;overflow:hidden;border:2px solid #BBDEFB;display:flex;align-items:center;transition:all .2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+          <div style="background:linear-gradient(135deg,#1565C0,#1E88E5);padding:18px;font-size:40px;min-width:80px;text-align:center;">🏆</div>
+          <div style="padding:14px 16px;">
+            <div style="font-size:16px;font-weight:900;color:#1565C0;" data-ru>EcoTournament - Турнир</div>
+            <div style="font-size:16px;font-weight:900;color:#1565C0;" data-kz>EcoTournament - Турнир</div>
+            <div style="font-size:12px;color:#546E7A;margin-top:3px;" data-ru>Класс vs класс, учитель создаёт комнату</div>
+            <div style="font-size:12px;color:#546E7A;margin-top:3px;" data-kz>Сынып vs сынып, мұғалім бөлме жасайды</div>
+          </div>
+        </div>
+      </a>
+      <div style="text-align:center;padding-top:4px;">
+        <a href="register.html" style="font-size:13px;color:var(--green);font-weight:800;text-decoration:none;" data-ru>Зарегистрироваться для полного доступа →</a>
+        <a href="register.html" style="font-size:13px;color:var(--green);font-weight:800;text-decoration:none;" data-kz>Толық қатынас үшін тіркелу →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HAMSTER CHAT MODAL ===== -->
+<div id="hamsterModal" style="display:none;position:fixed;inset:0;z-index:9991;background:rgba(0,0,0,0.5);backdrop-filter:blur(5px);align-items:flex-end;justify-content:center;padding:0;">
+  <div style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:480px;height:75vh;display:flex;flex-direction:column;box-shadow:0 -20px 60px rgba(0,0,0,0.2);">
+    <div style="background:linear-gradient(135deg,#F57F17,#FFB300);padding:16px 20px;border-radius:24px 24px 0 0;display:flex;align-items:center;gap:12px;">
+      <div style="width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:26px;">🐹</div>
+      <div style="flex:1;">
+        <div style="font-size:16px;font-weight:900;color:#fff;">Экохомяк</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.85);" data-ru>Онлайн - готов помочь!</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.85);" data-kz>Онлайн - көмектесуге дайын!</div>
+      </div>
+      <button onclick="closeHamsterChat()" style="background:rgba(255,255,255,0.25);border:none;border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:16px;color:#fff;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+    <div id="indexChatMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:#FAFFF8;"></div>
+    <div id="indexChatSugs" style="padding:8px 12px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid #E8F5E9;background:#fff;overflow-x:auto;"></div>
+    <div style="display:flex;gap:10px;padding:12px 16px;border-top:1px solid #E8F5E9;background:#fff;">
+      <input id="indexChatInput" type="text" onkeydown="if(event.key==='Enter')sendIndexChat()" style="flex:1;padding:11px 16px;border-radius:50px;border:1.5px solid #C8E6C9;font-family:'Nunito','Noto Sans',sans-serif;font-size:14px;outline:none;background:#F1F8F2;">
+      <button onclick="sendIndexChat()" style="width:44px;height:44px;border-radius:50%;background:#2E7D32;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── LIVE STATS + TOP LEADERBOARD from Supabase ────────────────────────────────
+async function loadIndexStats() {
+  try {
+    // Supabase configured in supabase2.js
+    
+    if (!window.supabase) {
+      // Retry after 500ms
+      setTimeout(loadIndexStats, 500);
+      return;
+    }
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    const [usersRes, reportsRes] = await Promise.all([
+      sb.from('users').select('id, role, points, school'),
+      sb.from('teen_reports').select('id', { count: 'exact', head: true })
+    ]);
+    const users = usersRes.data || [];
+    const reportsCount = reportsRes.count || 0;
+    const totalPts = users.reduce((a, u) => a + (u.points || 0), 0);
+    const schools = new Set(users.map(u => (u.school||'').trim()).filter(Boolean));
+    const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    setEl('statTotalUsers', users.length || '—');
+    setEl('statTotalPts', totalPts > 0 ? totalPts.toLocaleString() : '—');
+    setEl('statSchools', schools.size || '—');
+    setEl('statReports', reportsCount || '—');
+    // Build school leaderboard
+    const schoolMap = {};
+    users.forEach(u => {
+      const s = (u.school||'').trim(); if (!s) return;
+      if (!schoolMap[s]) schoolMap[s] = { score:0, count:0 };
+      schoolMap[s].score += (u.points||0); schoolMap[s].count++;
+    });
+    const top3 = Object.entries(schoolMap).map(([name,d])=>({name,...d})).sort((a,b)=>b.score-a.score).slice(0,3);
+    const medals=['🥇','🥈','🥉'], colors=['#FFF8E1','#F5F5F5','#FBE9E7'], borders=['#FFD740','#BDBDBD','#FF8A65'];
+    const lang = localStorage.getItem('selectedLanguage') || 'kz';
+    const lbEl = document.getElementById('indexLeaderboard');
+    const loadMsg = document.getElementById('lbLoadingMsg');
+    if (loadMsg) loadMsg.remove();
+    if (lbEl && top3.length) {
+      lbEl.innerHTML = top3.map((s,i)=>`
+        <div style="background:${colors[i]};border-radius:20px;padding:28px;border:2px solid ${borders[i]};text-align:center;transition:transform .2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+          <div style="font-size:40px;margin-bottom:8px;">${medals[i]}</div>
+          <div style="font-size:17px;font-weight:900;margin-bottom:6px;">${s.name}</div>
+          <div style="font-size:26px;font-weight:900;color:#2E7D32;">${s.score.toLocaleString()}</div>
+          <div style="font-size:12px;color:#546E7A;margin-top:4px;font-weight:700;">Eco Points</div>
+          <div style="font-size:12px;color:#546E7A;margin-top:2px;">${s.count} ${lang==='kz'?'оқушы':'учеников'}</div>
+        </div>`).join('');
+    } else if (lbEl) {
+      lbEl.innerHTML = `<div style="text-align:center;padding:40px;color:#546E7A;font-size:14px;grid-column:1/-1;">${lang==='kz'?'Деректер жоқ - бірінші болыңыз! 🌱':'Данных пока нет - станьте первыми! 🌱'}</div>`;
+    }
+  } catch(e) { console.log('Index stats error:', e); }
+}
+// Load supabase and call stats - with retry
+(function(){
+  if (window.supabase) { loadIndexStats(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+  s.onload = function() {
+    // Small delay to ensure supabase is fully initialized
+    setTimeout(function(){ loadIndexStats(); loadVideoLessons(); }, 100);
+  };
+  s.onerror = function() { console.warn('Supabase CDN failed, retrying...'); };
+  document.head.appendChild(s);
+})();
+
+// EcoGame modal defined in first script block above
+
+// ─── HAMSTER CHAT ──────────────────────────────────────────────────────────────
+const indexBotFAQ = {
+  ru:[
+    {kw:['привет','хай','здравствуй','сәлем'],r:'Привет! 🐹 Я Экохомяк - помощник EcoBala! Спроси об экологии, играх или регистрации!'},
+    {kw:['экология','природа'],r:'Экология - наука о взаимодействии живых организмов со средой. На EcoBala учимся беречь природу через игры и квесты! 🌍'},
+    {kw:['регистрация','зарегистрироваться','войти'],r:'Зарегистрируйся на <a href="register.html" style="color:#2E7D32;font-weight:700;">этой странице</a> - бесплатно! Выбери Kids (6-12 лет) или Teen (13-18 лет) 🌱'},
+    {kw:['kids','дети','ребёнок'],r:'EcoBala Kids - для детей 6-12 лет! Уроки с видео, тесты, значки и рейтинг 👶'},
+    {kw:['teen','подросток'],r:'EcoBala Teen - для подростков 13-18 лет! Квесты в реальном мире, отчёты с фото, карта добрых дел 🧑'},
+    {kw:['игра','ecogame','ecorace','гонка','викторина'],r:'EcoGame - наша экологическая викторина! EcoRace - гонка 2-4 игроков. EcoTournament - турнир класса! Нажми "Попробовать EcoGame" 🎮'},
+    {kw:['балл','очко','eco points'],r:'Eco Points - баллы за активность: уроки, квесты, игры. Уровни: 🌱 Росток → 🌿 → 🌳 Дерево → 🏆'},
+    {kw:['карта','квест','задание'],r:'В Teen есть живая эко-карта! Выполняй квесты - посади деревья, убери мусор - твои дела появятся на карте 🗺️'},
+    {kw:['учитель','учительская'],r:'Учительская панель для EcoGame прямо на уроке! Доступ через @Ecobalabot в Telegram 👩‍🏫'},
+    {kw:['бесплатно','платно','стоит'],r:'EcoBala полностью бесплатна для учеников! Регистрируйся прямо сейчас 🎉'},
+    {kw:['спасибо','благодар'],r:'Всегда рад помочь! Береги природу с EcoBala 🌱'},
+  ],
+  kz:[
+    {kw:['сәлем','сәлеметсіз','привет'],r:'Сәлем! 🐹 Мен Экохомяк - EcoBala көмекшісі! Экология, платформа немесе тіркелу туралы сұра!'},
+    {kw:['экология','табиғат'],r:'Экология - тіршілік иелерінің қоршаған ортамен байланысын зерттейтін ғылым. EcoBala-да ойындар арқылы үйренеміз! 🌍'},
+    {kw:['тіркелу','кіру','тіркел'],r:'<a href="register.html" style="color:#2E7D32;font-weight:700;">Осы бетте</a> тіркелуге болады - тегін! Kids (6-12 жас) немесе Teen (13-18 жас) таңда 🌱'},
+    {kw:['kids','балалар','бала'],r:'EcoBala Kids - 6-12 жас балалар үшін! Бейне сабақтар, тесттер, белгілер 👶'},
+    {kw:['teen','жасөспірім'],r:'EcoBala Teen - 13-18 жас үшін! Нақты квесттер, фото есептер, карта 🧑'},
+    {kw:['ойын','ecogame','гонка','викторина'],r:'EcoGame - экологиялық викторина! EcoRace - 2-4 ойыншыға. EcoTournament - сынып турнирі 🎮'},
+    {kw:['ұпай','eco points'],r:'Eco Points - белсенділік ұпайлары. Деңгейлер: 🌱 → 🌿 → 🌳 → 🏆'},
+    {kw:['карта','квест','тапсырма'],r:'Teen-де тірі эко-карта бар! Квесттер орында - ағаш отырғыз, қоқыс жина - картада көрінеді 🗺️'},
+    {kw:['мұғалім','мұғалімдер'],r:'Мұғалімдер панелі - EcoGame сабақта өткізуге! @Ecobalabot Telegram арқылы кіру 👩‍🏫'},
+    {kw:['тегін','ақылы'],r:'EcoBala оқушылар үшін толығымен тегін! Қазір тіркеліңіз 🎉'},
+    {kw:['рахмет'],r:'Әрқашан көмектесуге дайынмын! EcoBala-мен табиғатты қорға 🌱'},
+  ]
+};
+
+let indexChatLang = localStorage.getItem('selectedLanguage') || 'kz';
+let indexChatInited = false;
+
+// openHamsterChat and closeHamsterChat defined in first script block above
+
+// Modal click-outside handler (safe to add here)
+document.addEventListener('DOMContentLoaded', function() {
+  const hm = document.getElementById('hamsterModal');
+  if (hm) hm.addEventListener('click', function(e){ if(e.target===this) closeHamsterChat(); });
+  const em = document.getElementById('ecoGameModal');
+  if (em) em.addEventListener('click', function(e){ if(e.target===this) closeEcoGameDemo(); });
+});
+
+function renderIndexSugs() {
+  const chatLang = window._indexChatLang || localStorage.getItem('selectedLanguage') || 'kz';
+  const sugs = chatLang === 'kz'
+    ? ['EcoBala дегеніміз не?','Тіркелу қалай?','Ойындар туралы','Eco Points']
+    : ['Что такое EcoBala?','Как зарегистрироваться?','Расскажи об играх','Eco Points'];
+  document.getElementById('indexChatSugs').innerHTML = sugs.map(s =>
+    `<div onclick="askIndexBot('${s.replace(/'/g,"&#39;")}')" style="background:#E8F5E9;border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700;color:#1B5E20;cursor:pointer;white-space:nowrap;transition:background .2s;flex-shrink:0;" onmouseover="this.style.background='#C8E6C9'" onmouseout="this.style.background='#E8F5E9'">${s}</div>`
+  ).join('');
+}
+
+function addIndexMsg(text, from) {
+  const wrap = document.getElementById('indexChatMessages');
+  const div = document.createElement('div');
+  const isBot = from === 'bot';
+  div.style.cssText = `display:flex;gap:8px;align-items:flex-end;justify-content:${isBot?'flex-start':'flex-end'}`;
+  const bubble = `<div style="max-width:80%;padding:10px 14px;border-radius:${isBot?'4px 16px 16px 16px':'16px 16px 4px 16px'};background:${isBot?'#fff':'#2E7D32'};color:${isBot?'#1a2e1a':'#fff'};font-size:13px;font-weight:600;line-height:1.55;box-shadow:0 2px 8px rgba(0,0,0,0.08);">${text}</div>`;
+  div.innerHTML = isBot ? `<div style="font-size:22px;flex-shrink:0;margin-bottom:2px;">🐹</div>${bubble}` : bubble;
+  wrap.appendChild(div);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function sendIndexChat() {
+  const input = document.getElementById('indexChatInput');
+  const txt = input.value.trim();
+  if (!txt) return;
+  addIndexMsg(txt, 'user');
+  input.value = '';
+  indexBotReply(txt);
+}
+function askIndexBot(q) { addIndexMsg(q, 'user'); indexBotReply(q); }
+
+function indexBotReply(txt) {
+  const chatLang = window._indexChatLang || localStorage.getItem('selectedLanguage') || 'kz';
+  const lower = txt.toLowerCase();
+  const faq = indexBotFAQ[chatLang] || indexBotFAQ.kz;
+  let reply = chatLang === 'kz'
+    ? 'Қызықты сұрақ! 🤔 EcoBala, экология немесе тіркелу туралы сұраңыз!'
+    : 'Интересный вопрос! 🤔 Спроси меня об экологии, EcoBala, играх или регистрации!';
+  for (const item of faq) {
+    if (item.kw.some(k => lower.includes(k))) { reply = item.r; break; }
+  }
+  const wrap = document.getElementById('indexChatMessages');
+  const typing = document.createElement('div');
+  typing.id = 'indexTyping';
+  typing.style.cssText = 'display:flex;gap:8px;align-items:center;';
+  typing.innerHTML = `<div style="font-size:22px;">🐹</div><div style="background:#fff;border-radius:4px 16px 16px 16px;padding:10px 14px;font-size:18px;letter-spacing:3px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">···</div>`;
+  wrap.appendChild(typing);
+  wrap.scrollTop = wrap.scrollHeight;
+  setTimeout(() => {
+    const t2 = document.getElementById('indexTyping');
+    if (t2) t2.remove();
+    addIndexMsg(reply, 'bot');
+  }, 900 + Math.random() * 400);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1971 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="iconcakids.jpg" type="image/jpeg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoBala Kids</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap&subset=cyrillic,cyrillic-ext" rel="stylesheet">
+<style>
+  /* ── Казахский шрифт фикс ───────────────────────────────────────────
+     Noto Sans покрывает казахские буквы: Ә Ғ Қ Ң Ө Ұ Ү І
+     unicode-range заставляет браузер использовать Noto Sans ТОЛЬКО
+     для символов которых нет в Nunito (казахский расширенный кириллица)
+  ─────────────────────────────────────────────────────────────────── */
+  @font-face {
+    font-family: 'KazFont';
+    src: local('Noto Sans');
+    unicode-range: U+0400-045F, U+04D9, U+04E9, U+04B1, U+04A3, U+04BB,
+                   U+049B, U+04A2, U+04E8, U+04B0, U+0456, U+04AF, U+049A,
+                   U+04BA, U+04D8; /* казахский кириллический диапазон */
+  }
+  /* Глобальный стек: сначала Nunito (латиница/цифры), потом Noto Sans (казахский) */
+  *, body, input, textarea, select, button, span, div, p, h1, h2, h3, h4, h5, h6, a, li {
+    font-family: 'Nunito', 'Noto Sans', 'Segoe UI', system-ui, -apple-system, sans-serif !important;
+  }
+
+  /* Kazakh alphabet fix - Noto Sans as fallback for all text */
+  * { font-family: 'Nunito', 'Noto Sans', sans-serif; }
+  .topbar-logo, .stat-num, .qr-title, .ks-title, .room-code { font-family: 'Unbounded', 'Noto Sans', sans-serif !important; }
+</style>
+<style>
+  :root {
+    --blue: #1565C0; --blue-mid: #1E88E5; --blue-light: #BBDEFB; --blue-pale: #E3F2FD;
+    --green: #2E7D32; --green-light: #C8E6C9; --green-pale: #E8F5E9;
+    --amber: #F57F17; --amber-light: #FFF9C4;
+    --white: #fff; --text: #0D1B2A; --text-muted: #546E7A;
+    --bg: #F0F7FF; --radius: 16px; --nav-h: 70px; --bottom-h: 68px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+  body { font-family:'Nunito',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding-bottom:var(--bottom-h); }
+
+  /* TOP BAR */
+  .topbar {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:#fff; border-bottom:1px solid var(--blue-light);
+    height:var(--nav-h); display:flex; align-items:center; padding:0 20px;
+    justify-content:space-between;
+  }
+  .topbar-logo { font-family:'Unbounded','Noto Sans',sans-serif; font-weight:900; font-size:18px; color:var(--blue); }
+  .topbar-right { display:flex; align-items:center; gap:10px; }
+  .topbar-pts {
+    background:var(--blue-pale); border-radius:50px; padding:6px 12px;
+    font-size:13px; font-weight:800; color:var(--blue);
+    display:flex; align-items:center; gap:4px;
+  }
+  .topbar-avatar {
+    width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#90CAF9,#1E88E5);
+    display:flex; align-items:center; justify-content:center; font-size:18px; cursor:pointer;
+  }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position:fixed; bottom:0; left:0; right:0; z-index:100;
+    background:#fff; border-top:1px solid var(--blue-light);
+    height:var(--bottom-h); display:flex;
+  }
+  .bn-item {
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:3px; cursor:pointer; transition:all 0.2s; border:none; background:none;
+  }
+  .bn-icon { font-size:22px; }
+  .bn-label { font-size:10px; font-weight:800; color:var(--text-muted); }
+  .bn-item.active .bn-label { color:var(--blue); }
+  .bn-item.active .bn-icon { transform:scale(1.1); }
+  .bn-dot {
+    width:6px; height:6px; background:var(--blue); border-radius:50%;
+    position:absolute; top:8px; right:calc(50% - 16px);
+  }
+
+  /* PAGES */
+  .page { display:none; padding-top:calc(var(--nav-h) + 16px); padding-bottom:20px; min-height:100vh; }
+  .page.active { display:block; }
+  .inner { max-width:600px; margin:0 auto; padding:0 16px; }
+
+  /* ===== PROFILE PAGE ===== */
+  .profile-hero {
+    background:linear-gradient(135deg,var(--blue),var(--blue-mid));
+    border-radius:var(--radius); padding:24px; margin-bottom:16px; color:#fff; position:relative; overflow:hidden;
+  }
+  .ph-circles { position:absolute; inset:0; pointer-events:none; }
+  .ph-circle { position:absolute; border-radius:50%; background:rgba(255,255,255,0.07); }
+  .ph-c1 { width:120px;height:120px;right:-20px;top:-30px; }
+  .ph-c2 { width:80px;height:80px;right:60px;bottom:-20px; }
+  .profile-top { display:flex; align-items:center; gap:16px; margin-bottom:20px; }
+  .profile-avatar-big {
+    width:72px; height:72px; border-radius:50%;
+    background:rgba(255,255,255,0.2); border:3px solid rgba(255,255,255,0.5);
+    display:flex; align-items:center; justify-content:center; font-size:34px; flex-shrink:0;
+    cursor:pointer; transition:transform 0.2s;
+  }
+  .profile-avatar-big:hover { transform:scale(1.05); }
+  .profile-name { font-size:20px; font-weight:900; margin-bottom:2px; }
+  .profile-sub { font-size:13px; opacity:0.8; }
+  .profile-edit-btn {
+    margin-left:auto; background:rgba(255,255,255,0.2); border:none; border-radius:50px;
+    padding:6px 12px; color:#fff; font-size:12px; font-weight:700; cursor:pointer;
+    font-family:'Nunito',sans-serif; transition:background 0.2s;
+  }
+  .profile-edit-btn:hover { background:rgba(255,255,255,0.3); }
+  .level-row { display:flex; align-items:center; gap:12px; }
+  .level-badge { background:rgba(255,255,255,0.2); border-radius:50px; padding:4px 12px; font-size:13px; font-weight:800; }
+  .level-progress { flex:1; }
+  .lp-label { font-size:11px; opacity:0.8; margin-bottom:4px; display:flex; justify-content:space-between; }
+  .lp-bar { height:8px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden; }
+  .lp-fill { height:100%; background:#fff; border-radius:4px; width:72%; }
+
+  .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+  .stat-card {
+    background:#fff; border-radius:var(--radius); padding:16px; text-align:center;
+    border:1px solid var(--blue-light);
+  }
+  .stat-num { font-family:'Unbounded','Noto Sans',sans-serif; font-size:22px; font-weight:900; color:var(--blue); }
+  .stat-label { font-size:11px; color:var(--text-muted); font-weight:700; margin-top:2px; }
+
+  .section-heading { font-size:16px; font-weight:900; color:var(--text); margin-bottom:12px; margin-top:8px; }
+
+  .badges-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px; }
+  .badge-item {
+    background:#fff; border-radius:12px; padding:12px 8px; text-align:center;
+    border:1px solid var(--blue-light); transition:transform 0.2s;
+  }
+  .badge-item:hover { transform:translateY(-2px); }
+  .badge-item.locked { opacity:0.4; filter:grayscale(1); }
+  .badge-emoji { font-size:28px; margin-bottom:4px; }
+  .badge-name { font-size:10px; font-weight:700; color:var(--text); }
+
+  /* Edit modal */
+  .modal-overlay {
+    display:none; position:fixed; inset:0; z-index:200;
+    background:rgba(0,0,0,0.5); align-items:flex-end; justify-content:center;
+  }
+  .modal-overlay.open { display:flex; }
+  .modal-sheet {
+    background:#fff; border-radius:24px 24px 0 0; padding:28px; width:100%; max-width:500px;
+    animation:slideUp 0.3s ease;
+  }
+  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+  .modal-title { font-size:17px; font-weight:900; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; }
+  .modal-close { background:none; border:none; font-size:22px; cursor:pointer; color:var(--text-muted); }
+  .form-input-m {
+    width:100%; padding:12px 14px; border-radius:10px; border:2px solid var(--blue-light);
+    font-family:'Nunito',sans-serif; font-size:14px; outline:none; transition:border-color 0.2s; margin-bottom:14px;
+  }
+  .form-input-m:focus { border-color:var(--blue-mid); }
+  .avatar-picker { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-bottom:16px; }
+  .avatar-opt {
+    width:100%; aspect-ratio:1; border-radius:50%; background:var(--blue-pale);
+    display:flex; align-items:center; justify-content:center; font-size:22px; cursor:pointer;
+    border:2px solid transparent; transition:all 0.15s;
+  }
+  .avatar-opt.selected { border-color:var(--blue); background:var(--blue-light); }
+
+  /* ===== LESSONS PAGE ===== */
+  .lesson-card {
+    background:#fff; border-radius:16px; overflow:hidden;
+    border:1.5px solid var(--blue-light); margin-bottom:12px; transition:all 0.2s; cursor:pointer;
+    display:flex; align-items:stretch; box-shadow:0 2px 8px rgba(21,101,192,0.06);
+  }
+  .lesson-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(21,101,192,0.13); border-color:#90CAF9; }
+  .lesson-thumb {
+    width:86px; min-width:86px; background:linear-gradient(160deg,var(--blue-pale),var(--blue-light));
+    display:flex; align-items:center; justify-content:center; font-size:34px;
+    position:relative; flex-shrink:0;
+  }
+  .lesson-done-badge {
+    position:absolute; bottom:5px; left:50%; transform:translateX(-50%);
+    background:var(--green); color:#fff;
+    border-radius:20px; padding:2px 7px; font-size:9px; font-weight:800; white-space:nowrap;
+  }
+  .lesson-pts-badge {
+    position:absolute; top:5px; right:5px; background:var(--blue); color:#fff;
+    border-radius:20px; padding:2px 6px; font-size:9px; font-weight:800;
+  }
+  .lesson-body { padding:12px 13px; flex:1; display:flex; flex-direction:column; justify-content:center; min-width:0; }
+  .lesson-title { font-size:14px; font-weight:800; margin-bottom:4px; line-height:1.35; }
+  .lesson-meta { font-size:11px; color:var(--text-muted); display:flex; gap:7px; align-items:center; flex-wrap:wrap; }
+  .lesson-tag { background:var(--blue-pale); color:var(--blue); border-radius:8px; padding:2px 7px; font-size:10px; font-weight:700; }
+
+  /* Lesson viewer */
+  .lesson-viewer { display:none; position:fixed; inset:0; z-index:300; background:#f8fbff; overflow-y:auto; }
+  .lesson-viewer.open { display:block; }
+  .lv-header {
+    position:sticky; top:0; background:#fff; border-bottom:1.5px solid var(--blue-light);
+    padding:12px 14px; display:flex; align-items:center; gap:10px; z-index:10;
+    box-shadow:0 2px 8px rgba(21,101,192,0.07);
+  }
+  .lv-back {
+    background:var(--blue-pale); border:none; width:34px; height:34px; border-radius:50%;
+    font-size:17px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; transition:background 0.2s;
+  }
+  .lv-back:hover { background:var(--blue-light); }
+  .lv-title { font-size:14px; font-weight:800; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .lv-content { padding:14px 13px; max-width:600px; margin:0 auto; }
+  .lv-video { border-radius:14px; overflow:hidden; margin-bottom:13px; background:#000; aspect-ratio:16/9; box-shadow:0 4px 16px rgba(0,0,0,0.15); }
+  .lv-video iframe { width:100%; height:100%; border:none; }
+  .lv-notes {
+    background:var(--blue-pale); border-radius:14px; padding:13px 14px; margin-bottom:14px;
+    font-size:13px; line-height:1.75; color:var(--text); border-left:4px solid var(--blue);
+  }
+  .lv-quiz-btn {
+    background:linear-gradient(135deg,var(--blue),var(--blue-mid)); color:#fff; border:none;
+    border-radius:50px; padding:13px 24px; font-family:'Nunito','Noto Sans',sans-serif;
+    font-size:15px; font-weight:800; width:100%; cursor:pointer; transition:all 0.2s;
+    box-shadow:0 4px 14px rgba(21,101,192,0.22);
+  }
+  .lv-quiz-btn:hover { background:linear-gradient(135deg,#0D47A1,var(--blue)); transform:translateY(-1px); }
+
+  /* Quiz */
+  .quiz-screen { display:none; position:fixed; inset:0; z-index:400; background:#fff; }
+  .quiz-screen.open { display:flex; flex-direction:column; }
+  .quiz-header { padding:12px 14px; border-bottom:1.5px solid var(--blue-light); display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .quiz-progress { flex:1; height:7px; background:var(--blue-light); border-radius:4px; overflow:hidden; }
+  .quiz-progress-fill { height:100%; background:linear-gradient(90deg,var(--blue),var(--blue-mid)); border-radius:4px; transition:width 0.4s; }
+  .quiz-body { flex:1; padding:18px 14px; max-width:600px; margin:0 auto; width:100%; display:flex; flex-direction:column; overflow-y:auto; }
+  .quiz-q-num { font-size:11px; font-weight:800; color:var(--blue); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.06em; }
+  .quiz-question { font-size:16px; font-weight:800; line-height:1.5; margin-bottom:18px; }
+  .quiz-options { display:flex; flex-direction:column; gap:8px; }
+  .quiz-opt {
+    padding:13px 14px; border-radius:13px; border:2px solid var(--blue-light);
+    background:#fff; font-family:'Nunito','Noto Sans',sans-serif; font-size:14px; font-weight:700;
+    text-align:left; cursor:pointer; transition:all 0.18s;
+    display:flex; align-items:center; gap:10px;
+  }
+  .quiz-opt-letter { width:26px; height:26px; border-radius:50%; background:var(--blue-pale); color:var(--blue); font-size:11px; font-weight:900; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .quiz-opt:hover { border-color:var(--blue-mid); background:var(--blue-pale); }
+  .quiz-opt.correct { border-color:var(--green); background:var(--green-pale); color:var(--green); }
+  .quiz-opt.correct .quiz-opt-letter { background:var(--green); color:#fff; }
+  .quiz-opt.wrong { border-color:#C62828; background:#FFEBEE; color:#C62828; }
+  .quiz-opt.wrong .quiz-opt-letter { background:#C62828; color:#fff; }
+  .quiz-next {
+    padding:13px; border-radius:50px;
+    background:linear-gradient(135deg,var(--blue),var(--blue-mid)); color:#fff;
+    border:none; font-family:'Nunito','Noto Sans',sans-serif; font-size:15px; font-weight:800;
+    cursor:pointer; display:none; transition:all 0.2s; margin-top:16px;
+  }
+  .quiz-next:hover { background:linear-gradient(135deg,#0D47A1,var(--blue)); }
+  .quiz-result { text-align:center; padding:28px 14px; }
+  .qr-emoji { font-size:60px; margin-bottom:10px; }
+  .qr-title { font-family:'Unbounded','Noto Sans',sans-serif; font-size:20px; font-weight:900; margin-bottom:6px; }
+  .qr-pts { font-size:28px; font-weight:900; color:var(--blue); margin:13px 0; }
+  .qr-bar { height:10px; background:var(--blue-light); border-radius:5px; margin:13px 0; overflow:hidden; }
+  .qr-fill { height:100%; background:linear-gradient(90deg,var(--blue),var(--blue-mid)); border-radius:5px; }
+
+  /* ===== GAMES PAGE ===== */
+  .game-cards { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px; }
+  .game-card {
+    border-radius:var(--radius); overflow:hidden; cursor:pointer; transition:transform 0.2s;
+  }
+  .game-card:hover { transform:translateY(-3px); }
+  .gc-top { height:100px; display:flex; align-items:center; justify-content:center; font-size:44px; }
+  .gc-top-blue { background:linear-gradient(135deg,#1565C0,#1E88E5); }
+  .gc-top-green { background:linear-gradient(135deg,#2E7D32,#43A047); }
+  .gc-bottom { background:#fff; padding:14px; border:1px solid var(--blue-light); border-top:none; }
+  .gc-title { font-size:14px; font-weight:800; margin-bottom:2px; }
+  .gc-desc { font-size:12px; color:var(--text-muted); }
+
+  /* Kahoot join */
+  .kahoot-screen { display:none; position:fixed; inset:0; z-index:300; background:linear-gradient(160deg,#0D47A1,#1565C0); color:#fff; align-items:center; justify-content:center; flex-direction:column; padding:24px; }
+  .kahoot-screen.open { display:flex; }
+  .ks-title { font-family:'Unbounded','Noto Sans',sans-serif; font-size:28px; font-weight:900; text-align:center; margin-bottom:8px; }
+  .ks-sub { font-size:14px; opacity:0.8; text-align:center; margin-bottom:32px; }
+  .ks-input {
+    width:100%; max-width:320px; padding:18px; border-radius:16px; border:3px solid rgba(255,255,255,0.3);
+    background:rgba(255,255,255,0.15); color:#fff; font-family:'Nunito',sans-serif;
+    font-size:28px; font-weight:900; text-align:center; outline:none; letter-spacing:6px;
+    margin-bottom:16px;
+  }
+  .ks-input::placeholder { opacity:0.5; letter-spacing:6px; }
+  .ks-btn { background:#fff; color:var(--blue); border:none; border-radius:50px; padding:14px 32px; font-family:'Nunito',sans-serif; font-size:16px; font-weight:900; cursor:pointer; width:100%; max-width:320px; transition:all 0.2s; }
+  .ks-btn:hover { transform:scale(1.02); box-shadow:0 8px 24px rgba(0,0,0,0.2); }
+  .ks-back { margin-top:16px; background:none; border:none; color:rgba(255,255,255,0.7); font-family:'Nunito',sans-serif; font-size:14px; cursor:pointer; }
+
+  /* ===== LEADERBOARD ===== */
+  .lb-podium { display:flex; align-items:flex-end; justify-content:center; gap:8px; margin:16px 0 24px; }
+  .lb-place { text-align:center; flex:1; }
+  .lb-podium-bar { border-radius:var(--radius) var(--radius) 0 0; display:flex; align-items:flex-end; justify-content:center; padding-bottom:10px; }
+  .lb-place:nth-child(1) .lb-podium-bar { background:linear-gradient(to top,#FF8F00,#FFB300); height:100px; }
+  .lb-place:nth-child(2) .lb-podium-bar { background:linear-gradient(to top,#1565C0,#1E88E5); height:130px; }
+  .lb-place:nth-child(3) .lb-podium-bar { background:linear-gradient(to top,#5D4037,#795548); height:80px; }
+  .lb-num { font-size:24px; color:#fff; font-weight:900; }
+  .lb-avatar-sm { font-size:22px; display:block; margin-bottom:4px; }
+  .lb-name { font-size:12px; font-weight:800; }
+  .lb-pts-sm { font-size:11px; color:var(--text-muted); }
+  .lb-list { background:#fff; border-radius:var(--radius); border:1px solid var(--blue-light); overflow:hidden; }
+  .lb-row { display:flex; align-items:center; gap:12px; padding:14px 16px; border-bottom:1px solid var(--blue-light); }
+  .lb-row:last-child { border-bottom:none; }
+  .lb-rank { font-size:13px; font-weight:900; color:var(--text-muted); width:24px; text-align:center; }
+  .lb-row-avatar { font-size:24px; }
+  .lb-row-name { font-size:14px; font-weight:800; }
+  .lb-row-school { font-size:11px; color:var(--text-muted); }
+  .lb-row-pts { margin-left:auto; font-family:'Unbounded','Noto Sans',sans-serif; font-size:14px; font-weight:900; color:var(--blue); }
+  .lb-row.me { background:var(--blue-pale); }
+
+  /* ===== CHATBOT ===== */
+  .chat-page-wrap { display:flex; flex-direction:column; height:calc(100vh - var(--nav-h) - var(--bottom-h)); background:var(--bg); }
+
+  /* Hamster header */
+  .hamster-header {
+    background:linear-gradient(135deg,#1565C0,#1E88E5);
+    padding:14px 20px; display:flex; align-items:center; gap:14px;
+  }
+  .hamster-anim-wrap {
+    position:relative; width:60px; height:60px; flex-shrink:0;
+  }
+  /* SVG hamster face */
+  .hamster-svg { width:60px; height:60px; animation:hamsterBob 2s ease-in-out infinite; }
+  @keyframes hamsterBob { 0%,100%{transform:translateY(0) rotate(-3deg)} 50%{transform:translateY(-5px) rotate(3deg)} }
+  .hamster-info { flex:1; }
+  .hamster-name { font-size:16px; font-weight:900; color:#fff; }
+  .hamster-status { font-size:12px; color:rgba(255,255,255,0.8); display:flex; align-items:center; gap:5px; }
+  .hamster-online-dot { width:8px; height:8px; background:#69F0AE; border-radius:50%; animation:pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(0.8)} }
+
+  .chat-messages { flex:1; overflow-y:auto; padding:16px 14px; display:flex; flex-direction:column; gap:12px; }
+
+  .chat-msg { display:flex; gap:8px; align-items:flex-end; }
+  .chat-msg.bot { flex-direction:row; }
+  .chat-msg.user { flex-direction:row-reverse; }
+
+  .bot-ava-small {
+    width:32px; height:32px; border-radius:50%; background:#E3F2FD; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    animation:hamsterTalk 0.4s ease; overflow:hidden;
+  }
+  @keyframes hamsterTalk { 0%{transform:scale(0.5) rotate(-10deg)} 60%{transform:scale(1.1) rotate(5deg)} 100%{transform:scale(1) rotate(0)} }
+
+  .chat-bubble {
+    max-width: min(72%, 340px); padding:10px 14px; font-size:14px; line-height:1.55; font-weight:600;
+    word-break: break-word;
+  }
+  .bot .chat-bubble {
+    background:#fff; border:1px solid var(--blue-light);
+    border-radius:18px 18px 18px 4px;
+    box-shadow:0 2px 8px rgba(21,101,192,0.08);
+  }
+  .user .chat-bubble {
+    background:var(--blue); color:#fff;
+    border-radius:18px 18px 4px 18px;
+    box-shadow:0 2px 8px rgba(21,101,192,0.2);
+  }
+  .msg-time { font-size:10px; color:var(--text-muted); margin-top:3px; padding:0 4px; }
+  .bot .msg-time { text-align:left; }
+  .user .msg-time { text-align:right; }
+
+  /* Typing indicator */
+  .typing-bubble {
+    background:#fff; border:1px solid var(--blue-light); border-radius:18px 18px 18px 4px;
+    padding:12px 16px; display:flex; gap:5px; align-items:center;
+    box-shadow:0 2px 8px rgba(21,101,192,0.08);
+  }
+  .typing-dot { width:7px; height:7px; background:var(--blue-light); border-radius:50%; animation:typingAnim 1.2s infinite; }
+  .typing-dot:nth-child(2){ animation-delay:0.2s; }
+  .typing-dot:nth-child(3){ animation-delay:0.4s; }
+  @keyframes typingAnim { 0%,60%,100%{transform:translateY(0);background:var(--blue-light)} 30%{transform:translateY(-6px);background:var(--blue-mid)} }
+
+  .chat-suggestions-wrap { padding:8px 14px; display:flex; gap:8px; flex-wrap:wrap; background:transparent; }
+  .chat-sug {
+    background:#fff; border:1.5px solid var(--blue-light); border-radius:50px;
+    padding:7px 13px; font-size:12px; font-weight:700; color:var(--blue); cursor:pointer;
+    transition:all 0.15s; font-family:'Nunito',sans-serif;
+  }
+  .chat-sug:hover { background:var(--blue); color:#fff; border-color:var(--blue); }
+
+  .chat-input-bar {
+    padding:10px 14px; background:#fff; border-top:1px solid var(--blue-light);
+    display:flex; gap:8px; align-items:center;
+  }
+  .chat-input {
+    flex:1; padding:11px 16px; border-radius:50px; border:2px solid var(--blue-light);
+    font-family:'Nunito',sans-serif; font-size:14px; outline:none; transition:border-color 0.2s;
+    background:#F8FBFF;
+  }
+  .chat-input:focus { border-color:var(--blue-mid); background:#fff; }
+  .chat-send {
+    background:var(--blue); color:#fff; border:none; border-radius:50%; width:44px; height:44px;
+    font-size:16px; cursor:pointer; transition:all 0.2s; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .chat-send:hover { background:#0D47A1; transform:scale(1.05); }
+
+  /* ===== МОБИЛЬНАЯ АДАПТАЦИЯ ===== */
+  @media (max-width: 480px) {
+    :root { --nav-h: 56px; --bottom-h: 62px; }
+
+    /* Topbar */
+    .topbar { padding: 0 12px; }
+    .topbar-logo { font-size: 15px; }
+    .topbar-pts { padding: 5px 9px; font-size: 12px; }
+    .topbar-avatar { width: 32px; height: 32px; font-size: 15px; }
+
+    /* Bottom nav */
+    .bn-icon { font-size: 20px; }
+    .bn-label { font-size: 9px; }
+
+    /* Pages */
+    .page { padding-top: calc(var(--nav-h) + 10px); }
+    .inner { padding: 0 12px; }
+
+    /* Profile hero */
+    .profile-hero { padding: 16px 14px; border-radius: 14px; }
+    .profile-avatar-big { width: 56px; height: 56px; font-size: 26px; }
+    .profile-name { font-size: 16px; }
+    .profile-sub { font-size: 11px; }
+    .profile-edit-btn { padding: 5px 10px; font-size: 11px; }
+    .level-badge { font-size: 11px; padding: 3px 9px; }
+
+    /* Stats row */
+    .stats-row { gap: 8px; }
+    .stat-card { padding: 12px 8px; border-radius: 12px; }
+    .stat-num { font-size: 18px; }
+    .stat-label { font-size: 10px; }
+
+    /* Badges */
+    .badges-grid { grid-template-columns: repeat(4, 1fr); gap: 7px; }
+    .badge-item { padding: 10px 4px; border-radius: 10px; }
+    .badge-emoji { font-size: 22px; }
+    .badge-name { font-size: 9px; }
+
+    /* Lesson cards - горизонтальный layout на мобиле */
+    .lesson-card { display: flex; align-items: stretch; margin-bottom: 10px; }
+    .lesson-thumb {
+      height: auto; width: 80px; min-width: 80px; font-size: 32px;
+      border-radius: 0; flex-shrink: 0;
+    }
+    .lesson-body { padding: 12px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .lesson-title { font-size: 13px; margin-bottom: 5px; }
+    .lesson-meta { font-size: 11px; gap: 6px; flex-wrap: wrap; }
+    .lesson-done-badge { top: 6px; right: 6px; font-size: 10px; padding: 2px 7px; }
+    .lesson-pts-badge  { top: 6px; left: 6px; font-size: 10px; padding: 2px 7px; }
+
+    /* Lesson viewer */
+    .lv-header { padding: 12px 14px; }
+    .lv-title { font-size: 14px; }
+    .lv-content { padding: 14px 12px; }
+    .lv-notes { font-size: 13px; padding: 13px; }
+    .lv-quiz-btn { padding: 12px; font-size: 14px; border-radius: 14px; }
+
+    /* Quiz */
+    .quiz-header { padding: 0 12px; }
+    .quiz-body { padding: 16px 12px; }
+    .quiz-question { font-size: 15px; margin-bottom: 16px; }
+    .quiz-opt { padding: 13px 14px; font-size: 13px; border-radius: 12px; }
+    .quiz-next { padding: 12px; font-size: 14px; border-radius: 14px; }
+    .qr-emoji { font-size: 54px; }
+    .qr-title { font-size: 20px; }
+    .qr-pts { font-size: 26px; }
+
+    /* Games */
+    .game-cards { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .gc-top { height: 80px; font-size: 34px; }
+    .gc-bottom { padding: 10px 12px; }
+    .gc-title { font-size: 13px; }
+    .gc-desc { font-size: 11px; }
+
+    /* Kahoot */
+    .ks-title { font-size: 22px; }
+    .ks-input { font-size: 22px; padding: 14px; letter-spacing: 4px; }
+    .ks-btn { padding: 12px; font-size: 14px; }
+
+    /* Leaderboard */
+    .lb-podium { gap: 6px; margin: 10px 0 16px; }
+    .lb-place:nth-child(1) .lb-podium-bar { height: 80px; }
+    .lb-place:nth-child(2) .lb-podium-bar { height: 104px; }
+    .lb-place:nth-child(3) .lb-podium-bar { height: 64px; }
+    .lb-num { font-size: 20px; }
+    .lb-name { font-size: 11px; }
+    .lb-row { padding: 11px 12px; gap: 8px; }
+    .lb-row-name { font-size: 13px; }
+    .lb-row-pts { font-size: 13px; }
+
+    /* Chatbot */
+    .hamster-header { padding: 10px 14px; }
+    .hamster-svg { width: 44px; height: 44px; }
+    .hamster-name { font-size: 14px; }
+    .hamster-status { font-size: 11px; }
+    .chat-messages { padding: 12px 10px; }
+    .chat-bubble { font-size: 13px; padding: 9px 12px; }
+    .chat-suggestions-wrap { padding: 6px 10px; gap: 6px; }
+    .chat-sug { font-size: 11px; padding: 6px 10px; }
+    .chat-input-bar { padding: 8px 10px; gap: 6px; }
+    .chat-input { padding: 10px 14px; font-size: 13px; }
+    .chat-send { width: 40px; height: 40px; }
+
+    /* Modal */
+    .modal-sheet { padding: 20px 16px; border-radius: 20px 20px 0 0; }
+    .avatar-picker { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .avatar-opt { font-size: 20px; }
+
+    /* Section heading */
+    .section-heading { font-size: 14px; }
+  }
+
+  @media (max-width: 360px) {
+    .badges-grid { grid-template-columns: repeat(4, 1fr); gap: 5px; }
+    .badge-emoji { font-size: 18px; }
+    .badge-name { font-size: 8px; }
+    .lesson-thumb { width: 68px; min-width: 68px; font-size: 28px; }
+    .game-cards { grid-template-columns: 1fr 1fr; gap: 8px; }
+  }
+
+  /* Lang switcher */
+  .lang-sm{padding:4px 12px;border-radius:16px;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;color:#1565C0;transition:all .2s;}
+  .lang-sm.active{background:#1565C0;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.18);}
+  /* Logout */
+  .logout-btn{background:linear-gradient(135deg,#FFEBEE,#FFCDD2);border:1.5px solid #FFCDD2;border-radius:50px;padding:6px 12px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:#C62828;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:4px;white-space:nowrap;box-shadow:0 2px 6px rgba(198,40,40,.12);}
+  .logout-btn:hover{background:linear-gradient(135deg,#FFCDD2,#EF9A9A);transform:translateY(-1px);box-shadow:0 4px 12px rgba(198,40,40,.22);}
+  /* Avatar upload */
+  .avatar-upload-wrap{position:relative;width:80px;height:80px;margin:0 auto 14px;cursor:pointer;}
+  .ava-emoji{width:80px;height:80px;border-radius:50%;border:3px solid #BBDEFB;display:flex;align-items:center;justify-content:center;font-size:36px;background:#E3F2FD;overflow:hidden;}
+  .ava-emoji img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+  .avatar-upload-overlay{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;color:#fff;font-size:22px;}
+  .avatar-upload-wrap:hover .avatar-upload-overlay{opacity:1;}
+  .avatar-upload-spin{position:absolute;inset:0;border-radius:50%;border:3px solid #BBDEFB;border-top-color:#1565C0;animation:spinAva .7s linear infinite;display:none;}
+  @keyframes spinAva{to{transform:rotate(360deg);}}
+  /* Sidebar footer */
+  .dn-footer{margin-top:auto;padding-top:12px;border-top:1px solid #BBDEFB;display:flex;flex-direction:column;gap:2px;}
+  .dn-footer a{font-size:11px;color:var(--text-muted);text-decoration:none;padding:4px 14px;border-radius:8px;font-weight:600;transition:color .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dn-footer a:hover{color:#1565C0;}
+  .dn-social{display:flex;gap:6px;padding:5px 14px;}
+  .dn-social a{width:26px;height:26px;border-radius:8px;background:#E3F2FD;display:flex;align-items:center;justify-content:center;font-size:13px;padding:0;transition:background .15s;}
+  .dn-social a:hover{background:#BBDEFB;}
+  /* Desktop layout */
+
+  /* Hide desktop sidebar on mobile */
+  .desktop-nav { display: none; }
+  @media(min-width:769px){
+    :root{--bottom-h:0px;}
+    .bottom-nav{display:none!important;}
+    .desktop-nav{position:fixed;left:0;top:var(--nav-h);bottom:0;width:220px;background:#fff;border-right:1.5px solid #BBDEFB;display:flex;flex-direction:column;gap:2px;padding:14px 10px;z-index:90;box-shadow:2px 0 12px rgba(0,0,0,.05);}
+    .dn-item{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;color:var(--text-muted);transition:all .18s;border:none;background:none;width:100%;font-family:'Nunito',sans-serif;text-align:left;}
+    .dn-item:hover{background:#E3F2FD;color:#1565C0;}
+    .dn-item.active{background:#E3F2FD;color:#1565C0;font-weight:800;}
+    .dn-icon{font-size:20px;width:26px;flex-shrink:0;}
+    .page{margin-left:220px;padding-top:calc(var(--nav-h) + 28px);padding-bottom:60px;padding-left:32px;padding-right:32px;min-height:100vh;box-sizing:border-box;}
+    .inner{max-width:800px;margin:0 auto;padding:0;}
+    .chat-page-wrap{height:calc(100vh - var(--nav-h));}
+    .topbar{padding:0 28px;}
+    .modal-overlay{align-items:center;}
+    .modal-sheet{border-radius:20px;max-width:500px;margin:0 auto;}
+  }
+  @media(min-width:1280px){
+    .desktop-nav{width:240px;}
+    .page{margin-left:240px;padding-left:40px;padding-right:40px;}
+    .inner{max-width:900px;}
+  }
+
+  /* Lang bar container */
+  .lang-bar, .lang-btns {
+    display:flex; background:#E3F2FD; border-radius:20px; padding:3px; gap:2px;
+  }
+
+  /* Topbar mobile: compact */
+  @media (max-width: 480px) {
+    .topbar-right { gap:6px; }
+    .topbar-pts { padding:5px 8px; font-size:11px; }
+    .topbar-avatar { width:32px; height:32px; font-size:15px; }
+    .lang-sm { padding:3px 8px; font-size:10px; }
+    .logout-btn { padding:5px 8px; font-size:11px; gap:2px; }
+    .logout-btn span { display:none; }  /* hide text, show only icon */
+  }
+
+  /* ===== NEW 4-STEP LESSON VIEWER ===== */
+  .lesson-viewer { display:none; position:fixed; inset:0; z-index:300; background:#f8fbff; flex-direction:column; }
+  .lesson-viewer.open { display:flex; }
+
+  /* Step header */
+  .lv-steps { display:flex; align-items:center; gap:0; padding:0 16px; background:#fff; border-bottom:1px solid var(--blue-light); height:48px; flex-shrink:0; }
+  .lv-step-dot { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; transition:all .25s; flex-shrink:0; }
+  .lv-step-dot.done { background:var(--green); color:#fff; }
+  .lv-step-dot.active { background:var(--blue); color:#fff; box-shadow:0 2px 8px rgba(21,101,192,0.35); }
+  .lv-step-dot.pending { background:var(--blue-light); color:var(--blue); }
+  .lv-step-line { flex:1; height:3px; background:var(--blue-light); transition:background .25s; }
+  .lv-step-line.done { background:var(--green); }
+
+  /* Step content */
+  .lv-step-content { flex:1; overflow-y:auto; }
+  .lv-step-page { display:none; padding:20px 16px; max-width:640px; margin:0 auto; }
+  .lv-step-page.active { display:block; }
+
+  /* Step 1 - Info */
+  .lv-info-hero { background:linear-gradient(135deg,var(--blue),var(--blue-mid)); border-radius:20px; padding:28px; text-align:center; color:#fff; margin-bottom:20px; }
+  .lv-info-emoji { font-size:64px; margin-bottom:12px; display:block; }
+  .lv-info-title { font-size:22px; font-weight:900; margin-bottom:8px; }
+  .lv-info-pts { background:rgba(255,255,255,0.2); border-radius:50px; padding:6px 16px; display:inline-block; font-size:14px; font-weight:800; margin-bottom:4px; }
+  .lv-info-desc { font-size:14px; opacity:0.85; line-height:1.6; margin-top:10px; }
+
+  /* Step 2 - Video */
+  .lv-video-wrap { border-radius:16px; overflow:hidden; background:#000; aspect-ratio:16/9; margin-bottom:16px; box-shadow:0 4px 20px rgba(0,0,0,0.15); }
+  .lv-video-wrap iframe { width:100%; height:100%; border:none; display:block; }
+
+  /* Step 3 - Notes/Conspect */
+  .lv-notes-block { background:#fff; border-radius:16px; border:1.5px solid var(--blue-light); overflow:hidden; margin-bottom:16px; }
+  .lv-notes-header { background:var(--blue-pale); padding:14px 18px; font-size:14px; font-weight:800; color:var(--blue); border-bottom:1px solid var(--blue-light); display:flex; align-items:center; gap:8px; }
+  .lv-notes-body { padding:18px; font-size:14px; line-height:1.8; color:var(--text); white-space:pre-wrap; word-break:break-word; }
+
+  /* Step 4 - Quiz */
+  .lv-quiz-header { padding:14px 16px; background:#fff; border-bottom:1px solid var(--blue-light); display:flex; align-items:center; gap:12px; flex-shrink:0; }
+  .lv-quiz-progress { flex:1; height:7px; background:var(--blue-light); border-radius:4px; overflow:hidden; }
+  .lv-quiz-progress-fill { height:100%; background:linear-gradient(90deg,var(--blue),var(--blue-mid)); border-radius:4px; transition:width .4s; }
+  .lv-quiz-counter { font-size:13px; font-weight:800; color:var(--text-muted); white-space:nowrap; }
+  .lv-quiz-body { flex:1; overflow-y:auto; padding:20px 16px; max-width:640px; margin:0 auto; width:100%; }
+  .lv-quiz-qnum { font-size:11px; font-weight:800; color:var(--blue); text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
+  .lv-quiz-question { font-size:17px; font-weight:800; line-height:1.5; margin-bottom:20px; }
+  .lv-quiz-opts { display:flex; flex-direction:column; gap:10px; }
+  .lv-quiz-opt { padding:14px 16px; border-radius:14px; border:2px solid var(--blue-light); background:#fff; font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; text-align:left; cursor:pointer; transition:all .18s; display:flex; align-items:center; gap:12px; }
+  .lv-quiz-opt-letter { width:28px; height:28px; border-radius:50%; background:var(--blue-pale); color:var(--blue); font-size:11px; font-weight:900; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .lv-quiz-opt:hover { border-color:var(--blue-mid); background:var(--blue-pale); }
+  .lv-quiz-opt.correct { border-color:var(--green); background:var(--green-pale); color:var(--green); }
+  .lv-quiz-opt.correct .lv-quiz-opt-letter { background:var(--green); color:#fff; }
+  .lv-quiz-opt.wrong { border-color:#C62828; background:#FFEBEE; color:#C62828; }
+  .lv-quiz-opt.wrong .lv-quiz-opt-letter { background:#C62828; color:#fff; }
+  .lv-quiz-next { width:100%; padding:14px; border-radius:50px; background:linear-gradient(135deg,var(--blue),var(--blue-mid)); color:#fff; border:none; font-family:'Nunito',sans-serif; font-size:15px; font-weight:800; cursor:pointer; display:none; margin-top:16px; transition:all .2s; }
+  .lv-quiz-next:hover { background:linear-gradient(135deg,#0D47A1,var(--blue)); transform:translateY(-1px); }
+
+  /* Result screen */
+  .lv-result { text-align:center; padding:32px 16px; max-width:480px; margin:0 auto; }
+  .lv-result-emoji { font-size:64px; display:block; margin-bottom:12px; }
+  .lv-result-title { font-size:24px; font-weight:900; margin-bottom:6px; }
+  .lv-result-sub { font-size:15px; color:var(--text-muted); margin-bottom:16px; }
+  .lv-result-pts { font-size:32px; font-weight:900; color:var(--blue); margin:16px 0; }
+  .lv-result-bar { height:12px; background:var(--blue-light); border-radius:6px; margin:12px 0; overflow:hidden; }
+  .lv-result-fill { height:100%; background:linear-gradient(90deg,var(--blue),var(--blue-mid)); border-radius:6px; transition:width 1s; }
+
+  /* Bottom nav buttons */
+  .lv-nav { display:flex; gap:12px; padding:12px 16px; background:#fff; border-top:1px solid var(--blue-light); flex-shrink:0; }
+  .lv-nav-back { background:var(--blue-pale); border:none; border-radius:50px; padding:12px 20px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; color:var(--blue); cursor:pointer; transition:all .2s; }
+  .lv-nav-next { flex:1; background:linear-gradient(135deg,var(--blue),var(--blue-mid)); border:none; border-radius:50px; padding:13px 20px; font-family:'Nunito',sans-serif; font-size:15px; font-weight:800; color:#fff; cursor:pointer; transition:all .2s; }
+  .lv-nav-next:hover { background:linear-gradient(135deg,#0D47A1,var(--blue)); transform:translateY(-1px); }
+
+  /* ===== LEVEL-UP FULLSCREEN OVERLAY ===== */
+  .levelup-overlay {
+    display:none; position:fixed; inset:0; z-index:9000;
+    background:linear-gradient(160deg,#1B5E20,#2E7D32,#43A047);
+    align-items:center; justify-content:center; flex-direction:column;
+    animation:lvFadeIn .35s ease;
+  }
+  .levelup-overlay.show { display:flex; }
+  @keyframes lvFadeIn { from{opacity:0;transform:scale(.95)} to{opacity:1;transform:scale(1)} }
+  .lv-up-icon { font-size:80px; animation:lvBounce .6s .2s both; display:block; }
+  @keyframes lvBounce { 0%{transform:scale(0) rotate(-10deg)} 60%{transform:scale(1.2) rotate(5deg)} 100%{transform:scale(1) rotate(0)} }
+  .lv-up-label { font-size:14px; font-weight:800; color:rgba(255,255,255,0.7); letter-spacing:3px; text-transform:uppercase; margin-top:20px; animation:lvFadeUp .4s .4s both; }
+  @keyframes lvFadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .lv-up-title { font-family:'Unbounded',sans-serif; font-size:32px; font-weight:900; color:#fff; margin:8px 0; animation:lvFadeUp .4s .55s both; }
+  .lv-up-pts { font-size:16px; color:rgba(255,255,255,0.8); animation:lvFadeUp .4s .7s both; }
+  .lv-up-stars { display:flex; gap:8px; margin-top:20px; animation:lvFadeUp .4s .85s both; }
+  .lv-up-star { font-size:28px; animation:lvStarPop .3s both; }
+  .lv-up-star:nth-child(1){animation-delay:.9s}
+  .lv-up-star:nth-child(2){animation-delay:1.05s}
+  .lv-up-star:nth-child(3){animation-delay:1.2s}
+  @keyframes lvStarPop { from{transform:scale(0)} to{transform:scale(1)} }
+  .lv-up-btn { margin-top:32px; background:#fff; color:var(--green-dark); border:none; border-radius:50px; padding:14px 36px; font-family:'Nunito',sans-serif; font-size:16px; font-weight:900; cursor:pointer; animation:lvFadeUp .4s 1.3s both; transition:transform .2s; }
+  .lv-up-btn:hover { transform:scale(1.04); }
+  @keyframes slideLoad{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+</style>
+</head>
+<body>
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">🌱 Kids</div>
+  <div class="topbar-right">
+    <div class="lang-bar" style="padding:0;">
+      <button class="lang-sm" onclick="setLang('ru')">RU</button>
+      <button class="lang-sm active" onclick="setLang('kz')">KZ</button>
+    </div>
+    <div class="topbar-pts">⭐ <span id="ptsDisplay">720</span></div>
+    <div class="topbar-avatar" onclick="showPage('profile')">🐣</div>
+    <button class="logout-btn" onclick="doLogout()">🚪 <span data-ru>Выйти</span><span data-kz style="display:none">Шығу</span></button>
+  </div>
+</div>
+
+<!-- DESKTOP SIDEBAR -->
+<nav class="desktop-nav" id="desktopNav">
+  <button class="dn-item active" id="dn-profile" onclick="showPage('profile')"><span class="dn-icon">👤</span><span data-ru>Профиль</span><span data-kz style="display:none">Профиль</span></button>
+  <button class="dn-item" id="dn-lessons" onclick="showPage('lessons')"><span class="dn-icon">📚</span><span data-ru>Уроки</span><span data-kz style="display:none">Сабақтар</span></button>
+  <button class="dn-item" id="dn-games" onclick="showPage('games')"><span class="dn-icon">🎮</span><span data-ru>Игры</span><span data-kz style="display:none">Ойындар</span></button>
+  <button class="dn-item" id="dn-leaderboard" onclick="showPage('leaderboard')"><span class="dn-icon">🏆</span><span data-ru>Рейтинг</span><span data-kz style="display:none">Рейтинг</span></button>
+  <button class="dn-item" id="dn-chatbot" onclick="showPage('chatbot')"><span class="dn-icon">🐹</span><span data-ru>Чат-бот</span><span data-kz style="display:none">Чат-бот</span></button>
+  
+  <div class="dn-footer">
+        <div class="dn-social">
+      <a href="https://t.me/Ecobalabot" target="_blank" title="Telegram"><svg width="14" height="14" viewBox="0 0 24 24" fill="#1565C0"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg></a>
+      <a href="https://youtube.com/@ecobalakz" target="_blank" title="YouTube"><svg width="14" height="14" viewBox="0 0 24 24" fill="#C62828"><path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg></a>
+      <a href="https://www.instagram.com/ecobala.kz" target="_blank" title="Instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="#C2185B"><path d="M12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></a>
+    </div>
+    <a href="tel:+77714514717">📞 +7 771 451 47 17</a>
+    <a href="mailto:ecobalakz@gmail.com">✉️ ecobalakz@gmail.com</a>
+    <a href="privacy.html" target="_blank">🔒 <span data-ru>Конфиденциальность</span><span data-kz style="display:none">Құпиялылық</span></a>
+    <a href="terms.html" target="_blank">📄 <span data-ru>Условия</span><span data-kz style="display:none">Шарттар</span></a>
+  </div>
+</nav>
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="bn-item active" id="nav-profile" onclick="showPage('profile')">
+    <span class="bn-icon">👤</span>
+    <span class="bn-label" data-ru>Профиль</span>
+    <span class="bn-label" data-kz style="display:none">Профиль</span>
+  </button>
+  <button class="bn-item" id="nav-lessons" onclick="showPage('lessons')">
+    <span class="bn-icon">📚</span>
+    <span class="bn-label" data-ru>Уроки</span>
+    <span class="bn-label" data-kz style="display:none">Сабақтар</span>
+  </button>
+  <button class="bn-item" id="nav-games" onclick="showPage('games')">
+    <span class="bn-icon">🎮</span>
+    <span class="bn-label" data-ru>Игры</span>
+    <span class="bn-label" data-kz style="display:none">Ойындар</span>
+  </button>
+  <button class="bn-item" id="nav-leaderboard" onclick="showPage('leaderboard')">
+    <span class="bn-icon">🏆</span>
+    <span class="bn-label" data-ru>Рейтинг</span>
+    <span class="bn-label" data-kz style="display:none">Рейтинг</span>
+  </button>
+  <button class="bn-item" id="nav-chatbot" onclick="showPage('chatbot')">
+    <span class="bn-icon">🐹</span>
+    <span class="bn-label" data-ru>Чат-бот</span>
+    <span class="bn-label" data-kz style="display:none">Чат-бот</span>
+  </button>
+</nav>
+
+<!-- ===== PROFILE PAGE ===== -->
+<div class="page active" id="page-profile">
+  <div class="inner">
+    <div class="profile-hero">
+      <div class="ph-circles"><div class="ph-circle ph-c1"></div><div class="ph-circle ph-c2"></div></div>
+      <div class="profile-top">
+        <div class="profile-avatar-big" id="profileAvatar" onclick="openEditModal()">🐣</div>
+        <div>
+          <div class="profile-name" id="profileName"></div>
+          <div class="profile-sub" id="profileSub" data-ru>Kids • 4 класс • Хромтау</div>
+          <div class="profile-sub" id="profileSubKz" data-kz style="display:none">Kids • 4 сынып • Хромтау</div>
+        </div>
+        <button class="profile-edit-btn" onclick="openEditModal()">✏️ <span data-ru>Изменить</span><span data-kz style="display:none">Өзгерту</span></button>
+      </div>
+      <div class="level-row">
+        <div class="level-badge">🌿 <span data-ru>Уровень 5</span><span data-kz style="display:none">5-деңгей</span></div>
+        <div class="level-progress">
+          <div class="lp-label"><span>720 / 1000 Eco Pts</span><span>72%</span></div>
+          <div class="lp-bar"><div class="lp-fill"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num">12</div><div class="stat-label" data-ru>Уроков</div><div class="stat-label" data-kz style="display:none">Сабақ</div></div>
+      <div class="stat-card"><div class="stat-num">720</div><div class="stat-label">Eco Pts</div></div>
+      <div class="stat-card"><div class="stat-num">8</div><div class="stat-label" data-ru>Значков</div><div class="stat-label" data-kz style="display:none">Белгі</div></div>
+    </div>
+
+    <div class="section-heading" data-ru>Мои значки</div>
+    <div class="section-heading" data-kz style="display:none">Менің белгілерім</div>
+    <div class="badges-grid" id="badgesGrid"></div>
+
+    <div class="section-heading" data-ru>Последние достижения</div>
+    <div class="section-heading" data-kz style="display:none">Соңғы жетістіктер</div>
+    <div id="achievementsList"></div>
+  </div>
+</div>
+
+<!-- ===== LESSONS PAGE ===== -->
+<div class="page" id="page-lessons">
+  <div class="inner">
+    <div class="section-heading" style="margin-top:0;" data-ru>Уроки по экологии</div>
+    <div class="section-heading" style="margin-top:0;" data-kz style="display:none">Экология сабақтары</div>
+    <div id="lessonsList"></div>
+  </div>
+</div>
+
+<!-- ===== GAMES PAGE ===== -->
+<div class="page" id="page-games">
+  <div class="inner">
+    <div class="section-heading" style="margin-top:0;" data-ru>Выбери игру</div>
+    <div class="section-heading" style="margin-top:0;" data-kz style="display:none">Ойын таңдаңыз</div>
+    <div class="game-cards">
+      <div class="game-card" onclick="openKahoot()">
+        <div class="gc-top gc-top-blue">🎮</div>
+        <div class="gc-bottom">
+          <div class="gc-title">Kahoot!</div>
+          <div class="gc-desc" data-ru>Онлайн-викторина по коду</div>
+          <div class="gc-desc" data-kz style="display:none">Кодпен онлайн-викторина</div>
+        </div>
+      </div>
+      <div class="game-card" onclick="openBoardGame()">
+        <div class="gc-top gc-top-green">🏫</div>
+        <div class="gc-bottom">
+          <div class="gc-title" data-ru>На доске</div>
+          <div class="gc-title" data-kz style="display:none">Тақтада</div>
+          <div class="gc-desc" data-ru>Для школьной доски</div>
+          <div class="gc-desc" data-kz style="display:none">Мектеп тақтасы үшін</div>
+        </div>
+      </div>
+    </div>
+    <div style="background:#fff;border-radius:var(--radius);padding:20px;border:1px solid var(--blue-light);margin-bottom:14px;">
+      <div style="font-size:15px;font-weight:800;margin-bottom:8px;">🏆 <span data-ru>Мои игровые результаты</span><span data-kz style="display:none">Менің ойын нәтижелерім</span></div>
+      <div style="display:flex;gap:16px;">
+        <div style="text-align:center;"><div id="gameStatPlayed" style="font-size:22px;font-weight:900;color:var(--blue);">—</div><div style="font-size:11px;color:var(--text-muted);" data-ru>Игр сыграно</div><div style="font-size:11px;color:var(--text-muted);" data-kz style="display:none">Ойнаған</div></div>
+        <div style="text-align:center;"><div id="gameStatWins" style="font-size:22px;font-weight:900;color:#FFB300;">—</div><div style="font-size:11px;color:var(--text-muted);" data-ru>Побед</div><div style="font-size:11px;color:var(--text-muted);" data-kz style="display:none">Жеңіс</div></div>
+        <div style="text-align:center;"><div id="gameStatPts" style="font-size:22px;font-weight:900;color:var(--green);">—</div><div style="font-size:11px;color:var(--text-muted);">Eco Pts</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LEADERBOARD PAGE ===== -->
+<div class="page" id="page-leaderboard">
+  <div class="inner">
+    <div class="section-heading" style="margin-top:0;" data-ru>Рейтинг учеников</div>
+    <div class="section-heading" style="margin-top:0;" data-kz style="display:none">Оқушылар рейтингі</div>
+    <div class="lb-podium" id="podium"></div>
+    <div class="lb-list" id="lbList"></div>
+  </div>
+</div>
+
+<!-- ===== CHATBOT PAGE ===== -->
+<div class="page" id="page-chatbot">
+  <div class="chat-page-wrap">
+    <!-- Hamster header -->
+    <div class="hamster-header">
+      <div class="hamster-anim-wrap">
+        <svg class="hamster-svg" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+          <!-- ears -->
+          <ellipse cx="14" cy="18" rx="9" ry="10" fill="#F4A460"/>
+          <ellipse cx="46" cy="18" rx="9" ry="10" fill="#F4A460"/>
+          <ellipse cx="14" cy="18" rx="6" ry="7" fill="#FFB6C1"/>
+          <ellipse cx="46" cy="18" rx="6" ry="7" fill="#FFB6C1"/>
+          <!-- head -->
+          <ellipse cx="30" cy="32" rx="22" ry="20" fill="#F5DEB3"/>
+          <!-- cheeks -->
+          <ellipse cx="14" cy="36" rx="8" ry="7" fill="#FFD0A0" opacity="0.7"/>
+          <ellipse cx="46" cy="36" rx="8" ry="7" fill="#FFD0A0" opacity="0.7"/>
+          <!-- eyes -->
+          <circle cx="22" cy="28" r="4" fill="#2C1810"/>
+          <circle cx="38" cy="28" r="4" fill="#2C1810"/>
+          <circle cx="23.5" cy="26.5" r="1.5" fill="white"/>
+          <circle cx="39.5" cy="26.5" r="1.5" fill="white"/>
+          <!-- nose -->
+          <ellipse cx="30" cy="35" rx="3" ry="2" fill="#FF8B94"/>
+          <!-- mouth -->
+          <path d="M26 38 Q30 42 34 38" stroke="#2C1810" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <!-- whiskers -->
+          <line x1="10" y1="34" x2="22" y2="36" stroke="#888" stroke-width="1" opacity="0.6"/>
+          <line x1="10" y1="38" x2="22" y2="38" stroke="#888" stroke-width="1" opacity="0.6"/>
+          <line x1="38" y1="36" x2="50" y2="34" stroke="#888" stroke-width="1" opacity="0.6"/>
+          <line x1="38" y1="38" x2="50" y2="38" stroke="#888" stroke-width="1" opacity="0.6"/>
+        </svg>
+      </div>
+      <div class="hamster-info">
+        <div class="hamster-name">🐹 Экохомяк</div>
+        <div class="hamster-status">
+          <div class="hamster-online-dot"></div>
+          <span class="t-ru">Онлайн - готов помочь!</span>
+          <span class="t-kz" style="display:none">Онлайн - көмектесуге дайын!</span>
+        </div>
+      </div>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-suggestions-wrap" id="chatSuggestions"></div>
+    <div class="chat-input-bar">
+      <input class="chat-input" id="chatInput" onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="chat-send" onclick="sendChat()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LESSON VIEWER ===== -->
+</div>
+
+<!-- ===== 4-STEP LESSON VIEWER ===== -->
+<div class="lesson-viewer" id="lessonViewer">
+  <!-- TOP HEADER -->
+  <div class="lv-header">
+    <button class="lv-back" onclick="closeLessonViewer()">←</button>
+    <div class="lv-title" id="lvTitle"></div>
+  </div>
+  <!-- STEP PROGRESS -->
+  <div class="lv-steps" id="lvSteps">
+    <div class="lv-step-dot active" id="lstep0" title="Информация">1</div>
+    <div class="lv-step-line" id="lline0"></div>
+    <div class="lv-step-dot pending" id="lstep1" title="Видео">2</div>
+    <div class="lv-step-line" id="lline1"></div>
+    <div class="lv-step-dot pending" id="lstep2" title="Конспект">3</div>
+    <div class="lv-step-line" id="lline2"></div>
+    <div class="lv-step-dot pending" id="lstep3" title="Тест">4</div>
+  </div>
+  <!-- STEP CONTENT -->
+  <div class="lv-step-content" id="lvStepContent">
+
+    <!-- STEP 1: INFO -->
+    <div class="lv-step-page active" id="lpage0">
+      <div class="lv-info-hero">
+        <span class="lv-info-emoji" id="lvInfoEmoji">📘</span>
+        <div class="lv-info-title" id="lvInfoTitle"></div>
+        <div class="lv-info-pts" id="lvInfoPts"></div>
+        <div class="lv-info-desc" id="lvInfoDesc" data-ru>Познакомься с темой урока, посмотри видео и проверь себя тестом!</div>
+        <div class="lv-info-desc" id="lvInfoDescKz" data-kz style="display:none">Сабақ тақырыбымен танысып, видео қара және өзіңді тестпен тексер!</div>
+      </div>
+      <div style="background:#fff;border-radius:16px;border:1.5px solid var(--blue-light);padding:18px;margin-bottom:16px;">
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
+          <div style="width:40px;height:40px;background:var(--blue-pale);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;">🎬</div>
+          <div style="font-size:14px;font-weight:700;" data-ru>Шаг 2 - Видео</div>
+          <div style="font-size:14px;font-weight:700;" data-kz style="display:none">2-қадам - Видео</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
+          <div style="width:40px;height:40px;background:var(--blue-pale);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;">📝</div>
+          <div style="font-size:14px;font-weight:700;" data-ru>Шаг 3 - Конспект</div>
+          <div style="font-size:14px;font-weight:700;" data-kz style="display:none">3-қадам - Конспект</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;">
+          <div style="width:40px;height:40px;background:var(--blue-pale);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;">❓</div>
+          <div style="font-size:14px;font-weight:700;" data-ru>Шаг 4 - Тест (10 вопросов)</div>
+          <div style="font-size:14px;font-weight:700;" data-kz style="display:none">4-қадам - Тест (10 сұрақ)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: VIDEO -->
+    <div class="lv-step-page" id="lpage1">
+      <div class="lv-video-wrap"><iframe id="lvVideo" allowfullscreen></iframe></div>
+      <div style="background:var(--blue-pale);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--blue);font-weight:700;" data-ru>💡 Смотри внимательно - в конспекте и тесте будут эти темы!</div>
+      <div style="background:var(--blue-pale);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--blue);font-weight:700;" data-kz style="display:none">💡 Мұқият қара - конспект пен тестте осы тақырыптар болады!</div>
+    </div>
+
+    <!-- STEP 3: NOTES -->
+    <div class="lv-step-page" id="lpage2">
+      <div class="lv-notes-block">
+        <div class="lv-notes-header">📝 <span data-ru>Конспект урока</span><span data-kz style="display:none">Сабақ конспектісі</span></div>
+        <div class="lv-notes-body" id="lvNotes"></div>
+      </div>
+    </div>
+
+    <!-- STEP 4: QUIZ -->
+    <div class="lv-step-page" id="lpage3">
+      <div id="lvQuizInner"></div>
+    </div>
+
+  </div>
+  <!-- BOTTOM NAV -->
+  <div class="lv-nav" id="lvNav">
+    <button class="lv-nav-back" id="lvBtnBack" onclick="lvStepBack()" style="display:none">←</button>
+    <button class="lv-nav-next" id="lvBtnNext" onclick="lvStepNext()">
+      <span data-ru>Далее →</span><span data-kz style="display:none">Келесі →</span>
+    </button>
+  </div>
+</div>
+
+<!-- ===== LEVEL-UP OVERLAY ===== -->
+<div class="levelup-overlay" id="levelupOverlay">
+  <span class="lv-up-icon" id="lvUpIcon">🌿</span>
+  <div class="lv-up-label" data-ru>НОВЫЙ УРОВЕНЬ!</div>
+  <div class="lv-up-label" data-kz style="display:none">ЖАҢА ДЕҢГЕЙ!</div>
+  <div class="lv-up-title" id="lvUpTitle">Уровень 3</div>
+  <div class="lv-up-pts" id="lvUpPts"></div>
+  <div class="lv-up-stars">
+    <span class="lv-up-star">⭐</span>
+    <span class="lv-up-star">⭐</span>
+    <span class="lv-up-star">⭐</span>
+  </div>
+  <button class="lv-up-btn" onclick="closeLevelUp()" data-ru>Отлично! ✓</button>
+  <button class="lv-up-btn" onclick="closeLevelUp()" data-kz style="display:none">Тамаша! ✓</button>
+</div>
+
+
+<!-- ===== KAHOOT JOIN ===== -->
+<div class="kahoot-screen" id="kahootScreen">
+  <div class="ks-title">🎮 Kahoot!</div>
+  <div class="ks-sub" data-ru>Введи код комнаты от учителя</div>
+  <div class="ks-sub" data-kz style="display:none">Мұғалімнен бөлме кодын енгізіңіз</div>
+  <input class="ks-input" id="roomCode" maxlength="6" placeholder="000000" oninput="this.value=this.value.toUpperCase()">
+  <button class="ks-btn" onclick="joinRoom()">
+    <span data-ru>Войти в игру</span>
+    <span data-kz style="display:none">Ойынға кіру</span>
+    →
+  </button>
+  <button class="ks-back" onclick="document.getElementById('kahootScreen').classList.remove('open')">
+    ← <span data-ru>Назад</span><span data-kz style="display:none">Артқа</span>
+  </button>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-sheet">
+    <div class="modal-title">
+      <span data-ru>Редактировать профиль</span>
+      <span data-kz style="display:none">Профильді өзгерту</span>
+      <button class="modal-close" onclick="document.getElementById('editModal').classList.remove('open')">✕</button>
+    </div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:10px;" data-ru>Фото профиля</div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:10px;" data-kz style="display:none">Профиль суреті</div>
+    <div class="avatar-upload-wrap" onclick="document.getElementById('avatarFileInput').click()">
+      <div class="ava-emoji" id="modalAvaPreview"></div>
+      <div class="avatar-upload-overlay">📷</div>
+      <div class="avatar-upload-spin" id="avaUploadSpin"></div>
+      <input type="file" class="avatar-upload-input" id="avatarFileInput" accept="image/*" onchange="uploadAvatarPhoto(event)">
+    </div>
+    <div style="text-align:center;font-size:11px;color:var(--text-muted);margin-bottom:10px;" data-ru>или выбери эмодзи</div>
+    <div style="text-align:center;font-size:11px;color:var(--text-muted);margin-bottom:10px;" data-kz style="display:none">немесе эмодзи таңда</div>
+    <div class="avatar-picker" id="avatarPicker"></div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:6px;" data-ru>Имя / Ник</div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:6px;" data-kz style="display:none">Аты / Лақап аты</div>
+    <input class="form-input-m" id="editName" value="">
+    <button onclick="saveProfile()" style="width:100%;padding:13px;border-radius:50px;background:var(--blue);color:#fff;border:none;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;">
+      <span data-ru>Сохранить</span><span data-kz style="display:none">Сақтау</span>
+    </button>
+  </div>
+</div>
+
+<script>
+
+
+// ── Content moderation (encoded) ──────────────────────────────────────────
+const _PF=(function(){try{return atob('0YXRg9C5LNGF0YPRjyzRhdGD0Y4s0YXRg9GP0Lws0YXRg9GP0LzQuCzRhdGD0LXQsizRhdGD0LnQvdGPLNGF0YPQudC90Y4s0L/QuNC30LTQsCzQv9C40LfQtNGLLNC/0LjQt9C00LXRhizQv9C40LfQtNCw0YIs0L/QuNC30LTQsNC90YPQuyzQv9C40LfQtNCw0L3Rg9GCLNC10LHQsNGC0Yws0LXQsdCw0Lss0LXQsdCw0LvQuCzQtdCx0LDQvdGL0Lks0LXQsdCw0L3Rg9GCLNC10LHQsNC90LDRjyzQtdCx0LDQvdGM0LrQvizRgdGD0LrQsCzRgdGD0LrQuCzRgdGD0LrQsNC8LNGB0YPQutC1LNGB0YPRh9C60LAs0YHRg9GH0LDRgCzQsdC70Y/RgtGMLNCx0LvRj9C00Yws0LHQu9GP0LTQtdC5LNCx0LvRj9C00LjQvSzQsdC70Y/QtNGB0Los0LHQu9GP0LTQuNC90LAs0LHQu9GP0LTRgdGC0LLQvizQvNGD0LTQsNC6LNC80YPQtNCw0LrQuCzQvNGD0LTQsNC60LDQvCzQvNGD0LTQuNC70LAs0LzRg9C00LjQuyzQt9Cw0LvRg9C/0LAs0LfQsNC70YPQv9C40L0s0ZHQsdCw0L0s0ZHQsdCw0L3Ri9C5LNGR0LEs0ZHQsdC90YPRgizRkdCx0L3Rg9C7LNGR0LHQvdGD0YLRjCzQv9C40LfQtNC10YLRjCzQv9C40LfQtNC40YIs0L/QuNC30LTQsNCx0L7QuyzQv9C40LfQtNCw0L3Rg9GC0Yws0YjQu9GO0YXQsCzRiNC70Y7RhdC4LNGI0LvRjtGF0LDQvCzQvNGA0LDQt9GMLNC80YDQsNC30Lgs0YPQtdCx0LDQvSzRg9GR0LHQsNC9LNGD0ZHQsSzQv9C40LfQtNGO0Los0L/QuNC30LfRjtC60Lgs0LPQsNC90LTQvtC9LNCz0LDQvdC00L7QvdGLLNC90LDRhdGD0Lks0L/QvtGF0YPQuSzQvdCw0YXQtdGALGFzcyxmdWNrLHNoaXQsYml0Y2gsY29jayxkaWNrLHB1c3N5LGN1bnQsbmlnZ2VyLGZhZ2dvdCzRgdC40LrQsNC6LNGB0LjQutGW0L0s0YHQuNC60Lgs0YHQuNC60LBxLNCx0L7SmyzQsdC+0LrRgtGLLNGI0LXRiNGW0qMs0YjQtdGI0LXSo9C00ZYs0YjQtdGI0LXSo9C90ZbSoyzQsdCw0LnSk9GL0Lcs0LHQsNC50pPRi9C30YvQvSzQuNGC0ZbSoyzQuNGC0YHRltKjLNC40YLRgtC10Lks0LjRgtC/0ZbQvSzQtdGB0LXQuizQtdGB0LXQs9GW0qMs0LXRgdC10LrRgdGW0qMs0L/Ri9GB0YvSmyzQv9GL0YjRi9C6LNC/0LXQt9C00LXRgizQv9GW0LfQtNC10YIs0LbQtdGB0ZbRgCzQttC10YHRltGA0LTQtdC5LNGB0LLQvtC70L7Rh9GMLNGD0LHQu9GO0LTQvtC6LNGD0LHQu9GO0LTQutC4LNC70L7RiNCw0Lo=').split(',');}catch(e){return [];}})();
+function containsProfanity(t){if(!t)return false;const l=t.toLowerCase().replace(/[\s\-\.]+/g,'');return _PF.some(w=>l.includes(w.replace(/[\s\-\.]+/g,'')));}
+function profanityMsg(l){return l==='kz'?'⚠️ Бұл сөзді қолдануға болмайды!':'⚠️ Нельзя использовать такие слова!';}
+function chatProfanityMsg(l){return l==='kz'?'⚠️ Мен мұндай сөздерге жауап бермеймін 🌱':'⚠️ Я не отвечаю на такие слова. Спроси про природу! 🌱';}
+
+
+const IS_KIDS = true;
+let lang = localStorage.getItem('selectedLanguage') || 'kz';
+let currentPage = 'profile';
+let currentLesson = null;
+let quizQ = 0, quizScore = 0, quizAnswered = false;
+
+const avatarEmojis = ['🐣','🦊','🐧','🐸','🦁','🐼','🦋','🐬','🦅','🐻','🦉','🐺'];
+
+// lessons loaded from DB
+
+// achievements loaded from DB
+
+// lbData loaded from DB
+
+const botFAQ = {
+  ru:[
+    {kw:['вода','воды','водный'],r:'Вода покрывает 71% Земли! Пресной воды всего 3%. Каждый из нас должен экономить воду 💧'},
+    {kw:['мусор','отходы','переработка','recyclе'],r:'Каждый год образуется 2 млрд тонн мусора! Сортируй отходы - помогай планете ♻️'},
+    {kw:['дерево','деревья','лес','растени'],r:'Одно дерево производит кислород для одного человека в год! Сажай деревья 🌳'},
+    {kw:['квест','задание','баллы','eco'],r:'Квесты - это реальные экологические задания с баллами! Выполняй и получай Eco Points 🌿'},
+    {kw:['урок','учиться','учеба'],r:'В разделе "Уроки" есть видео-уроки по экологии с тестами. Проходи и зарабатывай баллы! 📚'},
+    {kw:['игра','kahoot','играть'],r:'В разделе "Игры" есть Kahoot-викторина! Попроси учителя создать комнату 🎮'},
+    {kw:['рейтинг','место','лучший'],r:'Зарабатывай Eco Points за уроки и квесты, чтобы подняться в рейтинге! 🏆'},
+    {kw:['привет','здравствуй','хай','hi'],r:'Привет! Я Экохомяк - твой экологический помощник! 🐹 Спроси меня о природе!'},
+    {kw:['спасибо','благодар'],r:'Всегда рад помочь! Береги природу вместе с EcoBala 🌱'},
+    {kw:['экология','эко','природа'],r:'Экология - наука о взаимодействии живых организмов с окружающей средой. Беречь природу важно! 🌍'},
+  ],
+  kz:[
+    {kw:['су','судың'],r:'Су Жер бетінің 71%-ын алып жатыр! Тұщы су тек 3%. Суды үнемдейік 💧'},
+    {kw:['қоқыс','қалдық','өңдеу'],r:'Жыл сайын 2 миллиард тонна қалдық! Қалдықтарды сұрыптаңыз ♻️'},
+    {kw:['ағаш','орман','өсімдік'],r:'Бір ағаш бір адамға жыл бойы оттегі береді! Ағаш отырғызыңыз 🌳'},
+    {kw:['квест','тапсырма'],r:'Квесттер - нақты экологиялық тапсырмалар! Орындап Eco Points алыңыз 🌿'},
+    {kw:['сабақ','оқу'],r:'"Сабақтар" бөлімінде видео сабақтар бар. Тестпен оқыңыз! 📚'},
+    {kw:['сәлем','сәлеметсіз'],r:'Сәлем! Мен Экохомяк - сіздің экологиялық көмекшіңіз! 🐹'},
+    {kw:['рахмет'],r:'Әрқашан көмектесуге дайынмын! EcoBala-мен табиғатты қорғаңыз 🌱'},
+    {kw:['экология','табиғат'],r:'Экология - тіршілік иелерінің қоршаған ортамен өзара әрекетін зерттейтін ғылым 🌍'},
+  ]
+};
+
+const suggestions = {
+  ru:['Что такое экология?','Как беречь воду?','Что делать с мусором?','Как получить больше баллов?'],
+  kz:['Экология дегеніміз не?','Суды қалай үнемдейді?','Қоқыспен не істейді?','Қалай ұпай алуға болады?']
+};
+
+function setLang(l) {
+  lang = l;
+  localStorage.setItem('selectedLanguage', l);
+  document.querySelectorAll('.lang-sm').forEach(b => b.classList.toggle('active', (b.getAttribute('onclick')||'').includes(`'${l}'`)));
+  document.querySelectorAll('[data-ru]').forEach(el => el.style.display = l==='ru' ? '' : 'none');
+  document.querySelectorAll('[data-kz]').forEach(el => el.style.display = l==='kz' ? '' : 'none');
+  renderLessons(); loadRatingFromDB && loadRatingFromDB(); renderSuggestions();
+  document.getElementById('chatInput').placeholder = l==='ru' ? 'Спроси хомяка...' : 'Хомяктан сұра...';
+}
+
+function showPage(p){
+  if(p==='games') setTimeout(loadGameStats, 100);
+  document.querySelectorAll('.dn-item').forEach(b=>b.classList.remove('active'));
+  const _dn=document.getElementById('dn-'+p);if(_dn)_dn.classList.add('active');
+  document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
+  document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
+  const _pk=document.getElementById('page-'+p);if(_pk)_pk.classList.add('active');
+  const _nk=document.getElementById('nav-'+p);if(_nk)_nk.classList.add('active');
+  currentPage = p;
+  try{localStorage.setItem('ecobala-kids-last-page',p);}catch(e){}
+  if(p==='leaderboard'){if(typeof loadRatingFromDB==='function')loadRatingFromDB();}
+}
+
+// Profile
+function openEditModal() {
+  const curAva = document.getElementById('profileAvatar');
+  const prev = document.getElementById('modalAvaPreview');
+  if (prev && curAva) prev.innerHTML = curAva.innerHTML || curAva.textContent;
+  document.getElementById('editModal').classList.add('open');
+  renderAvatarPicker();
+}
+function renderAvatarPicker() {
+  const cur = document.getElementById('profileAvatar').textContent;
+  document.getElementById('avatarPicker').innerHTML = avatarEmojis.map(e =>
+    `<div class="avatar-opt${e===cur?' selected':''}" onclick="selectAvatar('${e}')">${e}</div>`
+  ).join('');
+}
+function selectAvatar(e) {
+  document.querySelectorAll('.avatar-opt').forEach(a => a.classList.remove('selected'));
+  event.target.classList.add('selected');
+}
+async function saveProfile() {
+  const name = document.getElementById('editName').value.trim();
+  if (name && containsProfanity(name)) {
+    alert(profanityMsg(lang));
+    return;
+  }
+  const sel = document.querySelector('.avatar-opt.selected');
+  if (name) {
+    document.getElementById('profileName').textContent = name;
+    document.getElementById('editName').value = name;
+    if (cu) { cu.nickname = name; }
+    // Save nickname to DB
+    try {
+      const sb = window.getSupabaseClient();
+      if (sb && cu) await sb.from('users').update({ nickname: name }).eq('id', cu.id);
+    } catch(e) { console.warn('saveProfile:', e); }
+  }
+  if (sel) {
+    const ava = sel.textContent;
+    document.getElementById('profileAvatar').textContent = ava;
+    document.querySelector('.topbar-avatar').textContent = ava;
+  }
+  document.getElementById('editModal').classList.remove('open');
+}
+
+
+// Lessons
+
+
+
+
+
+
+
+
+
+
+// Games
+function openKahoot() { document.getElementById('kahootScreen').classList.add('open'); }
+function openBoardGame() { alert(lang==='ru'?'Игра для доски - откройте на большом экране!':'Тақта ойыны - үлкен экранда ашыңыз!'); }
+function joinRoom() {
+  const code = document.getElementById('roomCode').value;
+  if(code.length < 4) { alert(lang==='ru'?'Введите код комнаты':'Бөлме кодын енгізіңіз'); return; }
+  alert(`${lang==='ru'?'Подключаемся к комнате':'Бөлмеге қосылып жатырмыз'}: ${code}`);
+}
+
+// Leaderboard
+// renderLB removed - uses loadRatingFromDB from DB
+
+// Chatbot
+function renderSuggestions() {
+  document.getElementById('chatSuggestions').innerHTML = suggestions[lang].map(s=>
+    `<div class="chat-sug" onclick="askBot('${s}')">${s}</div>`
+  ).join('');
+}
+
+function getTime() {
+  const n = new Date();
+  return n.getHours().toString().padStart(2,'0') + ':' + n.getMinutes().toString().padStart(2,'0');
+}
+
+const hamsterSVG = `<svg viewBox="0 0 60 60" width="28" height="28" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="14" cy="18" rx="9" ry="10" fill="#F4A460"/>
+  <ellipse cx="46" cy="18" rx="9" ry="10" fill="#F4A460"/>
+  <ellipse cx="14" cy="18" rx="6" ry="7" fill="#FFB6C1"/>
+  <ellipse cx="46" cy="18" rx="6" ry="7" fill="#FFB6C1"/>
+  <ellipse cx="30" cy="32" rx="22" ry="20" fill="#F5DEB3"/>
+  <ellipse cx="14" cy="36" rx="8" ry="7" fill="#FFD0A0" opacity="0.7"/>
+  <ellipse cx="46" cy="36" rx="8" ry="7" fill="#FFD0A0" opacity="0.7"/>
+  <circle cx="22" cy="28" r="4" fill="#2C1810"/>
+  <circle cx="38" cy="28" r="4" fill="#2C1810"/>
+  <circle cx="23.5" cy="26.5" r="1.5" fill="white"/>
+  <circle cx="39.5" cy="26.5" r="1.5" fill="white"/>
+  <ellipse cx="30" cy="35" rx="3" ry="2" fill="#FF8B94"/>
+  <path d="M26 38 Q30 42 34 38" stroke="#2C1810" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>`;
+
+function addMsg(text, from) {
+  const wrap = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = `chat-msg ${from}`;
+  const t = getTime();
+  if(from==='bot') {
+    div.innerHTML = `
+      <div class="bot-ava-small">${hamsterSVG}</div>
+      <div>
+        <div class="chat-bubble">${text}</div>
+        <div class="msg-time">${t}</div>
+      </div>`;
+  } else {
+    div.innerHTML = `
+      <div>
+        <div class="chat-bubble">${text}</div>
+        <div class="msg-time">${t}</div>
+      </div>`;
+  }
+  wrap.appendChild(div);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function showTyping() {
+  const wrap = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg bot';
+  div.id = 'typingIndicator';
+  div.innerHTML = `
+    <div class="bot-ava-small">${hamsterSVG}</div>
+    <div class="typing-bubble">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>`;
+  wrap.appendChild(div);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typingIndicator');
+  if(t) t.remove();
+}
+
+function botReply(txt) {
+  showTyping();
+  const lower = txt.toLowerCase();
+  const faq = botFAQ[lang];
+  let reply = lang==='ru'
+    ? 'Интересный вопрос! 🤔 Пока я учусь отвечать на это. Спроси об экологии, воде, деревьях или мусоре!'
+    : 'Қызықты сұрақ! 🤔 Осыған жауап беруді үйренудемін. Экология, су, ағаш туралы сұраңыз!';
+  for(const item of faq) {
+    if(item.kw.some(k=>lower.includes(k))) { reply = item.r; break; }
+  }
+  setTimeout(()=>{
+    removeTyping();
+    addMsg(reply,'bot');
+  }, 900 + Math.random()*400);
+}
+
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  const txt = input.value.trim();
+  if(!txt) return;
+  if(containsProfanity(txt)){addMsg(chatProfanityMsg(lang),'bot');input.value='';return;}
+  addMsg(txt,'user');
+  input.value = '';
+  botReply(txt);
+}
+
+function askBot(q) {
+  addMsg(q,'user');
+  botReply(q);
+}
+
+
+const ALL_BADGES_DEF = {
+  first:    {ru:'Первый шаг', kz:'Бірінші қадам',  emoji:'🌱'},
+  student:  {ru:'Ученик',     kz:'Оқушы',           emoji:'📚'},
+  scholar:  {ru:'Отличник',   kz:'Үздік',           emoji:'🎓'},
+  explorer: {ru:'Исследователь',kz:'Зерттеуші',     emoji:'🗺️'},
+  hero:     {ru:'Эко-герой',  kz:'Эко-батыр',       emoji:'🌿'},
+  gamer:    {ru:'Игрок',      kz:'Ойыншы',          emoji:'🎮'},
+  streak:   {ru:'Серия x5',   kz:'Жалғасым x5',    emoji:'🔥'},
+  reporter: {ru:'Репортёр',   kz:'Репортер',        emoji:'📸'},
+  champion: {ru:'Чемпион',    kz:'Чемпион',         emoji:'🏆'},
+  gold:     {ru:'Золото',     kz:'Алтын',           emoji:'🥇'},
+};
+
+function renderBadgesFromDB(earned) {
+  const grid = document.getElementById('badgesGrid') || document.querySelector('.badges-grid');
+  if (!grid) return;
+  grid.innerHTML = Object.entries(ALL_BADGES_DEF).map(([key, b]) => {
+    const has = Array.isArray(earned) && earned.includes(key);
+    return `<div class="badge-item${has?'':' locked'}" title="${has?(lang==='kz'?b.kz:b.ru):(lang==='kz'?'Жабық':'Закрыто')}">
+      <div class="badge-emoji">${b.emoji}</div>
+      <div class="badge-name" data-ru>${b.ru}</div>
+      <div class="badge-name" data-kz style="display:none">${b.kz}</div>
+    </div>`;
+  }).join('');
+}
+
+
+async function loadGameStats() {
+  if (!cu) return;
+  try {
+    // Refresh from DB to get latest games_played
+    const sb = window.getSupabaseClient();
+    const { data } = await sb
+      .from('users')
+      .select('games_played, points, level')
+      .eq('id', cu.id)
+      .single();
+
+    const played = (data && data.games_played) || cu.games_played || 0;
+    const pts    = (data && data.points)       || cu.points       || 0;
+
+    // Wins: try teen_quest_reviews or kids_games, fallback to estimate
+    let wins = 0;
+    try {
+      const { count } = await sb
+        .from('kids_games')
+        .select('id', { count: 'exact', head: true })
+        .eq('winner_id', cu.id);
+      wins = count || 0;
+    } catch(e) {
+      // No kids_games table yet - estimate ~35% win rate
+      wins = played > 0 ? Math.floor(played * 0.35) : 0;
+    }
+
+    const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    setEl('gameStatPlayed', played);
+    setEl('gameStatWins',   wins);
+    setEl('gameStatPts',    pts);
+
+    // Update cu cache
+    if (data) { cu.games_played = played; cu.points = pts; }
+  } catch(e) {
+    console.error('loadGameStats:', e);
+    const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    setEl('gameStatPlayed', cu.games_played || 0);
+    setEl('gameStatWins',   0);
+    setEl('gameStatPts',    cu.points || 0);
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════
+// 4-STEP LESSON VIEWER
+// ═══════════════════════════════════════════════════════════════════════
+let lvStep = 0;          // 0=info, 1=video, 2=notes, 3=quiz
+let lvLesson = null;     // current lesson object
+let lvQuizQ = 0;
+let lvQuizScore = 0;
+let lvQuizAnswered = false;
+
+const LV_STEPS = 4;
+
+function openLessonViewer(lesson) {
+  lvLesson = lesson;
+  lvStep = 0;
+  // Fill info
+  document.getElementById('lvTitle').textContent = lesson.title[lang] || lesson.title.ru || '';
+  document.getElementById('lvInfoEmoji').textContent = lesson.emoji || '📘';
+  document.getElementById('lvInfoTitle').textContent = lesson.title[lang] || lesson.title.ru || '';
+  document.getElementById('lvInfoPts').textContent = '⭐ +' + (lesson.pts || 50) + ' Eco Points';
+  // Fill video
+  const ytId = lesson.ytId || '';
+  document.getElementById('lvVideo').src = ytId ? `https://www.youtube.com/embed/${ytId}` : '';
+  // Fill notes
+  const notes = lesson.notes ? (lesson.notes[lang] || lesson.notes.ru || '') : '';
+  document.getElementById('lvNotes').textContent = notes;
+  // Open viewer
+  document.getElementById('lessonViewer').classList.add('open');
+  lvRenderStep();
+}
+
+// alias for DB lessons
+function openLessonDB(l) { if (l && l.id) openLessonViewer(l); }
+function openLesson(id) {
+  const l = (window._dbLessons || []).find(x => x.id === id);
+  if (l) openLessonViewer(l);
+}
+
+function closeLessonViewer() {
+  document.getElementById('lessonViewer').classList.remove('open');
+  document.getElementById('lvVideo').src = '';
+}
+
+function lvRenderStep() {
+  // Pages
+  for (let i = 0; i < LV_STEPS; i++) {
+    const p = document.getElementById('lpage' + i);
+    if (p) p.classList.toggle('active', i === lvStep);
+  }
+  // Step dots
+  for (let i = 0; i < LV_STEPS; i++) {
+    const d = document.getElementById('lstep' + i);
+    if (!d) continue;
+    d.className = 'lv-step-dot ' + (i < lvStep ? 'done' : i === lvStep ? 'active' : 'pending');
+    d.textContent = i < lvStep ? '✓' : (i + 1);
+  }
+  // Lines
+  for (let i = 0; i < LV_STEPS - 1; i++) {
+    const l = document.getElementById('lline' + i);
+    if (l) l.className = 'lv-step-line ' + (i < lvStep ? 'done' : '');
+  }
+  // Nav buttons
+  const back = document.getElementById('lvBtnBack');
+  const next = document.getElementById('lvBtnNext');
+  if (back) back.style.display = lvStep > 0 ? '' : 'none';
+  // On quiz step, hide bottom nav (quiz has its own)
+  const nav = document.getElementById('lvNav');
+  if (nav) nav.style.display = lvStep === 3 ? 'none' : '';
+  if (next) {
+    if (lvStep < LV_STEPS - 1) {
+      next.innerHTML = lang === 'kz'
+        ? '<span>Келесі →</span>'
+        : '<span>Далее →</span>';
+    }
+  }
+  // Init quiz when reaching step 3
+  if (lvStep === 3) lvStartQuiz();
+}
+
+function lvStepNext() {
+  if (lvStep < LV_STEPS - 1) {
+    lvStep++;
+    lvRenderStep();
+    document.getElementById('lvStepContent').scrollTop = 0;
+  }
+}
+
+function lvStepBack() {
+  if (lvStep > 0) {
+    lvStep--;
+    if (lvStep === 1) {
+      // Restore video
+      const ytId = lvLesson?.ytId || '';
+      document.getElementById('lvVideo').src = ytId ? `https://www.youtube.com/embed/${ytId}` : '';
+    }
+    lvRenderStep();
+    document.getElementById('lvStepContent').scrollTop = 0;
+  }
+}
+
+// ── QUIZ ────────────────────────────────────────────────────────────────────
+function lvStartQuiz() {
+  lvQuizQ = 0;
+  lvQuizScore = 0;
+  lvQuizAnswered = false;
+  lvRenderQuizQ();
+}
+
+function lvRenderQuizQ() {
+  const qs = lvLesson?.questions || [];
+  if (!qs.length) { lvShowResult(0); return; }
+  const total = qs.length;
+  const q = qs[lvQuizQ];
+  if (!q) { lvShowResult(lvQuizScore); return; }
+
+  const pct = Math.round((lvQuizQ / total) * 100);
+  // Parse question text
+  const qText = typeof q.q === 'object' ? (q.q[lang] || q.q.ru || '') : (q.q || '');
+
+  const inner = document.getElementById('lvQuizInner');
+  if (!inner) return;
+  inner.innerHTML = `
+    <div class="lv-quiz-header">
+      <button onclick="lvStepBack()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted);">←</button>
+      <div class="lv-quiz-progress"><div class="lv-quiz-progress-fill" style="width:${pct}%"></div></div>
+      <div class="lv-quiz-counter">${lvQuizQ + 1} / ${total}</div>
+    </div>
+    <div class="lv-quiz-body">
+      <div class="lv-quiz-qnum">${lang === 'kz' ? 'Сұрақ' : 'Вопрос'} ${lvQuizQ + 1}</div>
+      <div class="lv-quiz-question">${qText}</div>
+      <div class="lv-quiz-opts">
+        ${(q.opts || []).map((o, i) => {
+          const txt = typeof o.t === 'object' ? (o.t[lang] || o.t.ru || '') : (o.t || '');
+          return `<button class="lv-quiz-opt" onclick="lvAnswerQ(${i})">
+            <span class="lv-quiz-opt-letter">${['A','B','C','D'][i] || String.fromCharCode(65+i)}</span>
+            ${txt}
+          </button>`;
+        }).join('')}
+      </div>
+      <button class="lv-quiz-next" id="lvQuizNext" onclick="lvNextQ()">${lang === 'kz' ? 'Келесі →' : 'Следующий →'}</button>
+    </div>`;
+  lvQuizAnswered = false;
+}
+
+function lvAnswerQ(i) {
+  if (lvQuizAnswered) return;
+  lvQuizAnswered = true;
+  const q = lvLesson.questions[lvQuizQ];
+  const correct = q.opts.findIndex(o => o.ok);
+  const opts = document.querySelectorAll('.lv-quiz-opt');
+  opts[i].classList.add(i === correct ? 'correct' : 'wrong');
+  if (correct !== i && opts[correct]) opts[correct].classList.add('correct');
+  if (i === correct) lvQuizScore++;
+  const nextBtn = document.getElementById('lvQuizNext');
+  if (nextBtn) nextBtn.style.display = 'block';
+}
+
+function lvNextQ() {
+  lvQuizQ++;
+  if (lvQuizQ >= (lvLesson?.questions?.length || 0)) {
+    lvShowResult(lvQuizScore);
+  } else {
+    lvRenderQuizQ();
+  }
+}
+
+function lvShowResult(score) {
+  const total = lvLesson?.questions?.length || 1;
+  const pct = Math.round((score / total) * 100);
+  const pts = score * Math.ceil((lvLesson?.pts || 50) / total);
+  const emoji = pct >= 80 ? '🌳' : pct >= 50 ? '🌿' : '🌱';
+  const title = pct >= 80
+    ? (lang === 'kz' ? 'Тамаша!' : 'Отлично!')
+    : pct >= 50
+    ? (lang === 'kz' ? 'Жақсы!' : 'Хорошо!')
+    : (lang === 'kz' ? 'Тағы байқа!' : 'Попробуй ещё!');
+
+  const inner = document.getElementById('lvQuizInner');
+  if (!inner) return;
+  inner.innerHTML = `
+    <div class="lv-result">
+      <span class="lv-result-emoji">${emoji}</span>
+      <div class="lv-result-title">${title}</div>
+      <div class="lv-result-sub">${score} / ${total} ${lang === 'kz' ? 'дұрыс жауап' : 'правильных ответов'}</div>
+      <div class="lv-result-pts">+${pts} Eco Points</div>
+      <div class="lv-result-bar"><div class="lv-result-fill" style="width:${pct}%"></div></div>
+      <button onclick="closeLessonViewer();loadLessonsFromDB();" style="width:100%;padding:14px;border-radius:50px;background:linear-gradient(135deg,var(--blue),var(--blue-mid));color:#fff;border:none;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;margin-top:8px;">
+        ${lang === 'kz' ? 'Дайын ✓' : 'Готово ✓'}
+      </button>
+    </div>`;
+
+  // Save points
+  saveLessonPoints(pts);
+}
+
+// ── RENDER LESSONS LIST ─────────────────────────────────────────────────────
+function renderLessons() {
+  // Called as fallback if DB is empty
+  document.getElementById('lessonsList').innerHTML =
+    `<div style="text-align:center;padding:48px;color:var(--text-muted);">
+       <div style="font-size:48px;margin-bottom:12px;">📚</div>
+       <div style="font-size:15px;font-weight:700;">${lang === 'kz' ? 'Сабақтар жүктелуде...' : 'Уроки загружаются...'}</div>
+     </div>`;
+}
+
+// ── LEVEL-UP SYSTEM ─────────────────────────────────────────────────────────
+const ECO_LEVELS = [
+  {lvl:1, icon:'🌱', name:{ru:'Росток', kz:'Өркен'}, min:0},
+  {lvl:2, icon:'🌿', name:{ru:'Растение', kz:'Өсімдік'}, min:100},
+  {lvl:3, icon:'🌳', name:{ru:'Деревце', kz:'Ағаш'},   min:300},
+  {lvl:4, icon:'🌲', name:{ru:'Лес',     kz:'Орман'},   min:600},
+  {lvl:5, icon:'🦋', name:{ru:'Эко-друг',kz:'Эко-дос'},min:1000},
+  {lvl:6, icon:'🌍', name:{ru:'Эко-герой',kz:'Эко-батыр'},min:1500},
+  {lvl:7, icon:'⭐', name:{ru:'Звезда',  kz:'Жұлдыз'}, min:2100},
+  {lvl:8, icon:'🏆', name:{ru:'Чемпион', kz:'Чемпион'}, min:2800},
+];
+
+function calcLevelFromPts(pts) {
+  let result = ECO_LEVELS[0];
+  for (const l of ECO_LEVELS) { if (pts >= l.min) result = l; }
+  return result;
+}
+
+function checkLevelUp(oldPts, newPts) {
+  const oldLvl = calcLevelFromPts(oldPts);
+  const newLvl = calcLevelFromPts(newPts);
+  if (newLvl.lvl > oldLvl.lvl) {
+    showLevelUp(newLvl, newPts);
+  }
+}
+
+function showLevelUp(lvlInfo, pts) {
+  document.getElementById('lvUpIcon').textContent = lvlInfo.icon;
+  document.getElementById('lvUpTitle').textContent =
+    (lang === 'kz' ? lvlInfo.name.kz : lvlInfo.name.ru) + ' - ' +
+    (lang === 'kz' ? lvlInfo.lvl + '-деңгей' : 'Уровень ' + lvlInfo.lvl);
+  document.getElementById('lvUpPts').textContent = pts + ' Eco Points';
+  const overlay = document.getElementById('levelupOverlay');
+  overlay.classList.add('show');
+  // Auto-close after 4s
+  setTimeout(closeLevelUp, 4000);
+}
+
+function closeLevelUp() {
+  document.getElementById('levelupOverlay').classList.remove('show');
+  // Refresh profile stats
+  if (cu) updateProfileStats(cu.points || 0, cu.level || 1, cu);
+}
+
+// ─── SUPABASE ИНТЕГРАЦИЯ ───────────────────────────────────────────────────────
+let cu = null; // текущий пользователь
+
+async function init() {
+  try {
+    // Fast check from localStorage cache to avoid flicker on reload
+    const cached = localStorage.getItem('ecobala-user-cache');
+    if (cached) {
+      try {
+        const c = JSON.parse(cached);
+        if (c && c.role === 'kids') cu = c; // use cache temporarily
+      } catch(e) {}
+    }
+    // Always verify with real session
+    const fresh = await EcoBalaAuth.getCurrentUser();
+    if (!fresh || fresh.role !== 'kids') {
+      localStorage.removeItem('ecobala-user-cache');
+      location.href = 'index.html';
+      return;
+    }
+    cu = fresh;
+  } catch(e) {
+    // If network error but we have valid cache, stay on page
+    if (cu && cu.role === 'kids') {
+      console.warn('Using cached user due to network error');
+    } else {
+      location.href = 'index.html';
+      return;
+    }
+  }
+
+  // Профиль - имя
+  const childName = cu.child_name ? (cu.child_name + (cu.child_surname ? ' ' + cu.child_surname : '')).trim() : null;
+  const displayName = cu.nickname || childName || cu.full_name || 'Ученик';
+  document.getElementById('profileName').textContent = displayName;
+  document.getElementById('editName').value = cu.nickname || childName || cu.full_name || '';
+
+  // Аватар
+  if (cu.avatar_url) {
+    const img = `<img src="${cu.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    document.getElementById('profileAvatar').innerHTML = img;
+    document.querySelector('.topbar-avatar').innerHTML = img;
+  } else if (cu.avatar) {
+    document.getElementById('profileAvatar').textContent = cu.avatar;
+    document.querySelector('.topbar-avatar').textContent = cu.avatar;
+  }
+
+  // Баллы / уровень
+  const pts = cu.points || 0;
+  const lvl = cu.level || 1;
+  document.getElementById('ptsDisplay').textContent = pts;
+  document.querySelector('.stat-num:nth-child(1)') && updateStats(pts, lvl);
+  updateProfileStats(pts, lvl, cu);
+  renderBadgesFromDB(cu.badges || []);
+  renderAchievements();
+
+  // Школа/класс под именем
+  const sc = cu.school || '', cl = cu.class || '';
+  const sub = [sc ? sc + ' школа' : '', cl ? cl + ' класс' : ''].filter(Boolean).join(' • ');
+  document.getElementById('profileSub') && (document.getElementById('profileSub').textContent = sub);
+
+  applyLang();
+  loadLessonsFromDB();
+  loadRatingFromDB();
+  loadGameStats();
+  renderSuggestions();
+  document.getElementById('chatInput').placeholder = lang==='ru' ? 'Спроси хомяка...' : 'Хомяктан сұра...';
+
+  // Restore last visited page
+  try {
+    const lastPage = localStorage.getItem('ecobala-kids-last-page');
+    if (lastPage && ['profile','lessons','games','leaderboard','chatbot'].includes(lastPage)) {
+      showPage(lastPage);
+    }
+  } catch(e) {}
+
+  setTimeout(()=>{
+    addMsg(lang==='ru'?'Привет! Я Экохомяк! 🐹 Спроси меня о природе и экологии. Я помогу тебе!':'Сәлем! Мен Экохомяк! 🐹 Маған табиғат және экология туралы сұраңыз.','bot');
+  }, 400);
+}
+
+function updateProfileStats(pts, lvl) {
+  // Обновляем stat cards с реальными данными
+  const statCards = document.querySelectorAll('.stat-card .stat-num');
+  if (statCards[1]) statCards[1].textContent = pts;
+  // Уровень в hero
+  const lvlBadge = document.querySelector('.level-badge');
+  if (lvlBadge) {
+    const lvlInfo = getEcoLevelInfo(pts);
+    lvlBadge.textContent = `${lvlInfo.icon} ${lang==='ru'?'Уровень':'Деңгей'} ${lvl}`;
+  }
+  // Прогресс бар
+  const lvlData = [{max:100},{max:300},{max:600},{max:1000},{max:1500},{max:2100},{max:2800},{max:99999}];
+  const prev = lvl > 1 ? lvlData[lvl-2].max : 0;
+  const next = lvlData[Math.min(lvl-1, lvlData.length-1)].max;
+  const pct = Math.min(100, Math.round(((pts - prev) / (next - prev)) * 100));
+  const fill = document.querySelector('.lp-fill');
+  if (fill) fill.style.width = pct + '%';
+  const lpLabel = document.querySelector('.lp-label');
+  if (lpLabel) lpLabel.innerHTML = `<span>${pts} / ${next} Eco Pts</span><span>${pct}%</span>`;
+}
+
+function getEcoLevelInfo(pts) {
+  if (pts < 100)  return { icon: '🌱' };
+  if (pts < 600)  return { icon: '🌿' };
+  if (pts < 1500) return { icon: '🌳' };
+  return { icon: '🏆' };
+}
+
+// Загрузка уроков из Supabase
+async function loadLessonsFromDB() {
+  // Show loading indicator immediately
+  const listEl = document.getElementById('lessonsList');
+  if (listEl) listEl.innerHTML = `<div style="text-align:center;padding:48px 20px;">
+    <div style="font-size:48px;margin-bottom:12px;">📚</div>
+    <div style="font-size:15px;font-weight:700;color:var(--text-muted);">${lang==='kz'?'Сабақтар жүктелуде...':'Загружаем уроки...'}</div>
+    <div style="margin-top:16px;"><div style="width:40px;height:4px;background:var(--blue-light);border-radius:2px;margin:0 auto;overflow:hidden;"><div style="height:100%;background:var(--blue);border-radius:2px;animation:slideLoad 1.2s ease-in-out infinite;"></div></div></div>
+  </div>`;
+  try {
+    const arr = await EcoBalaDB.getKidsLessons();
+    if (!arr.length) { renderLessons(); return; } // fallback на demo
+
+    // Конвертируем формат старой БД → новый
+    const converted = arr.map(l => ({
+      id: l.id,
+      emoji: l.icon || '📘',
+      title: typeof l.title === 'object' ? l.title : { ru: l.title || 'Урок', kz: l.title || 'Сабақ' },
+      pts: l.points || 50,
+      done: false,
+      ytId: extractYtId(l.youtube_url || ''),
+      notes: typeof l.note_text === 'object' ? l.note_text : { ru: l.note_text || '', kz: l.note_text || '' },
+      questions: Array.isArray(l.questions) ? l.questions.map(q => ({
+        q: typeof q.text === 'object' ? q.text : { ru: q.text || '', kz: q.text || '' },
+        opts: (typeof q.options === 'object' && !Array.isArray(q.options))
+          ? (q.options[lang] || q.options.ru || []).map((t, i) => ({ t, ok: i === (q.correct || 0) }))
+          : (Array.isArray(q.options) ? q.options.map((t, i) => ({ t: typeof t === 'string' ? t : (t[lang]||t.ru||''), ok: i === (q.correct||0) })) : [])
+      })) : []
+    }));
+
+    // Рендерим карточки
+    // Store for later access
+    window._dbLessons = converted;
+    document.getElementById('lessonsList').innerHTML = converted.map((l,idx) => `
+      <div class="lesson-card" onclick="openLessonViewer(window._dbLessons[${idx}])">
+        <div class="lesson-thumb">
+          <span style="font-size:${window.innerWidth<480?'28px':'56px'}">${l.emoji}</span>
+          ${l.done?`<div class="lesson-done-badge">✅ ${lang==='ru'?'Пройден':'Аяқталды'}</div>`:''}
+          <div class="lesson-pts-badge">⭐ +${l.pts}</div>
+        </div>
+        <div class="lesson-body">
+          <div class="lesson-title">${l.title[lang]||l.title.ru}</div>
+          <div class="lesson-meta">
+            <span class="lesson-tag">📖 ${(l.questions||[]).length} ${lang==='ru'?'вопросов':'сұрақ'}</span>
+            <span>${l.done?`✅ ${lang==='ru'?'Завершён':'Аяқталды'}`:lang==='ru'?'Не пройден':'Өтілмеген'}</span>
+          </div>
+        </div>
+      </div>`).join('');
+
+    // Счётчик уроков
+    const statCards = document.querySelectorAll('.stat-card .stat-num');
+    if (statCards[0]) statCards[0].textContent = arr.length;
+
+  } catch(e) {
+    console.error('loadLessonsFromDB:', e);
+    renderLessons(); // fallback
+  }
+}
+
+function extractYtId(url) {
+  if (!url) return '';
+  const m = url.match(/(?:v=|embed\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : url;
+}
+
+
+
+// Загрузка рейтинга из Supabase
+async function loadRatingFromDB() {
+  try {
+    const data = await EcoBalaDB.getLeaderboard('kids');
+    if (!data.length) return;
+
+    const podOrder = [data[1], data[0], data[2]].filter(Boolean);
+    const heights = ['100px','130px','80px'];
+    const grads = [
+      'linear-gradient(to top,#FF8F00,#FFB300)',
+      'linear-gradient(to top,#1565C0,#1E88E5)',
+      'linear-gradient(to top,#5D4037,#795548)'
+    ];
+    const medals = ['🥈','🥇','🥉'];
+
+    const podiumEl = document.getElementById('podium');
+    if (podiumEl) podiumEl.innerHTML = podOrder.map((p,i) => `
+      <div class="lb-place">
+        <span class="lb-avatar-sm">${p.avatar_url ? `<img src="${p.avatar_url}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">` : (p.avatar || '👤')}</span>
+        <div class="lb-name">${(p.name||'').split(' ')[0]}</div>
+        <div class="lb-pts-sm">${p.points||0}</div>
+        <div class="lb-podium-bar" style="background:${grads[i]};height:${heights[i]};">
+          <div class="lb-num">${medals[i]}</div>
+        </div>
+      </div>`).join('');
+
+    const listEl = document.getElementById('lbList');
+    if (listEl) listEl.innerHTML = data.slice(0,20).map((p,i) => `
+      <div class="lb-row${cu && p.id === cu.id ? ' me' : ''}">
+        <div class="lb-rank">${i+1}</div>
+        <div class="lb-row-avatar">${p.avatar_url ? `<img src="${p.avatar_url}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">` : (p.avatar || '👤')}</div>
+        <div>
+          <div class="lb-row-name">${p.name||'Аноним'}${cu && p.id===cu.id ? ` (${lang==='ru'?'Ты':'Сен'})`:''}</div>
+          <div class="lb-row-school">${p.school||''}</div>
+        </div>
+        <div class="lb-row-pts">${p.points||0}</div>
+      </div>`).join('');
+  } catch(e) {
+    console.error('loadRatingFromDB:', e);
+    renderLB(); // fallback
+  }
+}
+
+// Сохранить баллы после урока
+async function saveLessonPoints(earned) {
+  if (earned > 0 && cu) {
+    try {
+      const oldPts = cu.points || 0;
+      const updated = await EcoBalaDB.incrementLessonDone(cu.id, earned);
+      const newPts = updated.points;
+      const newLvl = updated.level;
+      cu.points = newPts;
+      cu.level = newLvl;
+      cu.lessons_done = updated.lessons_done;
+      cu.badges = updated.badges || cu.badges;
+      document.getElementById('ptsDisplay').textContent = newPts;
+      updateProfileStats(newPts, newLvl, cu);
+      renderBadgesFromDB(cu.badges || []);
+      // Check for level up
+      checkLevelUp(oldPts, newPts);
+    } catch(e) {
+      console.error('saveLessonPoints:', e);
+      // Fallback
+      const oldPts = cu.points || 0;
+      const newPts = oldPts + earned;
+      cu.points = newPts;
+      document.getElementById('ptsDisplay').textContent = newPts;
+      updateProfileStats(newPts, cu.level || 1, cu);
+      checkLevelUp(oldPts, newPts);
+    }
+  }
+}
+
+// Выход
+document.querySelector && (() => {
+  const logoutBtn = document.querySelector('.out-btn, [data-logout]');
+  if (logoutBtn) logoutBtn.onclick = async () => { await EcoBalaAuth.logout(); location.href = 'index.html'; };
+})();
+
+// Переопределяем closeQuiz чтобы сохранять баллы
+const _origCloseQuiz = typeof closeQuiz === 'function' ? closeQuiz : null;
+window.closeQuizAndSave = async function(earned) {
+  document.getElementById('quizScreen').classList.remove('open');
+  if (earned > 0) await saveLessonPoints(earned);
+  loadLessonsFromDB();
+};
+
+// Патчим finishLesson чтобы он через saveLessonPoints работал
+window.finishLesson = async function(earned) {
+  document.getElementById('quizScreen').classList.remove('open');
+  await saveLessonPoints(earned);
+};
+
+// applyLang с поддержкой обоих форматов
+function applyLang() {
+  document.querySelectorAll('[data-ru]').forEach(el => el.style.display = lang==='ru' ? '' : 'none');
+  document.querySelectorAll('[data-kz]').forEach(el => el.style.display = lang==='kz' ? '' : 'none');
+  document.querySelectorAll('.t-ru').forEach(el => el.style.display = lang==='ru' ? '' : 'none');
+  document.querySelectorAll('.t-kz').forEach(el => el.style.display = lang==='kz' ? '' : 'none');
+}
+
+
+async function uploadAvatarPhoto(event) {
+  const file = event.target.files[0];
+  if (!file || !cu) return;
+
+  if (file.size > 5 * 1024 * 1024) {
+    alert(lang === 'ru' ? 'Файл слишком большой. Максимум 5MB.' : 'Файл тым үлкен. Максимум 5MB.');
+    return;
+  }
+
+  const spin = document.getElementById('avaUploadSpin');
+  if (spin) spin.style.display = 'block';
+
+  try {
+    const sb = window.getSupabaseClient();
+    if (!sb) throw new Error('Supabase not loaded');
+
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const safeName = `${cu.id}_${Date.now()}.${ext}`;
+    const path = safeName;
+
+    const { error: upErr } = await sb.storage
+      .from('avatars')
+      .upload(path, file, { upsert: true, contentType: file.type });
+
+    let url;
+    if (upErr) {
+      console.error('Storage upload error:', upErr.message, upErr);
+      url = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    } else {
+      const { data: urlData } = sb.storage.from('avatars').getPublicUrl(path);
+      url = urlData.publicUrl + '?t=' + Date.now();
+    }
+
+    await sb.from('users').update({ avatar_url: url }).eq('id', cu.id);
+    cu.avatar_url = url;
+
+    const imgHtml = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">`;
+    ['profileAvatar'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = imgHtml;
+    });
+    const topAva = document.querySelector('.topbar-avatar');
+    if (topAva) topAva.innerHTML = imgHtml;
+
+    const prev = document.getElementById('modalAvaPreview');
+    if (prev) prev.innerHTML = imgHtml;
+
+  } catch(e) {
+    console.error('uploadAvatarPhoto:', e);
+    alert(lang === 'ru'
+      ? 'Ошибка загрузки фото: ' + (e.message || 'неизвестная ошибка')
+      : 'Фото жүктеу қатесі: ' + (e.message || ''));
+  } finally {
+    if (spin) spin.style.display = 'none';
+    event.target.value = '';
+  }
+}
+
+// Kids report submission (stubs — Kids have no reports page)
+async function submitNewReportKids() {}
+window.submitReport = function() {};
+window.submitNewReport = submitNewReportKids;
+
+// Logout
+function doLogout() {
+  EcoBalaAuth.logout().then(() => { location.href = 'index.html'; }).catch(() => { location.href = 'index.html'; });
+}
+
+// Achievements (simple stub — shows last lesson done info)
+function renderAchievements() {
+  const el = document.getElementById('achievementsList');
+  if (!el) return;
+  const items = [
+    { icon:'📚', label: lang==='kz' ? 'Сабақты аяқтадыңыз' : 'Урок завершён', sub: lang==='kz' ? 'Eco Points жиналуда' : 'Eco Points накапливаются' },
+  ];
+  el.innerHTML = items.map(a => `
+    <div style="background:#fff;border-radius:12px;padding:14px;border:1px solid var(--blue-light);margin-bottom:10px;display:flex;align-items:center;gap:12px;">
+      <span style="font-size:26px;">${a.icon}</span>
+      <div><div style="font-size:13px;font-weight:800;">${a.label}</div><div style="font-size:11px;color:var(--text-muted);">${a.sub}</div></div>
+    </div>`).join('');
+}
+
+</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase2.js"></script>
+<script>
+(function tryInit(n) {
+  if (typeof EcoBalaAuth !== 'undefined') {
+    init();
+  } else if (typeof window.supabase !== 'undefined' && n > 0) {
+    // supabase.min.js loaded but supabase2.js not yet - retry
+    setTimeout(() => tryInit(n - 1), 300);
+  } else if (n > 0) {
+    setTimeout(() => tryInit(n - 1), 300);
+  } else {
+    console.error('EcoBalaAuth not found - check supabase2.js');
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Nunito,sans-serif;flex-direction:column;gap:16px;padding:24px;text-align:center;"><div style="font-size:48px;">⚠️</div><div style="font-size:18px;font-weight:800;color:#C62828;">Ошибка загрузки</div><div style="font-size:14px;color:#546E7A;">Проверьте supabase2.js</div><button onclick="location.reload()" style="background:#2E7D32;color:#fff;border:none;padding:12px 24px;border-radius:50px;font-size:14px;font-weight:800;cursor:pointer;font-family:Nunito,sans-serif;">Перезагрузить</button></div>';
+  }
+})(20);
+</script>
+</body>
+</html>

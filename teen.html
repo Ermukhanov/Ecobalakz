@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="iconcateen.jpg" type="image/jpeg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoBala Teen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap&subset=cyrillic,cyrillic-ext" rel="stylesheet">
+<style>
+  /* ── Казахский шрифт фикс ───────────────────────────────────────────
+     Noto Sans покрывает казахские буквы: Ә Ғ Қ Ң Ө Ұ Ү І
+     unicode-range заставляет браузер использовать Noto Sans ТОЛЬКО
+     для символов которых нет в Nunito (казахский расширенный кириллица)
+  ─────────────────────────────────────────────────────────────────── */
+  @font-face {
+    font-family: 'KazFont';
+    src: local('Noto Sans');
+    unicode-range: U+0400-045F, U+04D9, U+04E9, U+04B1, U+04A3, U+04BB,
+                   U+049B, U+04A2, U+04E8, U+04B0, U+0456, U+04AF, U+049A,
+                   U+04BA, U+04D8; /* казахский кириллический диапазон */
+  }
+  /* Глобальный стек: сначала Nunito (латиница/цифры), потом Noto Sans (казахский) */
+  *, body, input, textarea, select, button, span, div, p, h1, h2, h3, h4, h5, h6, a, li {
+    font-family: 'Nunito', 'Noto Sans', 'Segoe UI', system-ui, -apple-system, sans-serif !important;
+  }
+
+  * { font-family: 'Nunito', 'Noto Sans', sans-serif; }
+  .topbar-logo, .stat-num, .lb-row-pts { font-family: 'Unbounded', 'Noto Sans', sans-serif !important; }
+:root{
+  --green:#2E7D32;--green-mid:#43A047;--green-light:#C8E6C9;--green-pale:#E8F5E9;--green-dark:#1B5E20;
+  --teal:#00695C;--teal-light:#E0F2F1;--teal-mid:#00897B;
+  --white:#fff;--text:#0D2010;--text-muted:#4A6741;
+  --bg:#F1F8F2;--radius:16px;--nav-h:64px;--bottom-h:68px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:var(--bottom-h);}
+
+/* TOPBAR */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;background:#fff;border-bottom:1px solid var(--green-light);height:var(--nav-h);display:flex;align-items:center;padding:0 18px;justify-content:space-between;}
+.topbar-logo{font-family:'Unbounded','Noto Sans',sans-serif;font-weight:900;font-size:17px;color:var(--green-dark);display:flex;align-items:center;gap:8px;}
+.topbar-logo-icon{width:34px;height:34px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.topbar-pts{background:var(--green-pale);border-radius:50px;padding:6px 12px;font-size:13px;font-weight:800;color:var(--green-dark);display:flex;align-items:center;gap:4px;}
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#A5D6A7,#2E7D32);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;}
+.lang-btns{display:flex;gap:3px;}
+.lang-sm{padding:3px 9px;border-radius:12px;font-size:11px;font-weight:800;border:1.5px solid var(--green-light);background:transparent;color:var(--text-muted);cursor:pointer;font-family:'Nunito',sans-serif;}
+.lang-sm.active{background:var(--green);color:#fff;border-color:var(--green);}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:#fff;border-top:1px solid var(--green-light);height:var(--bottom-h);display:flex;}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;transition:all 0.2s;border:none;background:none;font-family:'Nunito',sans-serif;}
+.bn-icon{font-size:22px;}
+.bn-label{font-size:10px;font-weight:800;color:var(--text-muted);}
+.bn-item.active .bn-label{color:var(--green);}
+.bn-item.active .bn-icon{transform:scale(1.12);}
+
+/* PAGES */
+.page{display:none;padding-top:calc(var(--nav-h)+14px);padding-bottom:20px;min-height:100vh;}
+.page.active{display:block;}
+.inner{max-width:640px;margin:0 auto;padding:0 15px;}
+
+/* ===== PROFILE ===== */
+.profile-hero{background:linear-gradient(135deg,var(--green-dark),var(--green-mid));border-radius:var(--radius);padding:22px;margin-bottom:14px;color:#fff;position:relative;overflow:hidden;}
+.ph-blob{position:absolute;border-radius:50%;background:rgba(255,255,255,0.07);}
+.ph-b1{width:140px;height:140px;right:-30px;top:-40px;}
+.ph-b2{width:90px;height:90px;right:80px;bottom:-20px;}
+.profile-top{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
+.profile-ava{width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,0.2);border:3px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;font-size:32px;cursor:pointer;transition:transform 0.2s;flex-shrink:0;}
+.profile-ava:hover{transform:scale(1.05);}
+.profile-name{font-size:19px;font-weight:900;}
+.profile-sub{font-size:12px;opacity:0.8;margin-top:2px;}
+.edit-btn{margin-left:auto;background:rgba(255,255,255,0.2);border:none;border-radius:50px;padding:6px 12px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;}
+.level-row{display:flex;align-items:center;gap:10px;}
+.level-badge{background:rgba(255,255,255,0.2);border-radius:50px;padding:4px 12px;font-size:12px;font-weight:800;white-space:nowrap;}
+.lp-wrap{flex:1;}
+.lp-label{font-size:11px;opacity:0.8;display:flex;justify-content:space-between;margin-bottom:4px;}
+.lp-bar{height:7px;background:rgba(255,255,255,0.2);border-radius:4px;overflow:hidden;}
+.lp-fill{height:100%;background:#fff;border-radius:4px;}
+
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+.stat-card{background:#fff;border-radius:var(--radius);padding:14px;text-align:center;border:1px solid var(--green-light);}
+.stat-num{font-family:'Unbounded','Noto Sans',sans-serif;font-size:20px;font-weight:900;color:var(--green);}
+.stat-label{font-size:11px;color:var(--text-muted);font-weight:700;margin-top:2px;}
+
+.sec-title{font-size:15px;font-weight:900;color:var(--text);margin-bottom:10px;margin-top:6px;}
+.badges-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px;}
+.badge-item{background:#fff;border-radius:12px;padding:11px 6px;text-align:center;border:1px solid var(--green-light);transition:transform 0.2s;}
+.badge-item:hover{transform:translateY(-2px);}
+.badge-item.locked{opacity:0.35;filter:grayscale(1);}
+.badge-emoji{font-size:26px;margin-bottom:3px;}
+.badge-name{font-size:10px;font-weight:700;}
+
+/* ===== QUESTS ===== */
+.quest-filter{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;}
+.qf-btn{padding:7px 14px;border-radius:50px;border:1.5px solid var(--green-light);background:#fff;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;transition:all 0.2s;color:var(--text-muted);}
+.qf-btn.active{background:var(--green);color:#fff;border-color:var(--green);}
+
+.quest-card{background:#fff;border-radius:16px;border:1.5px solid var(--green-light);margin-bottom:11px;overflow:hidden;transition:all 0.2s;cursor:pointer;box-shadow:0 2px 8px rgba(46,125,50,0.06);}
+.quest-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(46,125,50,0.13);border-color:#A5D6A7;}
+.qc-top{padding:13px 13px 9px;display:flex;align-items:flex-start;gap:11px;}
+.qc-icon{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,var(--green-pale),var(--green-light));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;border:1.5px solid var(--green-light);}
+.qc-title{font-size:15px;font-weight:800;margin-bottom:4px;}
+.qc-desc{font-size:12px;color:var(--text-muted);line-height:1.5;}
+.qc-right{flex:1;min-width:0;}
+.qc-bottom{padding:9px 13px;background:linear-gradient(135deg,var(--green-pale),#F1FBF1);display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid var(--green-light);}
+.qc-pts{font-size:13px;font-weight:800;color:var(--green);}
+.qc-deadline{font-size:12px;color:var(--text-muted);}
+.qc-status{margin-left:auto;}
+.qc-btn{background:var(--green);color:#fff;border:none;border-radius:50px;padding:7px 16px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all 0.2s;}
+.qc-btn:hover{background:var(--green-dark);}
+.qc-btn.done{background:var(--green-pale);color:var(--green-dark);cursor:default;}
+
+/* Quest detail screen */
+.quest-screen{display:none;position:fixed;inset:0;z-index:300;background:#fff;overflow-y:auto;}
+.quest-screen.open{display:block;}
+.qs-header{position:sticky;top:0;background:#fff;border-bottom:1.5px solid var(--green-light);padding:12px 13px;display:flex;align-items:center;gap:10px;z-index:10;box-shadow:0 2px 8px rgba(46,125,50,0.07);}
+.qs-back{background:none;border:none;font-size:22px;cursor:pointer;}
+.qs-title{font-size:16px;font-weight:800;}
+.qs-body{padding:20px;max-width:580px;margin:0 auto;}
+.qs-icon-big{font-size:64px;text-align:center;margin-bottom:12px;}
+.qs-pts-badge{display:inline-block;background:var(--green);color:#fff;border-radius:50px;padding:6px 16px;font-size:14px;font-weight:800;margin-bottom:16px;}
+.qs-desc-block{background:var(--green-pale);border-radius:var(--radius);padding:16px;font-size:14px;line-height:1.7;margin-bottom:16px;}
+.qs-meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
+.qs-meta-pill{background:#fff;border:1px solid var(--green-light);border-radius:50px;padding:6px 12px;font-size:12px;font-weight:700;}
+
+/* Report upload */
+.report-upload-area{border:2px dashed var(--green-light);border-radius:var(--radius);padding:28px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--green-pale);margin-bottom:14px;}
+.report-upload-area:hover{border-color:var(--green-mid);background:#fff;}
+.report-upload-area input{display:none;}
+.upload-preview{width:100%;max-height:200px;object-fit:cover;border-radius:10px;margin-top:10px;}
+.report-textarea{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--green-light);font-family:'Nunito',sans-serif;font-size:14px;outline:none;min-height:90px;resize:vertical;background:var(--green-pale);transition:border-color 0.2s;margin-bottom:14px;}
+.report-textarea:focus{border-color:var(--green-mid);background:#fff;}
+.submit-report-btn{width:100%;padding:13px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--green),var(--green-mid));color:#fff;font-family:'Nunito','Noto Sans',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 14px rgba(46,125,50,0.22);}
+.submit-report-btn:hover{background:var(--green-dark);transform:translateY(-1px);}
+
+/* ===== MAP ===== */
+.map-page-wrap{height:calc(100vh - var(--nav-h) - var(--bottom-h));display:flex;flex-direction:column;}
+.map-container{flex:1;position:relative;background:linear-gradient(160deg,#E8F5E9,#C8E6C9);}
+.map-iframe{width:100%;height:100%;border:none;}
+.map-legend{position:absolute;bottom:16px;right:12px;background:rgba(255,255,255,0.95);border-radius:12px;padding:10px 14px;font-size:12px;font-weight:700;backdrop-filter:blur(8px);box-shadow:0 4px 16px rgba(0,0,0,0.1);}
+.ml-item{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.ml-dot{width:10px;height:10px;border-radius:50%;}
+.map-dots-overlay{position:absolute;inset:0;pointer-events:none;}
+.eco-dot{position:absolute;width:16px;height:16px;border-radius:50%;transform:translate(-50%,-50%);animation:dotPulse 2s ease-in-out infinite;}
+@keyframes dotPulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.9}50%{transform:translate(-50%,-50%) scale(1.3);opacity:1}}
+.eco-dot-ring{position:absolute;width:28px;height:28px;border-radius:50%;transform:translate(-50%,-50%);animation:ringPulse 2s ease-in-out infinite;opacity:0.4;}
+@keyframes ringPulse{0%,100%{transform:translate(-50%,-50%) scale(0.8);opacity:0.4}50%{transform:translate(-50%,-50%) scale(1.2);opacity:0}}
+.dot-tooltip{position:absolute;background:#fff;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,0.12);transform:translate(-50%,-100%);margin-top:-8px;white-space:nowrap;pointer-events:none;}
+
+.map-stats-bar{background:#fff;border-top:1px solid var(--green-light);padding:12px 16px;display:flex;gap:20px;overflow-x:auto;}
+.msb-item{text-align:center;flex-shrink:0;}
+.msb-num{font-family:'Unbounded','Noto Sans',sans-serif;font-size:16px;font-weight:900;color:var(--green);}
+.msb-label{font-size:10px;color:var(--text-muted);font-weight:700;}
+
+/* ===== REPORTS PAGE ===== */
+.report-list-item{background:#fff;border-radius:var(--radius);border:1px solid var(--green-light);padding:16px;margin-bottom:12px;display:flex;align-items:flex-start;gap:12px;}
+.rli-icon{width:44px;height:44px;border-radius:12px;background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.rli-quest{font-size:14px;font-weight:800;margin-bottom:3px;}
+.rli-desc{font-size:12px;color:var(--text-muted);}
+.rli-status{margin-left:auto;flex-shrink:0;}
+.status-pill{border-radius:50px;padding:4px 10px;font-size:11px;font-weight:800;}
+.sp-pending{background:var(--green-pale);color:var(--green-dark);}
+.sp-approved{background:#E8F5E9;color:var(--green-dark);}
+.sp-rejected{background:#FFEBEE;color:#C62828;}
+
+/* ===== LEADERBOARD ===== */
+.lb-podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin:14px 0 20px;}
+.lb-place{text-align:center;flex:1;}
+.lb-podium-bar{border-radius:var(--radius) var(--radius) 0 0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;}
+.lb-place:nth-child(1) .lb-podium-bar{background:linear-gradient(to top,#FF8F00,#FFD54F);height:90px;}
+.lb-place:nth-child(2) .lb-podium-bar{background:linear-gradient(to top,#1B5E20,#43A047);height:120px;}
+.lb-place:nth-child(3) .lb-podium-bar{background:linear-gradient(to top,#5D4037,#8D6E63);height:72px;}
+.lb-num{font-size:22px;color:#fff;font-weight:900;}
+.lb-ava{font-size:20px;display:block;margin-bottom:4px;}
+.lb-name{font-size:11px;font-weight:800;}
+.lb-pts-sm{font-size:10px;color:var(--text-muted);}
+.lb-list{background:#fff;border-radius:var(--radius);border:1px solid var(--green-light);overflow:hidden;}
+.lb-row{display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid var(--green-light);}
+.lb-row:last-child{border-bottom:none;}
+.lb-row.me{background:var(--green-pale);}
+.lb-rank{font-size:12px;font-weight:900;color:var(--text-muted);width:22px;text-align:center;}
+.lb-row-ava{font-size:22px;}
+.lb-row-name{font-size:13px;font-weight:800;flex:1;}
+.lb-row-pts{font-family:'Unbounded','Noto Sans',sans-serif;font-size:13px;font-weight:900;color:var(--green);}
+
+/* ===== CHATBOT ===== */
+.chat-page-wrap{display:flex;flex-direction:column;height:calc(100vh - var(--nav-h) - var(--bottom-h));}
+.hamster-header{background:linear-gradient(135deg,var(--green-dark),var(--green-mid));padding:13px 18px;display:flex;align-items:center;gap:12px;}
+.hamster-svg{width:54px;height:54px;animation:hamsterBob 2.2s ease-in-out infinite;}
+@keyframes hamsterBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}
+.hamster-name{font-size:15px;font-weight:900;color:#fff;}
+.hamster-status{font-size:12px;color:rgba(255,255,255,0.8);display:flex;align-items:center;gap:5px;margin-top:2px;}
+.h-dot{width:7px;height:7px;background:#69F0AE;border-radius:50%;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.chat-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+.chat-msg{display:flex;gap:8px;align-items:flex-end;}
+.chat-msg.bot{flex-direction:row;}
+.chat-msg.user{flex-direction:row-reverse;}
+.bot-ava-sm{width:30px;height:30px;border-radius:50%;background:#E8F5E9;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.chat-bubble{max-width:min(72%,340px);padding:10px 14px;font-size:14px;line-height:1.55;font-weight:600;word-break:break-word;}
+.bot .chat-bubble{background:#fff;border:1px solid var(--green-light);border-radius:18px 18px 18px 4px;box-shadow:0 2px 8px rgba(46,125,50,0.07);}
+.user .chat-bubble{background:var(--green);color:#fff;border-radius:18px 18px 4px 18px;}
+.msg-time{font-size:10px;color:var(--text-muted);margin-top:2px;padding:0 4px;}
+.bot .msg-time{text-align:left;}.user .msg-time{text-align:right;}
+.typing-bubble{background:#fff;border:1px solid var(--green-light);border-radius:18px 18px 18px 4px;padding:11px 16px;display:flex;gap:5px;align-items:center;}
+.typing-dot{width:7px;height:7px;background:var(--green-light);border-radius:50%;animation:typAnim 1.2s infinite;}
+.typing-dot:nth-child(2){animation-delay:0.2s;}.typing-dot:nth-child(3){animation-delay:0.4s;}
+@keyframes typAnim{0%,60%,100%{transform:translateY(0);background:var(--green-light)}30%{transform:translateY(-6px);background:var(--green-mid)}}
+.chat-sugs{padding:8px 14px;display:flex;gap:7px;flex-wrap:wrap;}
+.chat-sug{background:#fff;border:1.5px solid var(--green-light);border-radius:50px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--green-dark);cursor:pointer;transition:all 0.15s;font-family:'Nunito',sans-serif;}
+.chat-sug:hover{background:var(--green);color:#fff;border-color:var(--green);}
+.chat-input-bar{padding:10px 14px;background:#fff;border-top:1px solid var(--green-light);display:flex;gap:8px;align-items:center;}
+.chat-input{flex:1;padding:11px 16px;border-radius:50px;border:2px solid var(--green-light);font-family:'Nunito',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;background:#F5FBF5;}
+.chat-input:focus{border-color:var(--green-mid);background:#fff;}
+.chat-send{background:var(--green);color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:16px;cursor:pointer;transition:all 0.2s;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.chat-send:hover{background:var(--green-dark);transform:scale(1.05);}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,0.5);align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-sheet{background:#fff;border-radius:24px 24px 0 0;padding:24px;width:100%;max-width:540px;animation:slideUp 0.3s ease;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.ms-title{font-size:16px;font-weight:900;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;}
+.ms-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-muted);}
+
+.toast{position:fixed;bottom:calc(var(--bottom-h)+10px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--green-dark);color:#fff;padding:11px 22px;border-radius:50px;font-size:13px;font-weight:800;z-index:500;opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ===== МОБИЛЬНАЯ АДАПТАЦИЯ ===== */
+@media (max-width: 480px) {
+  :root { --nav-h: 56px; --bottom-h: 62px; }
+
+  /* Topbar */
+  .topbar { padding: 0 12px; }
+  .topbar-logo { font-size: 15px; }
+  .topbar-logo-icon { width: 28px; height: 28px; font-size: 14px; }
+  .topbar-pts { padding: 5px 9px; font-size: 12px; }
+  .topbar-avatar { width: 32px; height: 32px; font-size: 15px; }
+  .lang-btns .lang-sm { padding: 3px 7px; font-size: 10px; }
+
+  /* Bottom nav - 6 items */
+  .bn-icon { font-size: 18px; }
+  .bn-label { font-size: 8px; }
+
+  /* Pages */
+  .page { padding-top: calc(var(--nav-h) + 10px); }
+  .inner { padding: 0 12px; }
+
+  /* Profile hero */
+  .profile-hero { padding: 14px 12px; border-radius: 14px; }
+  .profile-ava { width: 54px; height: 54px; font-size: 24px; }
+  .profile-name { font-size: 16px; }
+  .profile-sub { font-size: 11px; }
+  .edit-btn { padding: 5px 9px; font-size: 11px; }
+  .level-badge { font-size: 11px; padding: 3px 9px; white-space: nowrap; }
+
+  /* Stats */
+  .stats-row { gap: 8px; }
+  .stat-card { padding: 12px 6px; border-radius: 12px; }
+  .stat-num { font-size: 17px; }
+  .stat-label { font-size: 10px; }
+
+  /* Badges */
+  .badges-grid { grid-template-columns: repeat(4, 1fr); gap: 7px; }
+  .badge-item { padding: 9px 4px; border-radius: 10px; }
+  .badge-emoji { font-size: 20px; }
+  .badge-name { font-size: 9px; }
+  .sec-title { font-size: 14px; }
+
+  /* Quests filter */
+  .quest-filter { gap: 6px; }
+  .qf-btn { padding: 6px 11px; font-size: 11px; }
+
+  /* Quest cards - компактные */
+  .quest-card { margin-bottom: 9px; border-radius: 14px; }
+  .qc-top { padding: 13px 12px; gap: 10px; }
+  .qc-icon { width: 44px; height: 44px; font-size: 22px; border-radius: 12px; }
+  .qc-title { font-size: 14px; margin-bottom: 3px; }
+  .qc-desc { font-size: 12px; }
+  .qc-bottom { padding: 9px 12px; flex-wrap: wrap; gap: 6px; }
+  .qc-pts { font-size: 12px; }
+  .qc-deadline { font-size: 11px; }
+  .qc-btn { padding: 6px 13px; font-size: 12px; }
+
+  /* Quest screen */
+  .qs-header { padding: 12px 14px; }
+  .qs-title { font-size: 14px; }
+  .qs-body { padding: 14px 12px; }
+  .qs-icon-big { font-size: 48px; }
+  .qs-pts-badge { font-size: 12px; padding: 5px 13px; }
+  .qs-desc-block { font-size: 13px; padding: 13px; }
+  .report-textarea { font-size: 13px; }
+  .submit-report-btn { padding: 12px; font-size: 14px; border-radius: 14px; }
+
+  /* Map */
+  .map-stats-bar { padding: 10px 12px; gap: 14px; }
+  .msb-num { font-size: 14px; }
+  .msb-label { font-size: 9px; }
+
+  /* Reports */
+  .report-list-item { padding: 13px 11px; gap: 10px; }
+  .rli-icon { width: 38px; height: 38px; font-size: 18px; border-radius: 10px; }
+  .rli-quest { font-size: 13px; }
+  .rli-desc { font-size: 11px; }
+  .status-pill { font-size: 10px; padding: 3px 8px; }
+
+  /* Leaderboard */
+  .lb-podium { gap: 6px; margin: 10px 0 14px; }
+  .lb-place:nth-child(1) .lb-podium-bar { height: 72px; }
+  .lb-place:nth-child(2) .lb-podium-bar { height: 96px; }
+  .lb-place:nth-child(3) .lb-podium-bar { height: 58px; }
+  .lb-num { font-size: 18px; }
+  .lb-ava { font-size: 18px; }
+  .lb-name { font-size: 10px; }
+  .lb-row { padding: 10px 11px; gap: 8px; }
+  .lb-row-name { font-size: 13px; }
+  .lb-row-pts { font-size: 12px; }
+
+  /* Chatbot */
+  .hamster-header { padding: 10px 13px; }
+  .hamster-svg { width: 44px; height: 44px; }
+  .hamster-name { font-size: 13px; }
+  .hamster-status { font-size: 11px; }
+  .chat-messages { padding: 12px 10px; }
+  .chat-bubble { font-size: 13px; padding: 9px 12px; }
+  .chat-sugs { padding: 6px 10px; gap: 6px; }
+  .chat-sug { font-size: 11px; padding: 5px 10px; }
+  .chat-input-bar { padding: 8px 10px; gap: 6px; }
+  .chat-input { padding: 10px 13px; font-size: 13px; }
+  .chat-send { width: 40px; height: 40px; }
+
+  /* Modals */
+  .modal-sheet { padding: 18px 14px; }
+  .ms-title { font-size: 14px; margin-bottom: 12px; }
+}
+
+@media (max-width: 360px) {
+  .bn-label { font-size: 7px; }
+  .qc-icon { width: 38px; height: 38px; font-size: 19px; }
+  .badge-emoji { font-size: 18px; }
+}
+
+  /* Lang switcher */
+  .lang-sm{padding:4px 12px;border-radius:16px;border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;color:#2E7D32;transition:all .2s;}
+  .lang-sm.active{background:#2E7D32;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.18);}
+  /* Logout */
+  .logout-btn{background:linear-gradient(135deg,#FFEBEE,#FFCDD2);border:1.5px solid #FFCDD2;border-radius:50px;padding:6px 12px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:#C62828;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:4px;white-space:nowrap;box-shadow:0 2px 6px rgba(198,40,40,.12);}
+  .logout-btn:hover{background:linear-gradient(135deg,#FFCDD2,#EF9A9A);transform:translateY(-1px);box-shadow:0 4px 12px rgba(198,40,40,.22);}
+  /* Avatar upload */
+  .avatar-upload-wrap{position:relative;width:80px;height:80px;margin:0 auto 14px;cursor:pointer;}
+  .ava-emoji{width:80px;height:80px;border-radius:50%;border:3px solid #C8E6C9;display:flex;align-items:center;justify-content:center;font-size:36px;background:#E8F5E9;overflow:hidden;}
+  .ava-emoji img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+  .avatar-upload-overlay{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;color:#fff;font-size:22px;}
+  .avatar-upload-wrap:hover .avatar-upload-overlay{opacity:1;}
+  .avatar-upload-spin{position:absolute;inset:0;border-radius:50%;border:3px solid #C8E6C9;border-top-color:#2E7D32;animation:spinAva .7s linear infinite;display:none;}
+  @keyframes spinAva{to{transform:rotate(360deg);}}
+  /* Sidebar footer */
+  .dn-footer{margin-top:auto;padding-top:12px;border-top:1px solid #C8E6C9;display:flex;flex-direction:column;gap:2px;}
+  .dn-footer a{font-size:11px;color:var(--text-muted);text-decoration:none;padding:4px 14px;border-radius:8px;font-weight:600;transition:color .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dn-footer a:hover{color:#2E7D32;}
+  .dn-social{display:flex;gap:6px;padding:5px 14px;}
+  .dn-social a{width:26px;height:26px;border-radius:8px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;font-size:13px;padding:0;transition:background .15s;}
+  .dn-social a:hover{background:#C8E6C9;}
+  /* Desktop layout */
+
+  /* Hide desktop sidebar on mobile */
+  .desktop-nav { display: none; }
+  @media(min-width:769px){
+    :root{--bottom-h:0px;}
+    .bottom-nav{display:none!important;}
+    .desktop-nav{position:fixed;left:0;top:var(--nav-h);bottom:0;width:220px;background:#fff;border-right:1.5px solid #C8E6C9;display:flex;flex-direction:column;gap:2px;padding:14px 10px;z-index:90;box-shadow:2px 0 12px rgba(0,0,0,.05);}
+    .dn-item{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;color:var(--text-muted);transition:all .18s;border:none;background:none;width:100%;font-family:'Nunito',sans-serif;text-align:left;}
+    .dn-item:hover{background:#E8F5E9;color:#2E7D32;}
+    .dn-item.active{background:#E8F5E9;color:#2E7D32;font-weight:800;}
+    .dn-icon{font-size:20px;width:26px;flex-shrink:0;}
+    .page{margin-left:220px;padding-top:calc(var(--nav-h) + 28px);padding-bottom:60px;padding-left:32px;padding-right:32px;min-height:100vh;box-sizing:border-box;}
+    .inner{max-width:800px;margin:0 auto;padding:0;}
+    .chat-page-wrap{height:calc(100vh - var(--nav-h));}
+    .topbar{padding:0 28px;}
+    .modal-overlay{align-items:center;}
+    .modal-sheet{border-radius:20px;max-width:500px;margin:0 auto;}
+  }
+  @media(min-width:1280px){
+    .desktop-nav{width:240px;}
+    .page{margin-left:240px;padding-left:40px;padding-right:40px;}
+    .inner{max-width:900px;}
+  }
+
+  /* Lang bar container */
+  .lang-bar, .lang-btns {
+    display:flex; background:#E8F5E9; border-radius:20px; padding:3px; gap:2px;
+  }
+
+  /* Topbar mobile: compact */
+  @media (max-width: 480px) {
+    .topbar-right { gap:6px; }
+    .topbar-pts { padding:5px 8px; font-size:11px; }
+    .topbar-avatar { width:32px; height:32px; font-size:15px; }
+    .lang-sm { padding:3px 8px; font-size:10px; }
+    .logout-btn { padding:5px 8px; font-size:11px; gap:2px; }
+    .logout-btn span { display:none; }  /* hide text, show only icon */
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <div class="topbar-logo-icon">🌿</div>
+    Teen
+  </div>
+  <div class="topbar-right">
+    <div class="lang-btns">
+      <button class="lang-sm" onclick="setLang('ru')">RU</button>
+      <button class="lang-sm active" onclick="setLang('kz')">KZ</button>
+    </div>
+    <div class="topbar-pts">🌿 <span id="ptsDisp"></span> pts</div>
+    <div class="topbar-avatar" onclick="showPage('profile')">🧑</div>
+    <button class="logout-btn" onclick="doLogout()">🚪 <span class="t-ru">Выйти</span><span class="t-kz" style="display:none">Шығу</span></button>
+  </div>
+</div>
+
+<!-- DESKTOP SIDEBAR -->
+<nav class="desktop-nav" id="desktopNav">
+  <button class="dn-item active" id="dn-profile" onclick="showPage('profile')"><span class="dn-icon">👤</span><span class="t-ru">Профиль</span><span class="t-kz" style="display:none">Профиль</span></button>
+  <button class="dn-item" id="dn-quests" onclick="showPage('quests')"><span class="dn-icon">🗺️</span><span class="t-ru">Квесты</span><span class="t-kz" style="display:none">Квесттер</span></button>
+  <button class="dn-item" id="dn-reports" onclick="showPage('reports')"><span class="dn-icon">📋</span><span class="t-ru">Отчёты</span><span class="t-kz" style="display:none">Есептер</span></button>
+  <button class="dn-item" id="dn-map" onclick="showPage('map')"><span class="dn-icon">🌍</span><span class="t-ru">Карта</span><span class="t-kz" style="display:none">Карта</span></button>
+  <button class="dn-item" id="dn-leaderboard" onclick="showPage('leaderboard')"><span class="dn-icon">🏆</span><span class="t-ru">Рейтинг</span><span class="t-kz" style="display:none">Рейтинг</span></button>
+  <button class="dn-item" id="dn-chatbot" onclick="showPage('chatbot')"><span class="dn-icon">🐹</span><span class="t-ru">Чат-бот</span><span class="t-kz" style="display:none">Чат-бот</span></button>
+  
+  <div class="dn-footer">
+        <div class="dn-social">
+      <a href="https://t.me/Ecobalabot" target="_blank" title="Telegram"><svg width="14" height="14" viewBox="0 0 24 24" fill="#1565C0"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg></a>
+      <a href="https://youtube.com/@ecobalakz" target="_blank" title="YouTube"><svg width="14" height="14" viewBox="0 0 24 24" fill="#C62828"><path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg></a>
+      <a href="https://www.instagram.com/ecobala.kz" target="_blank" title="Instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="#C2185B"><path d="M12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></a>
+    </div>
+    <a href="tel:+77714514717">📞 +7 771 451 47 17</a>
+    <a href="mailto:ecobalakz@gmail.com">✉️ ecobalakz@gmail.com</a>
+    <a href="privacy.html" target="_blank">🔒 <span data-ru>Конфиденциальность</span><span data-kz style="display:none">Құпиялылық</span></a>
+    <a href="terms.html" target="_blank">📄 <span data-ru>Условия</span><span data-kz style="display:none">Шарттар</span></a>
+  </div>
+</nav>
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="bn-item active" id="nav-profile" onclick="showPage('profile')">
+    <span class="bn-icon">👤</span>
+    <span class="bn-label t-ru">Профиль</span><span class="bn-label t-kz" style="display:none">Профиль</span>
+  </button>
+  <button class="bn-item" id="nav-quests" onclick="showPage('quests')">
+    <span class="bn-icon">🗺️</span>
+    <span class="bn-label t-ru">Квесты</span><span class="bn-label t-kz" style="display:none">Квесттер</span>
+  </button>
+  <button class="bn-item" id="nav-map" onclick="showPage('map')">
+    <span class="bn-icon">🌍</span>
+    <span class="bn-label t-ru">Карта</span><span class="bn-label t-kz" style="display:none">Карта</span>
+  </button>
+  <button class="bn-item" id="nav-reports" onclick="showPage('reports')">
+    <span class="bn-icon">📋</span>
+    <span class="bn-label t-ru">Отчёты</span><span class="bn-label t-kz" style="display:none">Есептер</span>
+  </button>
+  <button class="bn-item" id="nav-leaderboard" onclick="showPage('leaderboard')">
+    <span class="bn-icon">🏆</span>
+    <span class="bn-label t-ru">Рейтинг</span><span class="bn-label t-kz" style="display:none">Рейтинг</span>
+  </button>
+  <button class="bn-item" id="nav-chatbot" onclick="showPage('chatbot')">
+    <span class="bn-icon">🐹</span>
+    <span class="bn-label">Бот</span>
+  </button>
+</nav>
+
+<!-- ===== PROFILE ===== -->
+<div class="page active" id="page-profile">
+  <div class="inner">
+    <div class="profile-hero">
+      <div class="ph-blob ph-b1"></div><div class="ph-blob ph-b2"></div>
+      <div class="profile-top">
+        <div class="profile-ava" id="profileAva" onclick="openEditModal()">🧑</div>
+        <div>
+          <div class="profile-name" id="profileName"></div>
+          <div class="profile-sub t-ru"></div>
+          <div class="profile-sub t-kz" style="display:none"></div>
+        </div>
+        <button class="edit-btn" onclick="openEditModal()">✏️</button>
+      </div>
+      <div class="level-row">
+        <div class="level-badge">🌳 <span class="t-ru">Уровень 8</span><span class="t-kz" style="display:none">8-деңгей</span></div>
+        <div class="lp-wrap">
+          <div class="lp-label"><span>1840 / 2500 pts</span><span>74%</span></div>
+          <div class="lp-bar"><div class="lp-fill" style="width:74%"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num">18</div><div class="stat-label t-ru">Квестов</div><div class="stat-label t-kz" style="display:none">Квест</div></div>
+      <div class="stat-card"><div class="stat-num">1840</div><div class="stat-label">Eco Pts</div></div>
+      <div class="stat-card"><div class="stat-num">12</div><div class="stat-label t-ru">Значков</div><div class="stat-label t-kz" style="display:none">Белгі</div></div>
+    </div>
+    <div class="sec-title t-ru">Мои значки</div>
+    <div class="sec-title t-kz" style="display:none">Менің белгілерім</div>
+    <div class="badges-grid" id="badgesGrid"></div>
+    <div class="sec-title t-ru">Последние квесты</div>
+    <div class="sec-title t-kz" style="display:none">Соңғы квесттер</div>
+    <div id="recentQuestsList"></div>
+  </div>
+</div>
+
+<!-- ===== QUESTS ===== -->
+<div class="page" id="page-quests">
+  <div class="inner">
+    <div class="quest-filter">
+      <button class="qf-btn active" id="qf-all" onclick="filterQuests('all')"><span class="t-ru">Все</span><span class="t-kz" style="display:none">Барлығы</span></button>
+      <button class="qf-btn" id="qf-active" onclick="filterQuests('active')"><span class="t-ru">Активные</span><span class="t-kz" style="display:none">Белсенді</span></button>
+      <button class="qf-btn" id="qf-done" onclick="filterQuests('done')"><span class="t-ru">Выполненные</span><span class="t-kz" style="display:none">Орындалған</span></button>
+    </div>
+    <div id="questsList"></div>
+  </div>
+</div>
+
+<!-- ===== MAP ===== -->
+<div class="page" id="page-map">
+  <div class="map-page-wrap">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+
+    <!-- Заголовок карты -->
+    <div style="padding:10px 14px;background:#fff;border-bottom:1.5px solid var(--green-light);display:flex;align-items:center;gap:10px;flex-shrink:0;">
+      <span style="font-size:20px;">🇰🇿</span>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:800;" class="t-ru">Эко-карта Казахстана</div>
+        <div style="font-size:14px;font-weight:800;display:none;" class="t-kz">Қазақстанның эко-картасы</div>
+        <div style="font-size:11px;color:var(--text-muted);" class="t-ru">Места где ученики делают добро</div>
+        <div style="font-size:11px;color:var(--text-muted);display:none;" class="t-kz">Оқушылар жақсылық жасайтын жерлер</div>
+      </div>
+      <div id="mapLoadStatus" style="font-size:11px;color:var(--text-muted);font-weight:700;">⏳</div>
+    </div>
+
+    <div class="map-container" style="flex:1;position:relative;">
+      <div id="leafletMap" style="width:100%;height:100%;"></div>
+
+      <!-- Легенда -->
+      <div class="map-legend">
+        <div class="ml-item"><div class="ml-dot" style="background:#2E7D32"></div>
+          <span class="t-ru">Деревья</span><span class="t-kz" style="display:none">Ағаш</span>
+        </div>
+        <div class="ml-item"><div class="ml-dot" style="background:#1565C0"></div>
+          <span class="t-ru">Уборка</span><span class="t-kz" style="display:none">Тазалық</span>
+        </div>
+        <div class="ml-item"><div class="ml-dot" style="background:#F57F17"></div>
+          <span class="t-ru">Акция</span><span class="t-kz" style="display:none">Акция</span>
+        </div>
+        <div class="ml-item"><div class="ml-dot" style="background:#9C27B0"></div>
+          <span class="t-ru">Квест</span><span class="t-kz" style="display:none">Квест</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Статистика -->
+    <div class="map-stats-bar" id="mapStatsBar">
+      <div class="msb-item">
+        <div class="msb-num" id="mapStatTrees">—</div>
+        <div class="msb-label t-ru">Деревьев</div><div class="msb-label t-kz" style="display:none">Ағаш</div>
+      </div>
+      <div class="msb-item">
+        <div class="msb-num" id="mapStatCleanups">—</div>
+        <div class="msb-label t-ru">Уборок</div><div class="msb-label t-kz" style="display:none">Тазалық</div>
+      </div>
+      <div class="msb-item">
+        <div class="msb-num" id="mapStatActions">—</div>
+        <div class="msb-label t-ru">Акций</div><div class="msb-label t-kz" style="display:none">Акция</div>
+      </div>
+      <div class="msb-item">
+        <div class="msb-num" id="mapStatCities">—</div>
+        <div class="msb-label t-ru">Городов</div><div class="msb-label t-kz" style="display:none">Қала</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== REPORTS ===== -->
+<div class="page" id="page-reports">
+  <div class="inner">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div class="sec-title t-ru" style="margin:0;">Мои отчёты</div>
+      <button onclick="openReportNew()" style="background:var(--green);color:#fff;border:none;border-radius:50px;padding:8px 16px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;">+ <span class="t-ru">Новый</span><span class="t-kz" style="display:none">Жаңа</span></button>
+    </div>
+    <div id="myReportsList"></div>
+  </div>
+</div>
+
+<!-- ===== LEADERBOARD ===== -->
+<div class="page" id="page-leaderboard">
+  <div class="inner">
+    <div class="sec-title t-ru" style="margin-top:0;">Teen рейтинг</div>
+    <div class="lb-podium" id="teenPodium"></div>
+    <div class="lb-list" id="teenLbList"></div>
+  </div>
+</div>
+
+<!-- ===== CHATBOT ===== -->
+<div class="page" id="page-chatbot">
+  <div class="chat-page-wrap">
+    <div class="hamster-header">
+      <svg class="hamster-svg" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="14" cy="18" rx="9" ry="10" fill="#F4A460"/>
+        <ellipse cx="46" cy="18" rx="9" ry="10" fill="#F4A460"/>
+        <ellipse cx="14" cy="18" rx="6" ry="7" fill="#FFB6C1"/>
+        <ellipse cx="46" cy="18" rx="6" ry="7" fill="#FFB6C1"/>
+        <ellipse cx="30" cy="32" rx="22" ry="20" fill="#F5DEB3"/>
+        <ellipse cx="14" cy="36" rx="8" ry="7" fill="#FFD0A0" opacity="0.7"/>
+        <ellipse cx="46" cy="36" rx="8" ry="7" fill="#FFD0A0" opacity="0.7"/>
+        <circle cx="22" cy="28" r="4" fill="#2C1810"/>
+        <circle cx="38" cy="28" r="4" fill="#2C1810"/>
+        <circle cx="23.5" cy="26.5" r="1.5" fill="white"/>
+        <circle cx="39.5" cy="26.5" r="1.5" fill="white"/>
+        <ellipse cx="30" cy="35" rx="3" ry="2" fill="#FF8B94"/>
+        <path d="M26 38 Q30 42 34 38" stroke="#2C1810" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <line x1="10" y1="34" x2="22" y2="36" stroke="#888" stroke-width="1" opacity="0.5"/>
+        <line x1="10" y1="38" x2="22" y2="38" stroke="#888" stroke-width="1" opacity="0.5"/>
+        <line x1="38" y1="36" x2="50" y2="34" stroke="#888" stroke-width="1" opacity="0.5"/>
+        <line x1="38" y1="38" x2="50" y2="38" stroke="#888" stroke-width="1" opacity="0.5"/>
+      </svg>
+      <div>
+        <div class="hamster-name">🌿 <span class="t-ru">Экохомяк</span><span class="t-kz" style="display:none">Экохомяк</span></div>
+        <div class="hamster-status"><div class="h-dot"></div><span class="t-ru">Онлайн - готов помочь!</span><span class="t-kz" style="display:none">Онлайн!</span></div>
+      </div>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-sugs" id="chatSugs"></div>
+    <div class="chat-input-bar">
+      <input class="chat-input" id="chatInput" onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="chat-send" onclick="sendChat()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- QUEST DETAIL -->
+<div class="quest-screen" id="questScreen">
+  <div class="qs-header">
+    <button class="qs-back" onclick="closeQuestScreen()">←</button>
+    <div class="qs-title" id="qsTitle"></div>
+  </div>
+  <div class="qs-body">
+    <div class="qs-icon-big" id="qsIcon"></div>
+    <div><span class="qs-pts-badge" id="qsPts"></span></div>
+    <div style="margin:12px 0;">
+      <div class="qs-meta" id="qsMeta"></div>
+    </div>
+    <div class="qs-desc-block" id="qsDesc"></div>
+    <div style="font-size:14px;font-weight:800;margin-bottom:10px;" class="t-ru">Загрузите фото-отчёт</div>
+    <div style="font-size:14px;font-weight:800;margin-bottom:10px;" class="t-kz" style="display:none">Фото-есеп жүктеңіз</div>
+    <div class="report-upload-area" onclick="document.getElementById('photoUpload').click()">
+      <div style="font-size:36px;margin-bottom:8px;">📷</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text-muted);" class="t-ru">Нажмите чтобы загрузить фото</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text-muted);" class="t-kz" style="display:none">Фото жүктеу үшін басыңыз</div>
+      <input type="file" id="photoUpload" accept="image/*" onchange="handlePhoto(event)" style="display:none">
+      <img id="photoPreview" class="upload-preview" style="display:none">
+    </div>
+    <textarea class="report-textarea" id="reportDesc" placeholder="Опишите что вы сделали..."></textarea>
+    <button class="submit-report-btn" onclick="submitReport()">
+      <span class="t-ru">Отправить отчёт →</span><span class="t-kz" style="display:none">Есеп жіберу →</span>
+    </button>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-sheet">
+    <div class="ms-title">
+      <span class="t-ru">Редактировать профиль</span><span class="t-kz" style="display:none">Профильді өзгерту</span>
+      <button class="ms-close" onclick="closeModal('editModal')">✕</button>
+    </div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:10px;" class="t-ru">Фото профиля</div>
+    <div class="avatar-upload-wrap" onclick="document.getElementById('avatarFileInputTeen').click()">
+      <div class="ava-emoji" id="modalAvaPreviewTeen"></div>
+      <div class="avatar-upload-overlay">📷</div>
+      <div class="avatar-upload-spin" id="avaUploadSpinTeen"></div>
+      <input type="file" class="avatar-upload-input" id="avatarFileInputTeen" accept="image/*" onchange="uploadAvatarPhoto(event)">
+    </div>
+    <div style="text-align:center;font-size:11px;color:var(--text-muted);margin-bottom:10px;" class="t-ru">или выбери эмодзи</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;" id="avaPickerTeen"></div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:6px;" class="t-ru">Имя</div>
+    <input style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--green-light);font-family:'Nunito',sans-serif;font-size:14px;outline:none;background:var(--green-pale);margin-bottom:14px;" id="editNameInput" value="">
+    <button onclick="saveProfile()" style="width:100%;padding:13px;border-radius:50px;background:var(--green);color:#fff;border:none;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;">
+      <span class="t-ru">Сохранить</span><span class="t-kz" style="display:none">Сақтау</span>
+    </button>
+  </div>
+</div>
+
+<!-- NEW REPORT MODAL -->
+<div class="modal-overlay" id="newReportModal">
+  <div class="modal-sheet">
+    <div class="ms-title">
+      <span class="t-ru">📋 Новый отчёт</span><span class="t-kz" style="display:none">📋 Жаңа есеп</span>
+      <button class="ms-close" onclick="document.getElementById('newReportModal').classList.remove('open')">✕</button>    </div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:6px;" class="t-ru">Квест</div>
+    <select style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid var(--green-light);font-family:'Nunito',sans-serif;font-size:14px;outline:none;background:var(--green-pale);margin-bottom:14px;" id="reportQuestSelect">
+      <option>Посади дерево 🌳</option>
+      <option>Уберись в парке ♻️</option>
+      <option>Сделай кормушку 🐦</option>
+    </select>
+    <textarea style="width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--green-light);font-family:'Nunito',sans-serif;font-size:14px;outline:none;min-height:80px;resize:vertical;background:var(--green-pale);margin-bottom:14px;" placeholder="Опишите что вы сделали..."></textarea>
+    <button onclick="submitNewReport()" style="width:100%;padding:13px;border-radius:50px;background:var(--green);color:#fff;border:none;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;">
+      <span class="t-ru">Отправить →</span><span class="t-kz" style="display:none">Жіберу →</span>
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+
+// ── Content moderation (encoded) ──────────────────────────────────────────
+const _PF=(function(){try{return atob('0YXRg9C5LNGF0YPRjyzRhdGD0Y4s0YXRg9GP0Lws0YXRg9GP0LzQuCzRhdGD0LXQsizRhdGD0LnQvdGPLNGF0YPQudC90Y4s0L/QuNC30LTQsCzQv9C40LfQtNGLLNC/0LjQt9C00LXRhizQv9C40LfQtNCw0YIs0L/QuNC30LTQsNC90YPQuyzQv9C40LfQtNCw0L3Rg9GCLNC10LHQsNGC0Yws0LXQsdCw0Lss0LXQsdCw0LvQuCzQtdCx0LDQvdGL0Lks0LXQsdCw0L3Rg9GCLNC10LHQsNC90LDRjyzQtdCx0LDQvdGM0LrQvizRgdGD0LrQsCzRgdGD0LrQuCzRgdGD0LrQsNC8LNGB0YPQutC1LNGB0YPRh9C60LAs0YHRg9GH0LDRgCzQsdC70Y/RgtGMLNCx0LvRj9C00Yws0LHQu9GP0LTQtdC5LNCx0LvRj9C00LjQvSzQsdC70Y/QtNGB0Los0LHQu9GP0LTQuNC90LAs0LHQu9GP0LTRgdGC0LLQvizQvNGD0LTQsNC6LNC80YPQtNCw0LrQuCzQvNGD0LTQsNC60LDQvCzQvNGD0LTQuNC70LAs0LzRg9C00LjQuyzQt9Cw0LvRg9C/0LAs0LfQsNC70YPQv9C40L0s0ZHQsdCw0L0s0ZHQsdCw0L3Ri9C5LNGR0LEs0ZHQsdC90YPRgizRkdCx0L3Rg9C7LNGR0LHQvdGD0YLRjCzQv9C40LfQtNC10YLRjCzQv9C40LfQtNC40YIs0L/QuNC30LTQsNCx0L7QuyzQv9C40LfQtNCw0L3Rg9GC0Yws0YjQu9GO0YXQsCzRiNC70Y7RhdC4LNGI0LvRjtGF0LDQvCzQvNGA0LDQt9GMLNC80YDQsNC30Lgs0YPQtdCx0LDQvSzRg9GR0LHQsNC9LNGD0ZHQsSzQv9C40LfQtNGO0Los0L/QuNC30LfRjtC60Lgs0LPQsNC90LTQvtC9LNCz0LDQvdC00L7QvdGLLNC90LDRhdGD0Lks0L/QvtGF0YPQuSzQvdCw0YXQtdGALGFzcyxmdWNrLHNoaXQsYml0Y2gsY29jayxkaWNrLHB1c3N5LGN1bnQsbmlnZ2VyLGZhZ2dvdCzRgdC40LrQsNC6LNGB0LjQutGW0L0s0YHQuNC60Lgs0YHQuNC60LBxLNCx0L7SmyzQsdC+0LrRgtGLLNGI0LXRiNGW0qMs0YjQtdGI0LXSo9C00ZYs0YjQtdGI0LXSo9C90ZbSoyzQsdCw0LnSk9GL0Lcs0LHQsNC50pPRi9C30YvQvSzQuNGC0ZbSoyzQuNGC0YHRltKjLNC40YLRgtC10Lks0LjRgtC/0ZbQvSzQtdGB0LXQuizQtdGB0LXQs9GW0qMs0LXRgdC10LrRgdGW0qMs0L/Ri9GB0YvSmyzQv9GL0YjRi9C6LNC/0LXQt9C00LXRgizQv9GW0LfQtNC10YIs0LbQtdGB0ZbRgCzQttC10YHRltGA0LTQtdC5LNGB0LLQvtC70L7Rh9GMLNGD0LHQu9GO0LTQvtC6LNGD0LHQu9GO0LTQutC4LNC70L7RiNCw0Lo=').split(',');}catch(e){return [];}})();
+function containsProfanity(t){if(!t)return false;const l=t.toLowerCase().replace(/[\s\-\.]+/g,'');return _PF.some(w=>l.includes(w.replace(/[\s\-\.]+/g,'')));}
+function profanityMsg(l){return l==='kz'?'⚠️ Бұл сөзді қолдануға болмайды!':'⚠️ Нельзя использовать такие слова!';}
+function chatProfanityMsg(l){return l==='kz'?'⚠️ Мен мұндай сөздерге жауап бермеймін 🌱':'⚠️ Я не отвечаю на такие слова. Спроси про природу! 🌱';}
+
+
+const IS_KIDS = false;
+let lang = localStorage.getItem('selectedLanguage') || 'kz';
+const quests = [
+  {id:1,icon:'🌳',title:{ru:'Посади дерево',kz:'Ағаш отырғыз'},desc:{ru:'Посади дерево в своём городе и сфотографируй. Укажи место на карте.',kz:'Қалаңызда ағаш отырғызып, суретке түсіріңіз.'},pts:50,deadline:'2024-12-31',done:false,loc:'Хромтау, парк'},
+  {id:2,icon:'♻️',title:{ru:'Уберись в парке',kz:'Саябақты тазала'},desc:{ru:'Собери мусор в ближайшем парке или сквере. Минимум 2 мешка.',kz:'Жақын жердегі саябақтан қоқыс жинаңыз.'},pts:40,deadline:'2024-11-30',done:false,loc:'Любой парк'},
+  {id:3,icon:'🐦',title:{ru:'Сделай кормушку',kz:'Қормалдық жаса'},desc:{ru:'Смастери кормушку для птиц из подручных материалов и установи её.',kz:'Қолыңда бар материалдардан қормалдық жасаңыз.'},pts:30,deadline:'2025-01-15',done:false,loc:'У дома'},
+  {id:4,icon:'🎨',title:{ru:'Экологический плакат',kz:'Экологиялық плакат'},desc:{ru:'Нарисуй плакат на тему экологии и разместите его в школе.',kz:'Экология тақырыбында плакат салып, мектепте қойыңыз.'},pts:25,deadline:'2024-12-15',done:true,loc:'Школа'},
+  {id:5,icon:'💧',title:{ru:'Акция "Чистая вода"',kz:'"Таза су" акциясы'},desc:{ru:'Организуй или участвуй в акции по очистке водоёма.',kz:'Су қоймасын тазалау акциясына қатысыңыз.'},pts:60,deadline:'2025-02-01',done:false,loc:'Хромтау, река'},
+];
+
+let questFilter = 'all';
+let myReports = [
+  {quest:'Экологический плакат',icon:'🎨',desc:'Нарисовал плакат о воде',date:'7 ноя',status:'approved'},
+  {quest:'Посади дерево',icon:'🌳',desc:'Отчёт отправлен на проверку',date:'10 ноя',status:'pending'},
+];
+
+// lbData removed - using real DB
+
+const botFAQ = {
+  ru:[
+    {kw:['квест','задание','выполн'],r:'Открой вкладку "Квесты" и выбери задание! Выполни его и отправь фото-отчёт. За каждый квест - Eco Points 🌿'},
+    {kw:['карта','эко-карт','точки'],r:'На вкладке "Карта" видно все выполненные квесты в городе - посаженные деревья, уборки, акции 🌍'},
+    {kw:['отчёт','фото','отправить'],r:'После выполнения квеста нажми на него и загрузи фото + описание. Администратор проверит и начислит баллы 📋'},
+    {kw:['баллы','очки','eco'],r:'Eco Points начисляются за квесты, уроки и игры. Набирай баллы и поднимайся в рейтинге! 🌱'},
+    {kw:['рейтинг','место','топ'],r:'Смотри рейтинг в разделе "Рейтинг"! Чем больше квестов выполняешь - тем выше поднимаешься 🏆'},
+    {kw:['привет','хай','здравствуй'],r:'Привет! Я Экохомяк 🐹 - твой экологический помощник. Выполняй квесты и береги природу!'},
+    {kw:['вода','море','река'],r:'Вода - основа жизни! Участвуй в акциях по очистке водоёмов и зарабатывай Eco Points 💧'},
+    {kw:['дерево','лес','сажать'],r:'Посадка деревьев - один из лучших квестов! За каждое дерево твоя зелёная точка появляется на карте 🌳'},
+    {kw:['спасибо'],r:'Береги природу вместе с EcoBala! 🌱'},
+  ],
+  kz:[
+    {kw:['квест','тапсырма'],r:'"Квесттер" бөліміне өтіп, тапсырма таңдаңыз! Орындап, фото-есеп жіберіңіз. Eco Points аласыз 🌿'},
+    {kw:['карта'],r:'"Карта" бөлімінде орындалған квесттер көрінеді - отырғызылған ағаштар, тазалықтар 🌍'},
+    {kw:['есеп','фото'],r:'Квестті орындағаннан кейін фото + сипаттама жіберіңіз. Әкімші тексеріп, ұпай береді 📋'},
+    {kw:['ұпай','eco'],r:'Eco Points квесттер, сабақтар үшін беріледі. Ұпайларды жинап, рейтингте жоғарыла! 🌱'},
+    {kw:['сәлем'],r:'Сәлем! Мен Экохомяк 🐹. Квесттер орындап, табиғатты қорға!'},
+    {kw:['рахмет'],r:'EcoBala-мен бірге табиғатты қорғаңыз! 🌱'},
+  ]
+};
+
+const suggestions = {
+  ru:['Как выполнить квест?','Где карта?','Как отправить отчёт?','Сколько баллов дают?'],
+  kz:['Квестті қалай орындайды?','Карта қайда?','Есеп қалай жіберіледі?']
+};
+
+const avatarList = ['🧑','🦊','🐧','🐸','🦁','🐼','🦋','🐬','🦅','🐻','🦉','🐺'];
+
+function setLang(l){
+  lang=l;
+  localStorage.setItem('selectedLanguage', l);
+  document.querySelectorAll('.lang-sm').forEach(b=>b.classList.toggle('active',(b.getAttribute('onclick')||'').includes(`'${l}'`)));
+  document.querySelectorAll('.t-ru').forEach(el=>el.style.display=l==='ru'?'':'none');
+  document.querySelectorAll('.t-kz').forEach(el=>el.style.display=l==='kz'?'':'none');
+  renderQuests();renderSugs();
+  document.getElementById('chatInput').placeholder = l==='ru'?'Спроси хомяка...':'Хомяктан сұра...';
+}
+
+function showPage(p){
+  document.querySelectorAll('.dn-item').forEach(b=>b.classList.remove('active'));
+  const _dn=document.getElementById('dn-'+p);if(_dn)_dn.classList.add('active');
+  document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));
+  document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('active'));
+  const _pg=document.getElementById('page-'+p);if(_pg)_pg.classList.add('active');
+  const _nv=document.getElementById('nav-'+p);if(_nv)_nv.classList.add('active');
+  try{localStorage.setItem('ecobala-teen-last-page',p);}catch(e){}
+  if(p==='leaderboard'){if(typeof loadRatingFromDB==='function')loadRatingFromDB();}
+  if(p==='reports') renderMyReports();
+  if(p==='map') { renderMapDots(); setTimeout(() => { initEcoMap && initEcoMap(); if(typeof ecoMap!=='undefined'&&ecoMap) ecoMap.invalidateSize(); }, 150); }
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// QUESTS
+function filterQuests(f){
+  questFilter=f;
+  ['all','active','done'].forEach(id=>{
+    document.getElementById('qf-'+id).classList.toggle('active',id===f);
+  });
+  renderQuests();
+}
+function renderQuests(){
+  let list = quests;
+  if(questFilter==='active') list=quests.filter(q=>!q.done);
+  if(questFilter==='done') list=quests.filter(q=>q.done);
+  document.getElementById('questsList').innerHTML = list.map(q=>`
+    <div class="quest-card" onclick="openQuest(${q.id})">
+      <div class="qc-top">
+        <div class="qc-icon">${q.icon}</div>
+        <div class="qc-right">
+          <div class="qc-title">${q.title[lang]}</div>
+          <div class="qc-desc">${q.desc[lang]}</div>
+        </div>
+      </div>
+      <div class="qc-bottom">
+        <span class="qc-pts">⭐ +${q.pts} Eco Pts</span>
+        <span class="qc-deadline">📅 ${q.deadline}</span>
+        <div class="qc-status">
+          ${q.done
+            ? `<span class="qc-btn done">✅ ${lang==='ru'?'Выполнен':'Орындалды'}</span>`
+            : `<button class="qc-btn" onclick="event.stopPropagation();openQuest(${q.id})">${lang==='ru'?'Выполнить →':'Орындау →'}</button>`}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function openQuest(id){
+  const q = quests.find(x=>x.id===id);
+  document.getElementById('qsTitle').textContent = q.title[lang];
+  document.getElementById('qsIcon').textContent = q.icon;
+  document.getElementById('qsPts').textContent = `⭐ +${q.pts} Eco Points`;
+  document.getElementById('qsDesc').textContent = q.desc[lang];
+  document.getElementById('qsMeta').innerHTML = [
+    `<span class="qs-meta-pill">📅 ${q.deadline}</span>`,
+    `<span class="qs-meta-pill">📍 ${q.loc}</span>`,
+    `<span class="qs-meta-pill">⭐ +${q.pts} pts</span>`,
+  ].join('');
+  document.getElementById('questScreen').classList.add('open');
+  document.getElementById('reportDesc').value='';
+  document.getElementById('photoPreview').style.display='none';
+}
+function closeQuestScreen(){document.getElementById('questScreen').classList.remove('open');}
+
+function handlePhoto(e){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{const img=document.getElementById('photoPreview');img.src=ev.target.result;img.style.display='block';};
+  r.readAsDataURL(file);
+}
+
+function submitReport(){
+  const desc=document.getElementById('reportDesc').value.trim();
+  if(!desc){showToast(lang==='ru'?'Добавьте описание':'Сипаттама қосыңыз');return;}
+  myReports.unshift({quest:document.getElementById('qsTitle').textContent,icon:'📋',desc,date:new Date().toLocaleDateString('ru'),status:'pending'});
+  closeQuestScreen();
+  showToast(lang==='ru'?'✅ Отчёт отправлен! Ждите проверки.':'✅ Есеп жіберілді!');
+}
+
+// PROFILE RECENT QUESTS
+function renderRecentQuests(){
+  document.getElementById('recentQuestsList').innerHTML = quests.slice(0,3).map(q=>`
+    <div style="background:#fff;border-radius:12px;padding:14px;border:1px solid var(--green-light);margin-bottom:10px;display:flex;align-items:center;gap:12px;">
+      <span style="font-size:26px;">${q.icon}</span>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:800;">${q.title[lang]}</div>
+        <div style="font-size:11px;color:var(--text-muted);">+${q.pts} Eco Pts</div>
+      </div>
+      <span style="font-size:12px;font-weight:800;color:${q.done?'var(--green)':'var(--text-muted)'}">${q.done?(lang==='ru'?'✅ Выполнен':'✅ Орындалды'):(lang==='ru'?'Активен':'Белсенді')}</span>
+    </div>`).join('');
+}
+
+// MY REPORTS
+function renderMyReports(){
+  document.getElementById('myReportsList').innerHTML = myReports.map(r=>`
+    <div class="report-list-item">
+      <div class="rli-icon">${r.icon}</div>
+      <div style="flex:1;">
+        <div class="rli-quest">${r.quest}</div>
+        <div class="rli-desc">${r.desc}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">📅 ${r.date}</div>
+      </div>
+      <div class="rli-status">
+        <span class="status-pill sp-${r.status}">
+          ${{pending:lang==='ru'?'На проверке':'Тексерілуде',approved:lang==='ru'?'Принят':'Қабылданды',rejected:lang==='ru'?'Отклонён':'Қабылданбады'}[r.status]}
+        </span>
+      </div>
+    </div>`).join('');
+}
+
+function openReportNew(){document.getElementById('newReportModal').classList.add('open');}
+function submitNewReport(){
+  myReports.unshift({quest:document.getElementById('reportQuestSelect').value,icon:'📋',desc:'Отчёт отправлен',date:new Date().toLocaleDateString('ru'),status:'pending'});
+  document.getElementById('newReportModal').classList.remove('open');
+  showToast(lang==='ru'?'✅ Отчёт отправлен!':'✅ Есеп жіберілді!');
+  renderMyReports();
+}
+
+// MAP DOTS
+function renderMapDots(){
+  const dots=[
+    {x:'35%',y:'40%',color:'#2E7D32',ring:'rgba(46,125,50,0.3)',tip:'Посажено 5 деревьев'},
+    {x:'55%',y:'55%',color:'#1565C0',ring:'rgba(21,101,192,0.3)',tip:'Уборка мусора'},
+    {x:'42%',y:'65%',color:'#2E7D32',ring:'rgba(46,125,50,0.3)',tip:'Посажено 3 дерева'},
+    {x:'68%',y:'38%',color:'#F57F17',ring:'rgba(245,127,23,0.3)',tip:'Эко-акция'},
+    {x:'28%',y:'58%',color:'#1565C0',ring:'rgba(21,101,192,0.3)',tip:'Уборка парка'},
+    {x:'60%',y:'70%',color:'#2E7D32',ring:'rgba(46,125,50,0.3)',tip:'Кормушка для птиц'},
+  ];
+  document.getElementById('mapDots').innerHTML = dots.map(d=>`
+    <div class="eco-dot-ring" style="left:${d.x};top:${d.y};background:${d.ring};"></div>
+    <div class="eco-dot" style="left:${d.x};top:${d.y};background:${d.color};" title="${d.tip}"></div>
+    <div class="dot-tooltip" style="left:${d.x};top:${d.y};display:none;">${d.tip}</div>
+  `).join('');
+}
+
+// LEADERBOARD
+// renderLB removed - using loadRatingFromDB
+
+// PROFILE EDIT
+let selectedAva = '🧑';
+function openEditModal(){
+  const curAva = document.getElementById('profileAva');
+  const prev = document.getElementById('modalAvaPreviewTeen');
+  if (prev && curAva) prev.innerHTML = curAva.innerHTML || curAva.textContent;
+  selectedAva = curAva ? curAva.textContent.trim() : '🧑';
+  document.getElementById('avaPickerTeen').innerHTML = avatarList.map(e=>
+    `<div onclick="selectAva('${e}',this)" style="font-size:26px;width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid ${e===selectedAva?'var(--green)':'transparent'};background:${e===selectedAva?'var(--green-pale)':''};transition:all 0.15s;">${e}</div>`
+  ).join('');
+  document.getElementById('editNameInput').value = document.getElementById('profileName').textContent.trim();
+  document.getElementById('editModal').classList.add('open');
+}
+function selectAva(e, el){
+  selectedAva = e;
+  document.querySelectorAll('#avaPickerTeen > div').forEach(d=>{
+    d.style.border='2px solid transparent';
+    d.style.background='';
+  });
+  el.style.border='2px solid var(--green)';
+  el.style.background='var(--green-pale)';
+}
+function closeModal(id){
+  const modalId = id || 'editModal';
+  document.getElementById(modalId).classList.remove('open');
+}
+async function saveProfile(){
+  const name=document.getElementById('editNameInput').value.trim();
+  if(name && containsProfanity(name)){showToast(profanityMsg(lang));return;}
+  if(name){
+    document.getElementById('profileName').textContent=name;
+    if(cu){cu.nickname=name;}
+    try{const sb=window.getSupabaseClient();if(sb&&cu)await sb.from('users').update({nickname:name}).eq('id',cu.id);}catch(e){console.warn(e);}
+  }
+  document.getElementById('profileAva').textContent=selectedAva;
+  document.querySelector('.topbar-avatar').textContent=selectedAva;
+  closeModal('editModal');
+  showToast(lang==='ru'?'✅ Профиль обновлён':'✅ Профиль жаңартылды');
+}
+
+// CHATBOT
+const hamSVG = `<svg viewBox="0 0 60 60" width="26" height="26" xmlns="http://www.w3.org/2000/svg"><ellipse cx="14" cy="18" rx="9" ry="10" fill="#F4A460"/><ellipse cx="46" cy="18" rx="9" ry="10" fill="#F4A460"/><ellipse cx="14" cy="18" rx="6" ry="7" fill="#FFB6C1"/><ellipse cx="46" cy="18" rx="6" ry="7" fill="#FFB6C1"/><ellipse cx="30" cy="32" rx="22" ry="20" fill="#F5DEB3"/><circle cx="22" cy="28" r="4" fill="#2C1810"/><circle cx="38" cy="28" r="4" fill="#2C1810"/><circle cx="23.5" cy="26.5" r="1.5" fill="white"/><circle cx="39.5" cy="26.5" r="1.5" fill="white"/><ellipse cx="30" cy="35" rx="3" ry="2" fill="#FF8B94"/><path d="M26 38 Q30 42 34 38" stroke="#2C1810" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;
+
+function getTime(){const n=new Date();return n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0');}
+
+function addMsg(text,from){
+  const wrap=document.getElementById('chatMessages');
+  const div=document.createElement('div');
+  div.className=`chat-msg ${from}`;
+  const t=getTime();
+  if(from==='bot'){
+    div.innerHTML=`<div class="bot-ava-sm">${hamSVG}</div><div><div class="chat-bubble">${text}</div><div class="msg-time">${t}</div></div>`;
+  } else {
+    div.innerHTML=`<div><div class="chat-bubble">${text}</div><div class="msg-time">${t}</div></div>`;
+  }
+  wrap.appendChild(div);wrap.scrollTop=wrap.scrollHeight;
+}
+
+function showTyping(){
+  const wrap=document.getElementById('chatMessages');
+  const div=document.createElement('div');
+  div.className='chat-msg bot';div.id='typingInd';
+  div.innerHTML=`<div class="bot-ava-sm">${hamSVG}</div><div class="typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+  wrap.appendChild(div);wrap.scrollTop=wrap.scrollHeight;
+}
+function removeTyping(){const t=document.getElementById('typingInd');if(t)t.remove();}
+
+function botReply(txt){
+  showTyping();
+  const lower=txt.toLowerCase();
+  const faq=botFAQ[lang];
+  let reply=lang==='ru'?'Интересный вопрос! 🤔 Попробуй спросить о квестах, карте или баллах!':'Қызықты сұрақ! 🤔 Квесттер, карта туралы сұраңыз!';
+  for(const item of faq){if(item.kw.some(k=>lower.includes(k))){reply=item.r;break;}}
+  setTimeout(()=>{removeTyping();addMsg(reply,'bot');},800+Math.random()*400);
+}
+
+function sendChat(){
+  const input=document.getElementById('chatInput');
+  const txt=input.value.trim();if(!txt)return;
+  if(containsProfanity(txt)){addMsg(chatProfanityMsg(lang),'bot');input.value='';return;}
+  addMsg(txt,'user');input.value='';botReply(txt);
+}
+
+function renderSugs(){
+  document.getElementById('chatSugs').innerHTML=suggestions[lang].map((s,i)=>
+    `<div class="chat-sug" data-sug="${i}" onclick="askSug(${i})">${s}</div>`
+  ).join('');
+}
+function askSug(i){
+  const s=suggestions[lang][i];
+  addMsg(s,'user');
+  botReply(s);
+}
+
+
+const ALL_BADGES_DEF = {
+  first:    {ru:'Первый шаг', kz:'Бірінші қадам',  emoji:'🌱'},
+  student:  {ru:'Ученик',     kz:'Оқушы',           emoji:'📚'},
+  scholar:  {ru:'Отличник',   kz:'Үздік',           emoji:'🎓'},
+  explorer: {ru:'Исследователь',kz:'Зерттеуші',     emoji:'🗺️'},
+  hero:     {ru:'Эко-герой',  kz:'Эко-батыр',       emoji:'🌿'},
+  gamer:    {ru:'Игрок',      kz:'Ойыншы',          emoji:'🎮'},
+  streak:   {ru:'Серия x5',   kz:'Жалғасым x5',    emoji:'🔥'},
+  reporter: {ru:'Репортёр',   kz:'Репортер',        emoji:'📸'},
+  champion: {ru:'Чемпион',    kz:'Чемпион',         emoji:'🏆'},
+  gold:     {ru:'Золото',     kz:'Алтын',           emoji:'🥇'},
+};
+
+function renderBadgesFromDB(earned) {
+  const grid = document.getElementById('badgesGrid') || document.querySelector('.badges-grid');
+  if (!grid) return;
+  grid.innerHTML = Object.entries(ALL_BADGES_DEF).map(([key, b]) => {
+    const has = Array.isArray(earned) && earned.includes(key);
+    return `<div class="badge-item${has?'':' locked'}" title="${has?(lang==='kz'?b.kz:b.ru):(lang==='kz'?'Жабық':'Закрыто')}">
+      <div class="badge-emoji">${b.emoji}</div>
+      <div class="badge-name" data-ru>${b.ru}</div>
+      <div class="badge-name" data-kz style="display:none">${b.kz}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── SUPABASE ИНТЕГРАЦИЯ ───────────────────────────────────────────────────────
+let cu = null;
+
+// Logout
+function doLogout() {
+  (typeof EcoBalaAuth !== 'undefined'
+    ? EcoBalaAuth.logout()
+    : Promise.resolve()
+  ).finally(() => { location.href = 'index.html'; });
+}
+
+
+// ── Утилиты ──────────────────────────────────────────────────────────────────
+
+function deadlineLabel(dl) {
+  if (!dl || dl === '—') return '';
+  try {
+    const d = new Date(dl);
+    if (isNaN(d)) return dl;
+    const now = new Date();
+    const diff = Math.ceil((d - now) / (1000 * 60 * 60 * 24));
+    if (diff < 0) return lang==='kz' ? '⏰ Мерзімі өтті' : '⏰ Просрочен';
+    if (diff === 0) return lang==='kz' ? '⏰ Бүгін' : '⏰ Сегодня';
+    if (diff <= 3) return (lang==='kz' ? '⏰ ' + diff + ' күн' : '⏰ ' + diff + ' дн.');
+    return '📅 ' + d.toLocaleDateString(lang==='kz' ? 'ru-RU' : 'ru-RU', {day:'numeric', month:'short'});
+  } catch(e) { return dl; }
+}
+
+function previewNewReportPhotos(input) {
+  const files = Array.from(input.files).slice(0, 3);
+  const container = document.getElementById('newReportPhotoPreviewContainer');
+  if (!container) return;
+  if (!files.length) { container.style.display = 'none'; container.innerHTML = ''; return; }
+  container.style.display = 'flex';
+  container.innerHTML = files.map((f, i) => {
+    const url = URL.createObjectURL(f);
+    return '<div style="position:relative;width:80px;height:80px;">' +
+      '<img src="' + url + '" style="width:80px;height:80px;object-fit:cover;border-radius:10px;border:1.5px solid var(--green-light);">' +
+      '<div style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.5);color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;" onclick="removePhoto(' + i + ')">✕</div>' +
+      '</div>';
+  }).join('');
+}
+
+function removePhoto(i) {
+  const input = document.getElementById('newReportPhoto');
+  const dt = new DataTransfer();
+  Array.from(input.files).forEach((f, idx) => { if (idx !== i) dt.items.add(f); });
+  input.files = dt.files;
+  previewNewReportPhotos(input);
+}
+
+async function initTeen() {
+  try {
+    const cached = localStorage.getItem('ecobala-user-cache');
+    if (cached) {
+      try {
+        const c = JSON.parse(cached);
+        if (c && c.role === 'teen') cu = c;
+      } catch(e) {}
+    }
+    const fresh = await EcoBalaAuth.getCurrentUser();
+    if (!fresh || fresh.role !== 'teen') {
+      localStorage.removeItem('ecobala-user-cache');
+      location.href = 'index.html';
+      return;
+    }
+    cu = fresh;
+  } catch(e) {
+    if (cu && cu.role === 'teen') {
+      console.warn('Using cached user due to network error');
+    } else {
+      location.href = 'index.html';
+      return;
+    }
+  }
+
+  // Имя
+  const name = cu.nickname || cu.full_name || 'Teen';
+  document.getElementById('profileName').textContent = name;
+
+  // Аватар
+  if (cu.avatar_url) {
+    const img = `<img src="${cu.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    document.getElementById('profileAva').innerHTML = img;
+    document.querySelector('.topbar-avatar').innerHTML = img;
+  } else if (cu.avatar) {
+    document.getElementById('profileAva').textContent = cu.avatar;
+    document.querySelector('.topbar-avatar').textContent = cu.avatar;
+  }
+  document.getElementById('editNameInput').value = cu.full_name || cu.nickname || '';
+
+  // Баллы и уровень
+  const pts = cu.points || 0;
+  const lvl = cu.level || 1;
+  document.getElementById('ptsDisp').textContent = pts;
+  updateTeenStats(pts, lvl, cu);
+  renderBadgesFromDB(cu.badges || []);
+
+  // Загружаем данные из БД
+  await loadQuestsFromDB();
+  await loadReportsFromDB();
+  await loadRatingFromDB();
+
+  renderSugs();
+  document.getElementById('chatInput').placeholder = lang==='ru'?'Спроси хомяка...':'Хомяктан сұра...';
+
+  // Restore last visited page
+  try {
+    const lastPage = localStorage.getItem('ecobala-teen-last-page');
+    if (lastPage && ['profile','quests','map','reports','leaderboard','chatbot'].includes(lastPage)) {
+      showPage(lastPage);
+    }
+  } catch(e) {}
+
+  setTimeout(()=>{
+    addMsg(lang==='ru'?'Привет! Я Экохомяк 🐹 Выполняй квесты и береги природу вместе с EcoBala!':'Сәлем! Мен Экохомяк 🐹 Квесттер орындап, табиғатты қорға!','bot');
+  },400);
+}
+
+function updateTeenStats(pts, lvl, cu_data) {
+  const lvlInfo = pts >= 2800 ? {icon:'🏆'} : pts >= 1500 ? {icon:'🌍'} : pts >= 600 ? {icon:'🌳'} : pts >= 100 ? {icon:'🌿'} : {icon:'🌱'};
+  const lvlBadge = document.querySelector('.level-badge');
+  if (lvlBadge) lvlBadge.textContent = `${lvlInfo.icon} ${lang==='ru'?'Уровень':'Деңгей'} ${lvl}`;
+  // Прогресс
+  const thresholds = [100,300,600,1000,1500,2100,2800,99999];
+  const prev = lvl > 1 ? thresholds[lvl-2] : 0;
+  const next = thresholds[Math.min(lvl-1, thresholds.length-1)];
+  const pct = Math.min(100, Math.round(((pts-prev)/(next-prev))*100));
+  const fill = document.querySelector('.lp-fill');
+  if (fill) fill.style.width = pct+'%';
+  const lpLabel = document.querySelector('.lp-label');
+  if (lpLabel) lpLabel.innerHTML = `<span>${pts} / ${next} pts</span><span>${pct}%</span>`;
+  // Stats row
+  const statNums = document.querySelectorAll('.stat-num');
+  if (cu_data) {
+    if (statNums[0]) statNums[0].textContent = cu_data.quests_done || 0;
+    if (statNums[2]) statNums[2].textContent = Array.isArray(cu_data.badges) ? cu_data.badges.length : 0;
+  }
+  if (statNums[1]) statNums[1].textContent = pts;
+}
+
+// Квесты из Supabase
+async function loadQuestsFromDB() {
+  try {
+    const arr = await EcoBalaDB.getTeenQuests();
+    if (!arr.length) { renderQuests(); return; }
+
+    // Конвертируем в наш формат
+    const converted = arr.map(q => ({
+      id: q.id,
+      icon: q.icon || '🌿',
+      title: typeof q.title === 'object' ? q.title : { ru: q.title||'Квест', kz: q.title||'Квест' },
+      desc:  typeof q.description === 'object' ? q.description : { ru: q.description||'', kz: q.description||'' },
+      pts:   q.points || 50,
+      deadline: q.deadline || q.expires_at || '—',
+      done: false,
+      loc: q.location || q.location_name || 'Хромтау',
+      repeatable: q.repeatable !== false
+    }));
+    window._dbQuests = converted;
+
+    // Обновляем квестов счётчик (это кол-во доступных квестов, не выполненных)
+    // выполненных берём из cu.quests_done
+    const statNumsQ = document.querySelectorAll('.stat-num');
+    if (statNumsQ[0] && cu) statNumsQ[0].textContent = cu.quests_done || 0;
+
+    // Рендерим
+    questFilter = 'all';
+    const el = document.getElementById('questsList');
+    el.innerHTML = converted.map(q => `
+      <div class="quest-card" onclick="openQuestDB('${q.id}')">
+        <div class="qc-top">
+          <div class="qc-icon">${q.icon}</div>
+          <div class="qc-right">
+            <div class="qc-title">${q.title[lang]||q.title.ru}</div>
+            <div class="qc-desc">${(q.desc[lang]||q.desc.ru).substring(0,80)}${(q.desc[lang]||q.desc.ru).length>80?'…':''}</div>
+          </div>
+        </div>
+        <div class="qc-bottom">
+          <span class="qc-pts">⭐ +${q.pts} Eco Pts</span>
+          <span class="qc-deadline">📅 ${q.deadline}</span>
+          <div class="qc-status">
+            <button class="qc-btn" onclick="event.stopPropagation();openQuestDB('${q.id}')">${lang==='ru'?'Выполнить →':'Орындау →'}</button>
+          </div>
+        </div>
+      </div>`).join('');
+
+    // Обновляем select в new report modal
+    const sel = document.getElementById('reportQuestSelect');
+    if (sel) sel.innerHTML = converted.map(q => `<option value="${q.id}">${q.icon} ${q.title[lang]||q.title.ru}</option>`).join('');
+
+    // Recent quests на профиле
+    renderRecentQuestsDB(converted);
+  } catch(e) {
+    console.error('loadQuestsFromDB:', e);
+    renderQuests();
+  }
+}
+
+function renderRecentQuestsDB(arr) {
+  const el = document.getElementById('recentQuestsList');
+  if (!el) return;
+  el.innerHTML = arr.slice(0,3).map(q => `
+    <div style="background:#fff;border-radius:12px;padding:14px;border:1px solid var(--green-light);margin-bottom:10px;display:flex;align-items:center;gap:12px;">
+      <span style="font-size:26px;">${q.icon}</span>
+      <div style="flex:1;"><div style="font-size:13px;font-weight:800;">${q.title[lang]||q.title.ru}</div><div style="font-size:11px;color:var(--text-muted);">+${q.pts} Eco Pts</div></div>
+      <span style="font-size:12px;font-weight:800;color:var(--text-muted);">${lang==='ru'?'Активен':'Белсенді'}</span>
+    </div>`).join('');
+}
+
+function openQuestDB(id) {
+  const arr = window._dbQuests || [];
+  const q = arr.find(x => String(x.id) === String(id));
+  if (!q) return;
+  document.getElementById('qsTitle').textContent = q.title[lang]||q.title.ru;
+  document.getElementById('qsIcon').textContent = q.icon;
+  document.getElementById('qsPts').textContent = `⭐ +${q.pts} Eco Points`;
+  document.getElementById('qsDesc').textContent = q.desc[lang]||q.desc.ru;
+  document.getElementById('qsMeta').innerHTML = [
+    `<span class="qs-meta-pill">📅 ${q.deadline}</span>`,
+    `<span class="qs-meta-pill">📍 ${q.loc}</span>`,
+    `<span class="qs-meta-pill">⭐ +${q.pts} pts</span>`,
+  ].join('');
+  document.getElementById('questScreen').classList.add('open');
+  document.getElementById('reportDesc').value='';
+  document.getElementById('photoPreview').style.display='none';
+  // Store current quest id for report
+  document.getElementById('questScreen').dataset.questId = id;
+}
+
+// Отчёты - загрузка из Supabase
+async function loadReportsFromDB() {
+  try {
+    if (!cu) return;
+    const sb = window.getSupabaseClient();
+    const { data } = await sb.from('teen_reports').select('*, quest:teen_quests(title,icon)').eq('user_id', cu.id).order('created_at', { ascending: false });
+    if (!data || !data.length) { renderMyReports(); return; }
+
+    window._myReports = data.map(r => ({
+      id: r.id,
+      quest: r.quest ? (typeof r.quest.title === 'object' ? r.quest.title[lang]||r.quest.title.ru : r.quest.title) : 'Квест',
+      icon: r.quest?.icon || '📋',
+      desc: r.description || '',
+      date: new Date(r.created_at).toLocaleDateString('ru'),
+      status: r.status || 'pending'
+    }));
+
+    const el = document.getElementById('myReportsList');
+    el.innerHTML = window._myReports.map(r => `
+      <div class="report-list-item">
+        <div class="rli-icon">${r.icon}</div>
+        <div style="flex:1;">
+          <div class="rli-quest">${r.quest}</div>
+          <div class="rli-desc">${r.desc.substring(0,60)}${r.desc.length>60?'…':''}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">📅 ${r.date}</div>
+        </div>
+        <div class="rli-status">
+          <span class="status-pill sp-${r.status}">${{pending:lang==='ru'?'На проверке':'Тексерілуде',approved:lang==='ru'?'Принят':'Қабылданды',rejected:lang==='ru'?'Отклонён':'Қабылданбады'}[r.status]||r.status}</span>
+        </div>
+      </div>`).join('');
+
+    // Счётчик отчётов
+    const statNums = document.querySelectorAll('.stat-num');
+    if (statNums[2]) statNums[2].textContent = data.length;
+  } catch(e) { console.error('loadReportsFromDB:', e); }
+}
+
+// Отправить отчёт в Supabase
+async function submitReportDB() {
+  const desc = document.getElementById('reportDesc').value.trim();
+  if (!desc) { showToast(lang==='ru'?'Добавьте описание':'Сипаттама қосыңыз'); return; }
+  const questId = document.getElementById('questScreen').dataset.questId;
+  if (!cu || !questId) { showToast('Ошибка: войдите в систему'); return; }
+
+  try {
+    const sb = window.getSupabaseClient();
+    let photoUrl = null;
+    const photoFile = document.getElementById('photoUpload')?.files[0];
+    if (photoFile) {
+      const path = `reports/${cu.id}_${questId}_${Date.now()}.${photoFile.name.split('.').pop()}`;
+      const { error } = await sb.storage.from('quest-photos').upload(path, photoFile);
+      if (!error) {
+        const { data } = sb.storage.from('quest-photos').getPublicUrl(path);
+        photoUrl = data.publicUrl;
+      }
+    }
+    const q2 = (window._dbQuests || []).find(q => String(q.id) === String(questId));
+    await sb.from('teen_reports').insert({
+      user_id: cu.id,
+      quest_id: questId,
+      quest_title: q2 ? (typeof q2.title==='object' ? (q2.title.ru||q2.title.kz||'Квест') : q2.title) : 'Квест',
+      quest_icon: q2 ? (q2.icon || '📋') : '📋',
+      description: desc,
+      photo_url: photoUrl,
+      status: 'pending'
+    });
+    closeQuestScreen();
+    showToast(lang==='ru'?'✅ Отчёт отправлен! Ждите проверки.':'✅ Есеп жіберілді!');
+    await loadReportsFromDB();
+  } catch(e) {
+    console.error('submitReportDB:', e);
+    showToast(lang==='ru'?'Ошибка отправки':'Жіберу қатесі');
+  }
+}
+
+// Патчим submitReport
+window.submitReport = submitReportDB;
+
+// Отправить новый отчёт из модалки
+async function submitNewReportDB() {
+  const questId = document.getElementById('reportQuestSelect')?.value;
+  const desc = document.querySelector('#newReportModal textarea')?.value?.trim();
+  if (!cu || !questId || !desc) { showToast(lang==='ru'?'Заполните все поля':'Барлық өрістерді толтырыңыз'); return; }
+  try {
+    const sb = window.getSupabaseClient();
+    // Get quest title and icon for admin display
+    const quest = (window._dbQuests || []).find(q => String(q.id) === String(questId));
+    const questTitle = quest ? (typeof quest.title === 'object' ? (quest.title.ru || quest.title.kz || 'Квест') : quest.title) : 'Квест';
+    const questIcon = quest ? (quest.icon || '📋') : '📋';
+    await sb.from('teen_reports').insert({
+      user_id: cu.id,
+      quest_id: questId,
+      quest_title: questTitle,
+      quest_icon: questIcon,
+      description: desc,
+      status: 'pending'
+    });
+    document.getElementById('newReportModal').classList.remove('open');
+    showToast(lang==='ru'?'✅ Отчёт отправлен!':'✅ Есеп жіберілді!');
+    await loadReportsFromDB();
+  } catch(e) { showToast('Ошибка'); }
+}
+window.submitNewReport = submitNewReportDB;
+
+// Рейтинг из Supabase
+async function loadRatingFromDB() {
+  try {
+    const data = await EcoBalaDB.getLeaderboard('teen');
+    if (!data.length) return;
+    const top3 = data.slice(0,3);
+    const pod = [top3[1], top3[0], top3[2]].filter(Boolean);
+    const h = ['90px','120px','72px'];
+    const grads = ['linear-gradient(to top,#FF8F00,#FFD54F)','linear-gradient(to top,#1B5E20,#43A047)','linear-gradient(to top,#5D4037,#8D6E63)'];
+    const medals = ['🥈','🥇','🥉'];
+    const podEl = document.getElementById('teenPodium');
+    if (podEl) podEl.innerHTML = pod.map((p,i) => `
+      <div class="lb-place">
+        <span class="lb-ava">${p.avatar_url?`<img src="${p.avatar_url}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">`:p.avatar||'🧑'}</span>
+        <div class="lb-name">${(p.name||'').split(' ')[0]}</div>
+        <div class="lb-pts-sm">${p.points||0}</div>
+        <div class="lb-podium-bar" style="background:${grads[i]};height:${h[i]};"><div class="lb-num">${medals[i]}</div></div>
+      </div>`).join('');
+
+    const listEl = document.getElementById('teenLbList');
+    if (listEl) listEl.innerHTML = data.slice(0,20).map((p,i) => `
+      <div class="lb-row${cu && p.id===cu.id?' me':''}">
+        <div class="lb-rank">${i+1}</div>
+        <div class="lb-row-ava">${p.avatar_url?`<img src="${p.avatar_url}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;">`:p.avatar||'🧑'}</div>
+        <div><div class="lb-row-name">${p.name||'Аноним'}${cu&&p.id===cu.id?` (${lang==='ru'?'Ты':'Сен'})`:''}</div><div style="font-size:11px;color:var(--text-muted);">${p.school||''}</div></div>
+        <div class="lb-row-pts">${p.points||0}</div>
+      </div>`).join('');
+  } catch(e) { console.error('loadRatingFromDB:', e); }
+}
+
+// Выход
+document.querySelector && (() => {
+  const btn = document.querySelector('[data-logout],.out-btn');
+  if (btn) btn.onclick = async () => { await EcoBalaAuth.logout(); location.href='index.html'; };
+})();
+
+
+async function uploadAvatarPhoto(event) {
+  const file = event.target.files[0];
+  if (!file || !cu) return;
+
+  // Validate file
+  if (file.size > 5 * 1024 * 1024) {
+    alert(lang === 'ru' ? 'Файл слишком большой. Максимум 5MB.' : 'Файл тым үлкен. Максимум 5MB.');
+    return;
+  }
+
+  const spinId = IS_KIDS ? 'avaUploadSpin' : 'avaUploadSpinTeen';
+  const spin = document.getElementById(spinId);
+  if (spin) spin.style.display = 'block';
+
+  try {
+    const sb = window.getSupabaseClient();
+    if (!sb) throw new Error('Supabase not loaded');
+
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const safeName = `${cu.id}_${Date.now()}.${ext}`;
+    const path = safeName;  // bucket is already 'avatars', no subfolder needed
+
+    // Try storage upload
+    const { error: upErr } = await sb.storage
+      .from('avatars')
+      .upload(path, file, { upsert: true, contentType: file.type });
+
+    let url;
+    if (upErr) {
+      console.error('Storage upload error:', upErr.message, upErr);
+      url = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    } else {
+      const { data: urlData } = sb.storage.from('avatars').getPublicUrl(path);
+      url = urlData.publicUrl + '?t=' + Date.now();
+    }
+
+    // Save to DB
+    await sb.from('users').update({ avatar_url: url }).eq('id', cu.id);
+    cu.avatar_url = url;
+
+    // Update UI everywhere
+    const imgHtml = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">`;
+    const ids = IS_KIDS
+      ? ['profileAvatar']
+      : ['profileAva'];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = imgHtml;
+    });
+    const topAva = document.querySelector('.topbar-avatar');
+    if (topAva) topAva.innerHTML = imgHtml;
+
+    // Update modal preview
+    const prevId = IS_KIDS ? 'modalAvaPreview' : 'modalAvaPreviewTeen';
+    const prev = document.getElementById(prevId);
+    if (prev) prev.innerHTML = imgHtml;
+
+  } catch(e) {
+    console.error('uploadAvatarPhoto:', e);
+    const msg = lang === 'ru'
+      ? 'Ошибка загрузки фото: ' + (e.message || 'неизвестная ошибка')
+      : 'Фото жүктеу қатесі: ' + (e.message || '');
+    alert(msg);
+  } finally {
+    if (spin) spin.style.display = 'none';
+    // Reset input so same file can be re-selected
+    event.target.value = '';
+  }
+}
+
+
+</script>
+
+
+
+<!-- Leaflet JS - карта Казахстана -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+// ── ЭКО-КАРТА КАЗАХСТАНА ──────────────────────────────────────────────────────
+let ecoMap = null;
+let mapInitialized = false;
+
+// Цвета и иконки по типу точки
+const POINT_STYLES = {
+  tree:    { color: '#2E7D32', icon: '🌳' },
+  cleanup: { color: '#1565C0', icon: '♻️' },
+  action:  { color: '#F57F17', icon: '🌿' },
+  quest:   { color: '#9C27B0', icon: '⭐' },
+};
+
+function createLeafletIcon(type) {
+  const style = POINT_STYLES[type] || POINT_STYLES.quest;
+  return L.divIcon({
+    className: '',
+    html: `<div style="
+      width:32px;height:32px;border-radius:50%;
+      background:${style.color};
+      border:3px solid #fff;
+      box-shadow:0 2px 8px rgba(0,0,0,0.3);
+      display:flex;align-items:center;justify-content:center;
+      font-size:14px;cursor:pointer;
+      transition:transform 0.2s;
+    ">${style.icon}</div>`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+    popupAnchor: [0, -18]
+  });
+}
+
+async function initEcoMap() {
+  if (mapInitialized) return;
+  mapInitialized = true;
+
+  const mapEl = document.getElementById('leafletMap');
+  if (!mapEl) return;
+
+  // Инициализация карты - центр Казахстана, вид всей страны
+  ecoMap = L.map('leafletMap', {
+    center: [48.0, 67.0],  // Центр Казахстана
+    zoom: 5,               // Масштаб - вся страна
+    zoomControl: true,
+    attributionControl: false
+  });
+
+  // Тайлы - OpenStreetMap (без API ключа)
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18, minZoom: 4,
+    attribution: '© OpenStreetMap'
+  }).addTo(ecoMap);
+
+  // Границы Казахстана - прямоугольник (упрощённо)
+  // Реальные координаты: ~40°N–55°N, ~51°E–87°E
+  const kazakhBounds = [[40.5, 50.0], [55.5, 87.5]];
+  L.rectangle(kazakhBounds, {
+    color: '#2E7D32',
+    weight: 2,
+    fill: false,
+    dashArray: '6,4',
+    opacity: 0.4
+  }).addTo(ecoMap);
+
+  // Флаг Казахстана в центре (маркер-декор)
+  const kazFlag = L.divIcon({
+    className: '',
+    html: `<div style="font-size:28px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));">🇰🇿</div>`,
+    iconSize: [32, 32], iconAnchor: [16, 16]
+  });
+  L.marker([48.0, 67.0], { icon: kazFlag, interactive: false }).addTo(ecoMap);
+
+  // Загружаем точки из Supabase
+  await loadMapPoints();
+}
+
+async function loadMapPoints() {
+  const statusEl = document.getElementById('mapLoadStatus');
+  if (statusEl) statusEl.textContent = '⏳';
+
+  try {
+    const sb = window.getSupabaseClient ? window.getSupabaseClient() : null;
+    if (!sb) { loadFallbackPoints(); return; }
+
+    // Загружаем из таблицы eco_map_points
+    const { data, error } = await sb
+      .from('eco_map_points')
+      .select('*')
+      .eq('approved', true)
+      .order('created_at', { ascending: false })
+      .limit(200);
+
+    if (error || !data || !data.length) {
+      console.log('Map: using fallback points', error);
+      loadFallbackPoints();
+      return;
+    }
+
+    addPointsToMap(data);
+    updateMapStats(data);
+    if (statusEl) statusEl.textContent = `✅ ${data.length}`;
+
+    // Realtime - подписка на новые точки
+    sb.channel('eco-map-realtime')
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'eco_map_points'
+      }, (payload) => {
+        if (payload.new && payload.new.approved) {
+          addPointsToMap([payload.new]);
+        }
+      })
+      .subscribe();
+
+  } catch(e) {
+    console.error('Map load error:', e);
+    loadFallbackPoints();
+  }
+}
+
+// Демо-точки если нет данных в БД
+function loadFallbackPoints() {
+  const fallback = [
+    { lat:50.2556, lng:58.4343, point_type:'tree',    icon:'🌳', title_ru:'Посадка деревьев, Хромтау',    title_kz:'Ағаш отырғызу, Хромтау',    city:'Хромтау' },
+    { lat:50.2534, lng:58.4298, point_type:'cleanup', icon:'♻️', title_ru:'Уборка парка, Хромтау',        title_kz:'Саябақ тазалау, Хромтау',   city:'Хромтау' },
+    { lat:50.2578, lng:58.4411, point_type:'action',  icon:'🌿', title_ru:'Эко-акция у реки',             title_kz:'Өзен жанындағы акция',      city:'Хромтау' },
+    { lat:50.2839, lng:57.1673, point_type:'tree',    icon:'🌳', title_ru:'Озеленение школы, Актобе',     title_kz:'Мектеп жасылдандыру, Ақтөбе',city:'Актобе'  },
+    { lat:43.2220, lng:76.8512, point_type:'tree',    icon:'🌿', title_ru:'Посадка саженцев, Алматы',     title_kz:'Саженец отырғызу, Алматы',   city:'Алматы'  },
+    { lat:51.1694, lng:71.4491, point_type:'cleanup', icon:'♻️', title_ru:'Уборка сада, Астана',          title_kz:'Бақ тазалау, Астана',        city:'Астана'  },
+    { lat:42.3417, lng:69.5901, point_type:'action',  icon:'🌿', title_ru:'Эко-урок, Шымкент',            title_kz:'Эко-сабақ, Шымкент',         city:'Шымкент' },
+    { lat:52.2873, lng:76.9674, point_type:'cleanup', icon:'♻️', title_ru:'Уборка набережной, Павлодар',  title_kz:'Жағалау тазалау, Павлодар',  city:'Павлодар'},
+  ];
+  addPointsToMap(fallback);
+  updateMapStats(fallback);
+}
+
+function addPointsToMap(points) {
+  if (!ecoMap) return;
+  points.forEach(p => {
+    if (!p.lat || !p.lng) return;
+    const type = p.point_type || 'quest';
+    const style = POINT_STYLES[type] || POINT_STYLES.quest;
+    const lngLang = typeof lang !== 'undefined' ? lang : 'ru';
+    const title = lngLang === 'kz' ? (p.title_kz || p.title_ru || '') : (p.title_ru || p.title_kz || '');
+
+    const marker = L.marker([parseFloat(p.lat), parseFloat(p.lng)], {
+      icon: createLeafletIcon(type)
+    });
+
+    const popupHTML = `
+      <div style="font-family:'Nunito','Noto Sans',sans-serif;min-width:160px;">
+        <div style="font-size:20px;margin-bottom:4px;">${p.icon || style.icon}</div>
+        <div style="font-size:13px;font-weight:800;color:#1a2e1a;margin-bottom:3px;">${title || p.city || ''}</div>
+        ${p.city ? `<div style="font-size:11px;color:#4a6741;font-weight:600;">📍 ${p.city}</div>` : ''}
+      </div>`;
+
+    marker.bindPopup(popupHTML, { maxWidth: 200 });
+    marker.addTo(ecoMap);
+  });
+}
+
+function updateMapStats(points) {
+  const trees    = points.filter(p => p.point_type === 'tree').length;
+  const cleanups = points.filter(p => p.point_type === 'cleanup').length;
+  const actions  = points.filter(p => p.point_type === 'action' || p.point_type === 'quest').length;
+  const cities   = new Set(points.map(p => p.city).filter(Boolean)).size;
+
+  const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  setEl('mapStatTrees',   trees);
+  setEl('mapStatCleanups', cleanups);
+  setEl('mapStatActions',  actions);
+  setEl('mapStatCities',   cities || '—');
+}
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase2.js"></script>
+<script>
+(function tryInit(n) {
+  if (typeof EcoBalaAuth !== 'undefined') {
+    initTeen();
+  } else if (n > 0) {
+    setTimeout(() => tryInit(n - 1), 300);
+  } else {
+    console.error('EcoBalaAuth not found - check supabase2.js');
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Nunito,sans-serif;flex-direction:column;gap:16px;padding:24px;text-align:center;"><div style="font-size:48px;">⚠️</div><div style="font-size:18px;font-weight:800;color:#C62828;">Ошибка загрузки</div><div style="font-size:14px;color:#546E7A;">Проверьте файл supabase2.js и подключение к интернету</div><button onclick="location.reload()" style="background:#2E7D32;color:#fff;border:none;padding:12px 24px;border-radius:50px;font-size:14px;font-weight:800;cursor:pointer;font-family:Nunito,sans-serif;">Перезагрузить</button></div>';
+  }
+})(20);
+</script>
+</body>
+</html>

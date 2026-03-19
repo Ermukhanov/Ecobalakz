@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>EcoBala Admin</title>
+<link rel="icon" href="iconca.jpg" type="image/jpeg"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap&subset=cyrillic,cyrillic-ext" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<style>
+*, body, input, textarea, select, button, span, div, p, h1, h2, h3, h4, h5, h6, a, li {
+    font-family: 'Nunito', 'Noto Sans', 'Segoe UI', system-ui, sans-serif !important;
+}
+:root{
+    --bg:#0b1220;--panel:rgba(255,255,255,0.06);--panel2:rgba(255,255,255,0.085);
+    --border:rgba(255,255,255,0.14);--text:rgba(255,255,255,0.92);--muted:rgba(255,255,255,0.68);
+    --accent:#2ECC71;--accent2:#4AA3DF;--danger:#ff5c7a;--warning:#ffcf5a;
+    --shadow:0 18px 60px rgba(0,0,0,0.35);
+}
+*,*::before,*::after{cursor:none!important}
+#leafCursor{position:fixed;pointer-events:none;z-index:99999;font-size:22px;line-height:1;transform:translate(-50%,-50%) rotate(-30deg);transition:transform 0.1s ease;user-select:none;will-change:transform;}
+input,textarea,select{cursor:text!important}
+a,button{cursor:pointer!important}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:radial-gradient(1000px 800px at 20% 0%,rgba(46,204,113,0.18),transparent 55%),radial-gradient(900px 700px at 80% 0%,rgba(74,163,223,0.18),transparent 55%),var(--bg);color:var(--text);min-height:100vh;}
+a{color:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:24px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:40px;height:40px;border-radius:14px;background:rgba(255,255,255,0.12);box-shadow:0 12px 40px rgba(46,204,113,0.18);overflow:hidden;display:grid;place-items:center}
+.logo img{width:100%;height:100%;object-fit:cover;display:block}
+.brand h1{margin:0;font-size:18px}
+.brand small{color:var(--muted)}
+.btn{border:1px solid var(--border);background:rgba(255,255,255,0.06);color:var(--text);padding:10px 12px;border-radius:14px;cursor:pointer;transition:transform .08s ease,background .18s ease,border-color .18s ease;font-weight:600}
+.btn:hover{background:rgba(255,255,255,0.09);border-color:rgba(255,255,255,0.22)}
+.btn:active{transform:scale(0.99)}
+.btn-primary{background:rgba(46,204,113,0.16);border-color:rgba(46,204,113,0.45)}
+.btn-danger{background:rgba(255,92,122,0.12);border-color:rgba(255,92,122,0.45)}
+.grid{display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+.card .head{padding:14px 14px 12px;border-bottom:1px solid rgba(255,255,255,0.10);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card .head h2{margin:0;font-size:14px;letter-spacing:.2px}
+.card .body{padding:14px}
+.tabs{display:grid;gap:8px}
+.tab{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border-radius:16px;border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.05);cursor:pointer;transition:all 0.2s}
+.tab:hover{background:rgba(255,255,255,0.08)}
+.tab.active{background:rgba(46,204,113,0.14);border-color:rgba(46,204,113,0.45)}
+.tab strong{font-size:13px}
+.tab small{color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kpi{background:var(--panel2);border:1px solid rgba(255,255,255,0.12);border-radius:18px;padding:12px;min-height:86px}
+.kpi .num{font-size:20px;font-weight:800}
+.kpi .lbl{color:var(--muted);font-size:12px;margin-top:6px}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chart-box{background:var(--panel2);border:1px solid rgba(255,255,255,0.12);border-radius:18px;padding:12px;min-height:280px}
+.chart-box h3{margin:0 0 10px;font-size:13px}
+.chart-wrap{position:relative;height:220px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.input,.inp{width:100%;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.06);color:var(--text)}
+.input::placeholder,.inp::placeholder{color:rgba(255,255,255,0.45)}
+.input:focus,.inp:focus{outline:3px solid rgba(74,163,223,0.35);border-color:rgba(74,163,223,0.55)}
+table{width:100%;border-collapse:separate;border-spacing:0}
+th,td{text-align:left;padding:10px;border-bottom:1px solid rgba(255,255,255,0.10);font-size:13px}
+th{color:rgba(255,255,255,0.75);font-weight:700}
+td small{color:var(--muted)}
+.pill{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.06);font-size:12px;color:rgba(255,255,255,0.82)}
+.pill.kids{border-color:rgba(74,163,223,0.35);background:rgba(74,163,223,0.10)}
+.pill.teen{border-color:rgba(46,204,113,0.35);background:rgba(46,204,113,0.10)}
+.hide{display:none!important}
+.admin-banner{background:linear-gradient(135deg,#2c3e50 0%,#3498db 100%);color:white;padding:20px 0;margin:20px 0;border-radius:12px}
+.admin-banner .container{display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto;padding:0 20px}
+.banner-close{background:rgba(255,255,255,0.2);border:none;color:white;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(30,40,60,0.95);color:#fff;padding:12px 24px;border-radius:50px;font-size:14px;font-weight:700;opacity:0;transition:all 0.3s;z-index:9999;border:1px solid rgba(255,255,255,0.2)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:980px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.charts{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="leafCursor">&#127807;</div>
+
+<div class="wrap">
+<div class="topbar">
+  <div class="brand">
+    <div class="logo"><img src="iconca.jpg" alt="EcoBala"/></div>
+    <div><h1>EcoBala Admin</h1><small id="adminSubtitle">Dashboard</small></div>
+  </div>
+  <div class="row">
+    <button class="btn" id="goHomeBtn">&#8592; На главную</button>
+    <button class="btn btn-danger hide" id="logoutBtn">Выйти</button>
+  </div>
+</div>
+
+<div class="admin-banner" id="adminBanner">
+  <div class="container">
+    <div><h3 style="margin:0 0 4px;font-size:17px;">&#128737;&#65039; Панель администратора EcoBala</h3><p style="margin:0;opacity:.9;font-size:13px;">Управление пользователями, уроками, квестами и отчётами</p></div>
+    <button class="banner-close" id="adminBannerClose">&#10005;</button>
+  </div>
+</div>
+
+<div class="card" id="loginCard" style="max-width:420px;margin:80px auto;">
+  <div class="head"><h2 style="font-size:16px;">&#128272; Вход администратора</h2></div>
+  <div class="body">
+    <p style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6;">Доступ только для администратора EcoBala.</p>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
+      <div style="position:relative;">
+        <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;">&#128231;</span>
+        <input class="input" id="loginInput" type="text" placeholder="Email администратора" autocomplete="username" style="padding-left:40px;border-radius:12px;"/>
+      </div>
+      <div style="position:relative;">
+        <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;">&#128273;</span>
+        <input class="input" id="passInput" type="password" placeholder="Пароль" autocomplete="current-password" style="padding-left:40px;border-radius:12px;"/>
+      </div>
+    </div>
+    <div id="loginMsg" style="color:rgba(255,92,122,0.9);font-size:13px;min-height:18px;margin-bottom:10px;"></div>
+    <button class="btn btn-primary" id="loginBtn" style="width:100%;padding:12px;border-radius:12px;font-size:15px;font-weight:700;">Войти в панель &#8594;</button>
+    <div style="text-align:center;margin-top:14px;"><a href="index.html" style="font-size:12px;color:var(--muted);text-decoration:none;">&#8592; На главную страницу</a></div>
+  </div>
+</div>
+
+<div class="grid hide" id="appGrid">
+  <div class="card">
+    <div class="head"><h2>Разделы</h2></div>
+    <div class="body">
+      <div class="tabs" id="tabs">
+        <div class="tab active" data-tab="dashboard"><div><strong>Dashboard</strong><br><small>Сводка + статистика</small></div><span class="pill">&#128202;</span></div>
+        <div class="tab" data-tab="users"><div><strong>Пользователи</strong><br><small>Kids + Teen</small></div><span class="pill">&#128101;</span></div>
+        <div class="tab" data-tab="kids_lessons"><div><strong>Kids: Уроки</strong><br><small>CRUD + тесты (10 вопр.)</small></div><span class="pill kids">&#128218;</span></div>
+        <div class="tab" data-tab="kids_games"><div><strong>Kids: Игры</strong><br><small>CRUD</small></div><span class="pill kids">&#127918;</span></div>
+        <div class="tab" data-tab="teen_quests"><div><strong>Teen: Квесты</strong><br><small>CRUD + карта</small></div><span class="pill teen">&#129513;</span></div>
+        <div class="tab" data-tab="teen_reports"><div><strong>Teen: Отчёты</strong><br><small>Просмотр / модерация</small></div><span class="pill teen">&#129534;</span></div>
+        <div class="tab" data-tab="leaderboard"><div><strong>Рейтинг</strong><br><small>Kids + Teen топ</small></div><span class="pill">&#127942;</span></div>
+        <div class="tab" data-tab="school_rating"><div><strong>Рейтинг школ</strong><br><small>Суммарный балл школ</small></div><span class="pill">&#127979;</span></div>
+        <div class="tab" data-tab="supabase_data"><div><strong>Данные БД</strong><br><small>Таблицы + CSV экспорт</small></div><span class="pill">&#128376;&#65039;</span></div>
+        <div class="tab" data-tab="banners"><div><strong>Баннеры</strong><br><small>Видео и фото на сайте</small></div><span class="pill" style="background:rgba(156,39,176,0.15);">&#128444;&#65039;</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="mainCard">
+    <div class="head"><h2 id="mainTitle">Dashboard</h2><div class="row" id="mainActions"></div></div>
+    <div class="body" id="mainBody"></div>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase2.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+// ── Helpers ──────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+// Use supabase2.js client directly (avoid circular: getSB→getSupabaseClient→getSB)
+function _sb(){
+  if(window._adminSbClient) return window._adminSbClient;
+  if(window.getSupabaseClient && typeof window.getSupabaseClient === 'function'){
+    try{ window._adminSbClient = window.getSupabaseClient(); return window._adminSbClient; }catch(e){}
+  }
+  // Fallback: create own client
+  if(window.supabase){
+    const SUPABASE_URL='https://zngfwsuaaygryzpmynuv.supabase.co';
+    const SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuZ2Z3c3VhYXlncnl6cG15bnV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NjA1NDksImV4cCI6MjA4ODUzNjU0OX0.M8Xx4DxYzWVN94ChFM5LDWrUdEi1jv1kk2JopcfpfrA';
+    window._adminSbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    return window._adminSbClient;
+  }
+  return null;
+}
+function fmt(n){ return Number(n||0).toLocaleString('ru-RU'); }
+function escapeHtml(s){ return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function uid(p){ return p+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8); }
+function showToast(msg){ const t=$('toast');if(!t)return;t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800); }
+function setMain(title,actions,body){ $('mainTitle').textContent=title;$('mainActions').innerHTML=actions||'';$('mainBody').innerHTML=body||''; }
+
+let chartInstances = {};
+function destroyCharts(){ Object.values(chartInstances).forEach(c=>{try{c.destroy();}catch{}});chartInstances={}; }
+
+// ── Auth ─────────────────────────────────────────────────────────────────
+async function checkAuth(){ try{ const u=await EcoBalaAuth.getCurrentUser(); return u&&u.role==='admin'; }catch{return false;} }
+function setLoggedInUI(on){ $('loginCard').classList.toggle('hide',on);$('appGrid').classList.toggle('hide',!on);$('logoutBtn').classList.toggle('hide',!on); }
+
+async function login(){
+  const email=String($('loginInput').value||'').trim(), pass=String($('passInput').value||'');
+  $('loginMsg').textContent='';
+  if(!email||!pass){$('loginMsg').textContent='Введите логин и пароль.';return;}
+  const btn=$('loginBtn');
+  btn.textContent='⏳ Входим...'; btn.disabled=true;
+  try{
+    const sb=_sb();
+    // Step 1: Auth sign-in
+    const {data:authData, error:authErr} = await sb.auth.signInWithPassword({email,password:pass});
+    if(authErr) throw authErr;
+    const uid = authData.user.id;
+    // Step 2: Try get profile from users table
+    const {data:profile, error:profErr} = await sb.from('users').select('*').eq('id',uid).single();
+    if(profErr && profErr.code==='PGRST116'){
+      // No row in users table - create one as admin
+      await sb.from('users').upsert({id:uid, email:email, role:'admin', full_name:'Admin'});
+      const {data:p2} = await sb.from('users').select('*').eq('id',uid).single();
+      if(p2 && p2.role==='admin'){setLoggedInUI(true);boot();return;}
+    }
+    if(profErr) throw new Error('Профиль не найден. Проверьте таблицу users: '+profErr.message);
+    if(profile&&profile.role==='admin'){
+      setLoggedInUI(true);boot();
+    } else {
+      await sb.auth.signOut();
+      $('loginMsg').textContent='❌ Доступ только для администратора. Ваша роль: '+(profile?.role||'не задана');
+    }
+  }catch(e){
+    console.error('Admin login error:',e);
+    $('loginMsg').textContent='❌ '+(e.message||'Неверный логин или пароль');
+  } finally {
+    btn.textContent='Войти в панель →'; btn.disabled=false;
+  }
+}
+async function logout(){ await EcoBalaAuth.logout(); location.reload(); }
+
+// ── Dashboard ─────────────────────────────────────────────────────────────
+async function renderDashboard(){
+  setMain('Dashboard','',`
+    <div class="kpis">
+      <div class="kpi"><div class="num" id="dKids">&#8230;</div><div class="lbl">Kids пользователей</div></div>
+      <div class="kpi"><div class="num" id="dTeen">&#8230;</div><div class="lbl">Teen пользователей</div></div>
+      <div class="kpi"><div class="num" id="dPts">&#8230;</div><div class="lbl">Сумма баллов</div></div>
+      <div class="kpi"><div class="num" id="dReports">&#8230;</div><div class="lbl">Teen отчётов</div></div>
+    </div>
+    <div style="height:12px"></div>
+    <div class="kpis" style="grid-template-columns:repeat(3,minmax(0,1fr));">
+      <div class="kpi"><div class="num" id="dQuests">&#8230;</div><div class="lbl">Teen квестов</div></div>
+      <div class="kpi"><div class="num" id="dLessons">&#8230;</div><div class="lbl">Kids уроков</div></div>
+      <div class="kpi"><div class="num" id="dTopSchool">&#8230;</div><div class="lbl">Топ школа</div></div>
+    </div>
+    <div style="height:12px"></div>
+    <div class="charts">
+      <div class="chart-box"><h3>Пользователи по ролям</h3><div class="chart-wrap"><canvas id="rolesChart"></canvas></div></div>
+      <div class="chart-box"><h3>Топ школы по баллам</h3><div class="chart-wrap"><canvas id="schoolsChart"></canvas></div></div>
+    </div>`);
+  try{
+    const s=await EcoBalaDB.getDashboardStats();
+    $('dKids').textContent=fmt(s.kidsCount);$('dTeen').textContent=fmt(s.teenCount);
+    $('dPts').textContent=fmt(s.totalPoints);$('dReports').textContent=fmt(s.reportCounts?.all||0);
+    $('dQuests').textContent=fmt(s.questsCount);$('dLessons').textContent=fmt(s.lessonsCount);
+    $('dTopSchool').textContent=s.topSchool?`${s.topSchool.school} — ${fmt(s.topSchool.score)} pts`:'—';
+    setTimeout(()=>renderCharts(s),100);
+  }catch(e){console.error('dashboard',e);}
+}
+
+function renderCharts(s){
+  destroyCharts();if(!window.Chart)return;
+  const opts={responsive:true,maintainAspectRatio:false};
+  const c1=$('rolesChart');
+  if(c1) chartInstances.roles=new Chart(c1,{type:'doughnut',data:{labels:['Kids','Teen'],datasets:[{data:[s.kidsCount||0,s.teenCount||0],backgroundColor:['rgba(74,163,223,0.8)','rgba(46,204,113,0.8)'],borderWidth:0}]},options:{...opts,plugins:{legend:{labels:{color:'rgba(255,255,255,0.8)'}}}}});
+  const c2=$('schoolsChart');
+  if(c2&&s.schools?.length){
+    const top=s.schools.slice(0,8);
+    chartInstances.schools=new Chart(c2,{type:'bar',data:{labels:top.map(x=>x.school),datasets:[{label:'Баллы',data:top.map(x=>x.score),backgroundColor:'rgba(46,204,113,0.3)',borderColor:'rgba(46,204,113,0.8)',borderWidth:1,borderRadius:8}]},options:{...opts,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'rgba(255,255,255,0.7)',maxRotation:30},grid:{display:false}},y:{beginAtZero:true,ticks:{color:'rgba(255,255,255,0.7)',precision:0},grid:{color:'rgba(255,255,255,0.08)'}}}}});
+  }
+}
+
+// ── Users ─────────────────────────────────────────────────────────────────
+async function renderUsers(){
+  let users=[];try{users=await EcoBalaDB.getAllUsers();}catch(e){}
+  setMain('Пользователи',`<button class="btn" id="refreshUsersBtn">&#128260; Обновить</button>`,`
+    <div class="row" style="margin-bottom:12px;">
+      <input class="input" id="userSearch" placeholder="Поиск по имени / школе" style="max-width:320px;"/>
+      <select class="input" id="roleFilter" style="width:130px;"><option value="">Все роли</option><option value="kids">Kids</option><option value="teen">Teen</option></select>
+      <span class="pill">Всего: ${fmt(users.length)}</span>
+    </div>
+    <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,0.1);">
+      <table><thead><tr><th>Роль</th><th>Имя / Email</th><th>Школа</th><th>Кл.</th><th>Баллы</th><th>Ур.</th><th></th></tr></thead>
+      <tbody id="usersTbody"></tbody></table>
+    </div>
+    <div id="usersMsg" style="margin-top:10px;color:var(--muted);font-size:13px;"></div>`);
+
+  function renderRows(arr){
+    const t=$('usersTbody');if(!t)return;
+    t.innerHTML=arr.map(u=>`<tr>
+      <td><span class="pill ${u.role}">${u.role}</span></td>
+      <td><div style="font-weight:700;">${escapeHtml(u.nickname||u.full_name||'—')}</div><small>${escapeHtml(u.email||u.id||'')}</small></td>
+      <td><input class="input" data-f="school" data-id="${u.id}" value="${escapeHtml(u.school||'')}" style="min-width:150px;"/></td>
+      <td><input class="input" data-f="class" data-id="${u.id}" value="${escapeHtml(u.class||'')}" style="width:70px;"/></td>
+      <td><input class="input" data-f="points" data-id="${u.id}" value="${u.points||0}" style="width:90px;"/></td>
+      <td>${u.level||1}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn" data-act="save" data-id="${u.id}">&#128190;</button>
+        <button class="btn btn-danger" data-act="del" data-id="${u.id}">&#128465;</button>
+      </td></tr>`).join('');
+  }
+
+  function getFiltered(){
+    const q=($('userSearch')?.value||'').toLowerCase(),rf=$('roleFilter')?.value||'';
+    return users.filter(u=>{const h=`${u.nickname||''} ${u.full_name||''} ${u.email||''} ${u.school||''}`.toLowerCase();return(!q||h.includes(q))&&(!rf||u.role===rf);});
+  }
+
+  renderRows(getFiltered());
+  $('userSearch')?.addEventListener('input',()=>renderRows(getFiltered()));
+  $('roleFilter')?.addEventListener('change',()=>renderRows(getFiltered()));
+  $('refreshUsersBtn')?.addEventListener('click',renderUsers);
+
+  $('mainBody').addEventListener('click',async e=>{
+    const btn=e.target.closest('button[data-act]');if(!btn)return;
+    const act=btn.getAttribute('data-act'),id=btn.getAttribute('data-id');
+    if(act==='save'){
+      const row=btn.closest('tr'),updates={};
+      row.querySelectorAll('input[data-f]').forEach(inp=>{const f=inp.getAttribute('data-f');updates[f]=f==='points'?Number(inp.value):inp.value;});
+      try{await EcoBalaDB.updateUser(id,updates);showToast('&#10003; Сохранено');$('usersMsg').textContent='Данные обновлены.';}
+      catch(e){showToast('&#10007; Ошибка');}
+    }
+    if(act==='del'){
+      if(!confirm('Удалить пользователя?'))return;
+      try{await EcoBalaDB.deleteUser(id);showToast('&#10003; Удалён');renderUsers();}catch(e){showToast('&#10007; Ошибка');}
+    }
+  });
+}
+
+// ── Leaderboard ───────────────────────────────────────────────────────────
+async function renderLeaderboard(){
+  setMain('Рейтинг Kids & Teen',`<button class="btn" id="refreshLbBtn">&#128260;</button>`,`
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px;">
+      <div><h3 style="margin-bottom:10px;font-size:14px;color:var(--muted);">&#128118; Kids — Топ 20</h3><div id="lbKids">&#8230;</div></div>
+      <div><h3 style="margin-bottom:10px;font-size:14px;color:var(--muted);">&#129491; Teen — Топ 20</h3><div id="lbTeen">&#8230;</div></div>
+    </div>`);
+
+  async function loadLb(role,elId){
+    const el=document.getElementById(elId);
+    try{
+      const data=await EcoBalaDB.getLeaderboard(role);
+      if(!data.length){el.innerHTML='<p style="color:var(--muted)">Нет данных</p>';return;}
+      const medals=['&#127945;','&#129352;','&#129353;'];
+      el.innerHTML=`<div style="overflow:auto;border-radius:14px;border:1px solid rgba(255,255,255,0.1);">
+        <table><thead><tr><th>#</th><th>Имя</th><th>Школа</th><th>Кл.</th><th>Баллы</th></tr></thead>
+        <tbody>${data.slice(0,20).map((u,i)=>`<tr>
+          <td>${medals[i]||i+1}</td>
+          <td style="font-weight:700;">${escapeHtml(u.name||'—')}</td>
+          <td>${escapeHtml(u.school||'—')}</td>
+          <td>${escapeHtml(u.class||'—')}</td>
+          <td style="font-weight:700;color:var(--accent);">${fmt(u.points||0)}</td>
+        </tr>`).join('')}</tbody></table></div>`;
+    }catch(e){el.innerHTML='<p style="color:var(--danger)">Ошибка</p>';}
+  }
+  loadLb('kids','lbKids');loadLb('teen','lbTeen');
+  $('refreshLbBtn')?.addEventListener('click',()=>{loadLb('kids','lbKids');loadLb('teen','lbTeen');});
+}
+
+// ── School Rating ─────────────────────────────────────────────────────────
+async function renderSchoolRating(){
+  setMain('Рейтинг школ',`<button class="btn" id="refreshSchoolBtn">&#128260; Обновить</button>`,`<div id="schoolRatingBody">&#8230;</div>`);
+  async function load(){
+    const el=$('schoolRatingBody');
+    try{
+      const sb=_sb();
+      const {data,error}=await sb.from('users').select('school,points,role').not('school','is',null).neq('school','');
+      if(error)throw error;
+      const map={};
+      (data||[]).forEach(u=>{const s=(u.school||'').trim();if(!s)return;if(!map[s])map[s]={school:s,points:0,kids:0,teen:0};map[s].points+=Number(u.points||0);if(u.role==='kids')map[s].kids++;else map[s].teen++;});
+      const schools=Object.values(map).sort((a,b)=>b.points-a.points);
+      if(!schools.length){el.innerHTML='<p style="color:var(--muted)">Нет данных</p>';return;}
+      const medals=['&#127945;','&#129352;','&#129353;'];
+      el.innerHTML=`<div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,0.1);">
+        <table><thead><tr><th>#</th><th>Школа</th><th>Kids</th><th>Teen</th><th>Всего</th><th>Суммарный балл</th></tr></thead>
+        <tbody>${schools.map((s,i)=>`<tr>
+          <td style="font-size:${i<3?'20px':'13px'}">${medals[i]||i+1}</td>
+          <td style="font-weight:800;">&#127979; ${escapeHtml(s.school)}</td>
+          <td><span class="pill kids">${s.kids}</span></td>
+          <td><span class="pill teen">${s.teen}</span></td>
+          <td>${s.kids+s.teen}</td>
+          <td style="font-weight:900;color:var(--accent);font-size:16px;">${fmt(s.points)} pts</td>
+        </tr>`).join('')}</tbody></table></div>`;
+    }catch(e){el.innerHTML=`<p style="color:var(--danger)">Ошибка: ${escapeHtml(e.message)}</p>`;}
+  }
+  load();
+  $('refreshSchoolBtn')?.addEventListener('click',load);
+}
+
+// ── Kids Lessons ──────────────────────────────────────────────────────────
+function mapLesson(x){
+  return{
+    id:String(x.id||''),icon:String(x.icon||'&#128218;'),
+    title:typeof x.title==='object'?x.title:{ru:x.title||'',kz:x.title||''},
+    desc:typeof x.description==='object'?x.description:{ru:x.description||'',kz:''},
+    noteText:typeof x.note_text==='object'?x.note_text:{ru:x.note_text||'',kz:''},
+    youtubeUrl:x.youtube_url||'',points:x.points||50,
+    questions:Array.isArray(x.questions)?x.questions:[]
+  };
+}
+
+async function renderKidsLessons(){
+  let lessons=[];try{lessons=(await EcoBalaDB.getKidsLessons()).map(mapLesson);}catch(e){}
+
+  setMain('Kids: Уроки',`<button class="btn btn-primary" id="newLessonBtn">+ Новый урок</button>`,`
+    <div class="row" style="margin-bottom:12px;">
+      <input class="input" id="lessonSearch" placeholder="Поиск..." style="max-width:300px;"/>
+      <span class="pill kids">Уроков: ${fmt(lessons.length)}</span>
+    </div>
+    <div class="card" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.1);margin-bottom:14px;">
+      <div class="head"><h2 id="lessonFormTitle">Новый урок</h2></div>
+      <div class="body">
+        <div class="row">
+          <input class="input" id="lessonIcon" placeholder="Иконка" style="width:80px;"/>
+          <input class="input" id="lessonTitleRu" placeholder="Название (RU)" style="flex:1;"/>
+          <input class="input" id="lessonTitleKz" placeholder="Название (KZ)" style="flex:1;"/>
+          <input class="input" id="lessonPoints" type="number" placeholder="Баллы" style="width:110px;" value="50"/>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <input class="input" id="lessonDescRu" placeholder="Описание (RU)" style="flex:1;"/>
+          <input class="input" id="lessonDescKz" placeholder="Описание (KZ)" style="flex:1;"/>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <textarea class="input" id="lessonNoteRu" rows="4" placeholder="Конспект (RU)" style="flex:1;resize:vertical;"></textarea>
+          <textarea class="input" id="lessonNoteKz" rows="4" placeholder="Конспект (KZ)" style="flex:1;resize:vertical;"></textarea>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <input class="input" id="lessonYoutube" type="url" placeholder="YouTube ссылка" style="flex:1;"/>
+        </div>
+        <div style="height:10px;"></div>
+        <div class="kpi" style="min-height:auto;">
+          <div style="font-weight:800;margin-bottom:10px;">Тест — 10 вопросов, 3 варианта (A/B/C)</div>
+          <div id="quizBuilder"></div>
+        </div>
+        <div class="row" style="margin-top:12px;justify-content:flex-end;">
+          <div id="lessonMsg" style="color:var(--muted);font-size:13px;flex:1;"></div>
+          <button class="btn" id="lessonResetBtn">Очистить</button>
+          <button class="btn btn-primary" id="lessonSaveBtn">&#128190; Сохранить урок</button>
+        </div>
+      </div>
+    </div>
+    <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,0.1);">
+      <table><thead><tr><th>Урок</th><th>YouTube</th><th>Вопр.</th><th>Баллы</th><th></th></tr></thead>
+      <tbody id="lessonsTbody"></tbody></table>
+    </div>`);
+
+  // Build 10 quiz questions
+  const qb=$('quizBuilder');
+  if(qb){
+    qb.innerHTML='';
+    for(let i=0;i<10;i++){
+      const d=document.createElement('div');
+      d.className='kpi';d.style.minHeight='auto';d.style.marginBottom='10px';
+      d.innerHTML=`<div style="font-weight:800;margin-bottom:8px;">Вопрос ${i+1}</div>
+        <input class="input" data-q="${i}" data-f="tru" placeholder="Текст вопроса (RU)"/>
+        <div style="height:6px;"></div>
+        <input class="input" data-q="${i}" data-f="tkz" placeholder="Текст вопроса (KZ)"/>
+        <div style="height:6px;"></div>
+        <div class="row">
+          <input class="input" data-q="${i}" data-f="r0" placeholder="A (RU)" style="flex:1;"/>
+          <input class="input" data-q="${i}" data-f="r1" placeholder="B (RU)" style="flex:1;"/>
+          <input class="input" data-q="${i}" data-f="r2" placeholder="C (RU)" style="flex:1;"/>
+        </div>
+        <div style="height:6px;"></div>
+        <div class="row">
+          <input class="input" data-q="${i}" data-f="k0" placeholder="A (KZ)" style="flex:1;"/>
+          <input class="input" data-q="${i}" data-f="k1" placeholder="B (KZ)" style="flex:1;"/>
+          <input class="input" data-q="${i}" data-f="k2" placeholder="C (KZ)" style="flex:1;"/>
+        </div>
+        <div style="height:6px;"></div>
+        <div class="row">
+          <span class="pill">Правильный:</span>
+          <label><input type="radio" name="q${i}c" value="0" checked/> A</label>
+          <label><input type="radio" name="q${i}c" value="1"/> B</label>
+          <label><input type="radio" name="q${i}c" value="2"/> C</label>
+        </div>`;
+      qb.appendChild(d);
+    }
+  }
+
+  let editId='';
+  function resetForm(){
+    editId='';$('lessonFormTitle').textContent='Новый урок';
+    ['lessonIcon','lessonTitleRu','lessonTitleKz','lessonDescRu','lessonDescKz','lessonNoteRu','lessonNoteKz','lessonYoutube'].forEach(id=>{const el=$(id);if(el)el.value='';});
+    $('lessonIcon').value='&#128218;';$('lessonPoints').value='50';$('lessonMsg').textContent='';
+    document.querySelectorAll('#quizBuilder input[data-q]').forEach(i=>i.value='');
+    for(let i=0;i<10;i++){const r=document.querySelector(`input[name="q${i}c"][value="0"]`);if(r)r.checked=true;}
+  }
+
+  function fillForm(l){
+    editId=l.id;$('lessonFormTitle').textContent='Редактировать урок';
+    $('lessonIcon').value=l.icon||'&#128218;';$('lessonTitleRu').value=l.title?.ru||'';$('lessonTitleKz').value=l.title?.kz||'';
+    $('lessonDescRu').value=l.desc?.ru||'';$('lessonDescKz').value=l.desc?.kz||'';
+    $('lessonNoteRu').value=l.noteText?.ru||'';$('lessonNoteKz').value=l.noteText?.kz||'';
+    $('lessonYoutube').value=l.youtubeUrl||'';$('lessonPoints').value=l.points||50;
+    (l.questions||[]).forEach((q,i)=>{
+      const s=(f,v)=>{const el=document.querySelector(`#quizBuilder input[data-q="${i}"][data-f="${f}"]`);if(el)el.value=v||'';};
+      s('tru',q.text?.ru);s('tkz',q.text?.kz);
+      s('r0',q.options?.ru?.[0]);s('r1',q.options?.ru?.[1]);s('r2',q.options?.ru?.[2]);
+      s('k0',q.options?.kz?.[0]);s('k1',q.options?.kz?.[1]);s('k2',q.options?.kz?.[2]);
+      const r=document.querySelector(`input[name="q${i}c"][value="${q.correct||0}"]`);if(r)r.checked=true;
+    });
+  }
+
+  function collectDraft(){
+    const g=id=>$(id)?.value?.trim()||'';
+    const draft={id:editId||uid('lesson'),icon:g('lessonIcon')||'&#128218;',
+      title:{ru:g('lessonTitleRu'),kz:g('lessonTitleKz')},
+      description:{ru:g('lessonDescRu'),kz:g('lessonDescKz')},
+      note_text:{ru:g('lessonNoteRu'),kz:g('lessonNoteKz')},
+      youtube_url:g('lessonYoutube'),points:Number($('lessonPoints')?.value||50),questions:[]};
+    for(let i=0;i<10;i++){
+      const gq=f=>document.querySelector(`#quizBuilder input[data-q="${i}"][data-f="${f}"]`)?.value?.trim()||'';
+      draft.questions.push({id:`q${i+1}`,text:{ru:gq('tru'),kz:gq('tkz')},
+        options:{ru:[gq('r0'),gq('r1'),gq('r2')],kz:[gq('k0'),gq('k1'),gq('k2')]},
+        correct:Number(document.querySelector(`input[name="q${i}c"]:checked`)?.value||0)});
+    }
+    return draft;
+  }
+
+  function validate(d){
+    if(!d.title.ru)return'Введите название (RU)';if(!d.title.kz)return'Введите название (KZ)';
+    if(!d.description.ru)return'Введите описание (RU)';if(!d.description.kz)return'Введите описание (KZ)';
+    if(!d.note_text.ru)return'Введите конспект (RU)';if(!d.note_text.kz)return'Введите конспект (KZ)';
+    for(let i=0;i<10;i++){
+      const q=d.questions[i];
+      if(!q.text.ru)return`Вопрос ${i+1}: заполните текст (RU)`;
+      if(!q.text.kz)return`Вопрос ${i+1}: заполните текст (KZ)`;
+      if(q.options.ru.some(o=>!o))return`Вопрос ${i+1}: все варианты (RU)`;
+      if(q.options.kz.some(o=>!o))return`Вопрос ${i+1}: все варианты (KZ)`;
+    }
+    return null;
+  }
+
+  function renderTable(arr){
+    const t=$('lessonsTbody');if(!t)return;
+    t.innerHTML=arr.map(l=>`<tr>
+      <td><div style="font-weight:800;">${escapeHtml(l.icon)} ${escapeHtml(l.title?.ru||'—')}</div><small>${escapeHtml(l.title?.kz||'')}</small></td>
+      <td><small>${l.youtubeUrl?escapeHtml(l.youtubeUrl.slice(0,40))+'&#8230;':'—'}</small></td>
+      <td>${(l.questions||[]).length}/10</td>
+      <td>${l.points||0} pts</td>
+      <td style="white-space:nowrap;">
+        <button class="btn" data-act="edit" data-id="${l.id}">&#9998;&#65039;</button>
+        <button class="btn btn-danger" data-act="del" data-id="${l.id}">&#128465;</button>
+      </td></tr>`).join('');
+  }
+
+  resetForm();renderTable(lessons);
+  $('newLessonBtn')?.addEventListener('click',resetForm);
+  $('lessonResetBtn')?.addEventListener('click',resetForm);
+  $('lessonSearch')?.addEventListener('input',e=>{const q=e.target.value.toLowerCase();renderTable(lessons.filter(l=>(l.title?.ru+' '+l.title?.kz).toLowerCase().includes(q)));});
+
+  $('lessonSaveBtn')?.addEventListener('click',async()=>{
+    const draft=collectDraft(),err=validate(draft);
+    if(err){$('lessonMsg').textContent=err;return;}
+    try{await EcoBalaDB.saveKidsLesson(draft);showToast('&#10003; Урок сохранён в Supabase');renderKidsLessons();}
+    catch(e){$('lessonMsg').textContent='Ошибка: '+e.message;}
+  });
+
+  $('mainBody').addEventListener('click',async e=>{
+    const btn=e.target.closest('button[data-act]');if(!btn)return;
+    const act=btn.getAttribute('data-act'),id=btn.getAttribute('data-id');
+    if(act==='edit'){const arr=await EcoBalaDB.getKidsLessons();const l=arr.find(x=>String(x.id)===id);if(l){fillForm(mapLesson(l));window.scrollTo({top:0,behavior:'smooth'});}}
+    if(act==='del'){if(!confirm('Удалить урок?'))return;await EcoBalaDB.deleteKidsLesson(id);showToast('&#10003; Удалён');renderKidsLessons();}
+  });
+}
+
+// ── Kids Games ────────────────────────────────────────────────────────────
+async function renderKidsGames(){
+  let games=[];try{games=await EcoBalaDB.getKidsGames();}catch(e){}
+  setMain('Kids: Игры',`<button class="btn btn-primary" id="newGameBtn">+ Новая</button>`,`
+    <div class="card" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.1);margin-bottom:14px;">
+      <div class="head"><h2>Создание / редактирование</h2></div>
+      <div class="body">
+        <div class="row">
+          <input class="input" id="gameIcon" placeholder="Иконка" style="width:80px;"/><input class="input" id="gameTitleRu" placeholder="Название (RU)" style="flex:1;"/><input class="input" id="gameTitleKz" placeholder="Название (KZ)" style="flex:1;"/>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <input class="input" id="gameDescRu" placeholder="Описание (RU)" style="flex:1;"/><input class="input" id="gameDescKz" placeholder="Описание (KZ)" style="flex:1;"/>
+        </div>
+        <div class="row" style="margin-top:10px;justify-content:flex-end;">
+          <span id="gameMsg" style="color:var(--muted);font-size:13px;flex:1;"></span>
+          <button class="btn" id="gameResetBtn">Очистить</button><button class="btn btn-primary" id="gameSaveBtn">&#128190; Сохранить</button>
+        </div>
+      </div>
+    </div>
+    <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,0.1);">
+      <table><thead><tr><th>Игра</th><th></th></tr></thead><tbody id="gamesTbody"></tbody></table>
+    </div>`);
+
+  let editGameId='';
+  const resetGame=()=>{editGameId='';['gameIcon','gameTitleRu','gameTitleKz','gameDescRu','gameDescKz'].forEach(id=>{const el=$(id);if(el)el.value='';});$('gameIcon').value='&#127918;';};
+  $('gamesTbody').innerHTML=games.map(g=>`<tr><td><strong>${escapeHtml(g.icon||'&#127918;')}</strong> ${escapeHtml(g.title?.ru||g.title||'—')}</td>
+    <td style="white-space:nowrap;"><button class="btn" data-act="edit" data-id="${g.id}">&#9998;</button><button class="btn btn-danger" data-act="del" data-id="${g.id}">&#128465;</button></td></tr>`).join('');
+  $('newGameBtn')?.addEventListener('click',resetGame);$('gameResetBtn')?.addEventListener('click',resetGame);
+  $('gameSaveBtn')?.addEventListener('click',async()=>{
+    const draft={id:editGameId||uid('game'),icon:$('gameIcon')?.value||'&#127918;',title:{ru:$('gameTitleRu')?.value?.trim(),kz:$('gameTitleKz')?.value?.trim()},description:{ru:$('gameDescRu')?.value?.trim(),kz:$('gameDescKz')?.value?.trim()}};
+    if(!draft.title.ru){$('gameMsg').textContent='Введите название (RU)';return;}
+    try{await EcoBalaDB.saveKidsGame(draft);showToast('&#10003; Игра сохранена');renderKidsGames();}catch(e){$('gameMsg').textContent='Ошибка: '+e.message;}
+  });
+  $('mainBody').addEventListener('click',async e=>{
+    const btn=e.target.closest('button[data-act]');if(!btn)return;
+    const act=btn.getAttribute('data-act'),id=btn.getAttribute('data-id');
+    if(act==='edit'){const g=games.find(x=>String(x.id)===id);if(g){editGameId=g.id;$('gameIcon').value=g.icon||'&#127918;';$('gameTitleRu').value=g.title?.ru||'';$('gameTitleKz').value=g.title?.kz||'';$('gameDescRu').value=g.description?.ru||'';$('gameDescKz').value=g.description?.kz||'';}}
+    if(act==='del'){if(!confirm('Удалить?'))return;await EcoBalaDB.deleteKidsGame(id);showToast('&#10003; Удалено');renderKidsGames();}
+  });
+}
+
+// ── Teen Quests ───────────────────────────────────────────────────────────
+function mapQuest(x){return{id:String(x.id||''),icon:x.icon||'&#129513;',title:typeof x.title==='object'?x.title:{ru:x.title||'',kz:''},desc:typeof x.description==='object'?x.description:{ru:x.description||'',kz:''},address:typeof x.address==='object'?x.address:{ru:x.address||'',kz:''},geo:x.geo||null,points:Number(x.points||0),deadlineHours:Number(x.deadline_hours||x.deadlineHours||72),isNew:!!x.is_new,repeatable:x.repeatable!==false};}
+
+async function renderTeenQuests(){
+  let quests=[];try{quests=(await EcoBalaDB.getTeenQuests()).map(mapQuest);}catch(e){}
+  setMain('Teen: Квесты',`<button class="btn btn-primary" id="newQuestBtn">+ Новый квест</button>`,`
+    <div class="row" style="margin-bottom:12px;">
+      <input class="input" id="questSearch" placeholder="Поиск..." style="max-width:300px;"/>
+      <span class="pill teen">Квестов: ${fmt(quests.length)}</span>
+    </div>
+    <div class="card" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.1);margin-bottom:14px;">
+      <div class="head"><h2 id="questFormTitle">Новый квест</h2></div>
+      <div class="body">
+        <div class="row">
+          <input class="input" id="questIcon" placeholder="Иконка" style="width:80px;"/>
+          <input class="input" id="questTitleRu" placeholder="Название (RU)" style="flex:1;"/>
+          <input class="input" id="questTitleKz" placeholder="Название (KZ)" style="flex:1;"/>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <textarea class="input" id="questDescRu" rows="3" placeholder="Описание (RU)" style="flex:1;resize:vertical;"></textarea>
+          <textarea class="input" id="questDescKz" rows="3" placeholder="Описание (KZ)" style="flex:1;resize:vertical;"></textarea>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <input class="input" id="questAddressRu" placeholder="Место (RU)" style="flex:1;"/>
+          <input class="input" id="questAddressKz" placeholder="Орын (KZ)" style="flex:1;"/>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <input class="input" id="questPoints" type="number" placeholder="Баллы" style="width:120px;" min="0" step="10"/>
+          <input class="input" id="questDeadlineH" type="number" placeholder="Дедлайн (ч)" style="width:150px;" value="72" min="1"/>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);"><input type="checkbox" id="questIsNew" checked/> Новый</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);"><input type="checkbox" id="questRep" checked/> Повторяемый</label>
+        </div>
+        <div style="margin-top:10px;"><span class="pill">&#128205; Кликни на карте — отметить место квеста</span></div>
+        <div id="questMapAdmin" style="width:100%;height:240px;border-radius:14px;border:1px solid rgba(255,255,255,0.2);margin-top:8px;"></div>
+        <div class="row" style="margin-top:10px;justify-content:flex-end;">
+          <div id="questMsg" style="color:var(--muted);font-size:13px;flex:1;"></div>
+          <button class="btn" id="questResetBtn">Очистить</button>
+          <button class="btn btn-primary" id="questSaveBtn">&#128190; Сохранить квест</button>
+        </div>
+      </div>
+    </div>
+    <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,0.1);">
+      <table><thead><tr><th>Квест</th><th>Место</th><th>Баллы</th><th>Дедлайн</th><th></th></tr></thead><tbody id="questsTbody"></tbody></table>
+    </div>`);
+
+  let editQuestId='',questGeo=null,questMap=null,questMarker=null;
+  function initQMap(){
+    const el=document.getElementById('questMapAdmin');
+    if(!el||!window.L||questMap)return;
+    questMap=L.map(el).setView([50.2567,58.4365],11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM'}).addTo(questMap);
+    questMap.on('click',ev=>{questGeo={lat:ev.latlng.lat,lng:ev.latlng.lng};if(questMarker)questMap.removeLayer(questMarker);questMarker=L.marker([questGeo.lat,questGeo.lng]).addTo(questMap);});
+  }
+
+  function resetQuest(){
+    editQuestId='';questGeo=null;$('questFormTitle').textContent='Новый квест';
+    ['questIcon','questTitleRu','questTitleKz','questDescRu','questDescKz','questAddressRu','questAddressKz'].forEach(id=>{const el=$(id);if(el)el.value='';});
+    $('questIcon').value='&#129513;';$('questPoints').value='';$('questDeadlineH').value='72';
+    $('questIsNew').checked=true;$('questRep').checked=true;$('questMsg').textContent='';
+    if(questMarker&&questMap){questMap.removeLayer(questMarker);questMarker=null;}
+  }
+  function fillQuest(q){
+    editQuestId=q.id;$('questFormTitle').textContent='Редактировать';$('questIcon').value=q.icon;
+    $('questTitleRu').value=q.title?.ru||'';$('questTitleKz').value=q.title?.kz||'';
+    $('questDescRu').value=q.desc?.ru||'';$('questDescKz').value=q.desc?.kz||'';
+    $('questAddressRu').value=q.address?.ru||'';$('questAddressKz').value=q.address?.kz||'';
+    $('questPoints').value=q.points||'';$('questDeadlineH').value=q.deadlineHours||72;
+    $('questIsNew').checked=!!q.isNew;$('questRep').checked=q.repeatable!==false;
+    questGeo=q.geo||null;if(questMap&&questGeo){if(questMarker)questMap.removeLayer(questMarker);questMarker=L.marker([questGeo.lat,questGeo.lng]).addTo(questMap);questMap.setView([questGeo.lat,questGeo.lng],14);}
+  }
+
+  function renderQTable(arr){
+    const t=$('questsTbody');if(!t)return;
+    t.innerHTML=arr.map(q=>`<tr>
+      <td><div style="font-weight:800;">${escapeHtml(q.icon)} ${escapeHtml(q.title?.ru||'—')}</div><small>${escapeHtml(q.desc?.ru?.slice(0,60)||'')}</small></td>
+      <td><small>${escapeHtml(q.address?.ru||'—')}</small>${q.geo?'<br><span class="pill">&#128205;</span>':''}</td>
+      <td>${fmt(q.points)}</td>
+      <td>${q.deadlineHours}ч</td>
+      <td style="white-space:nowrap;"><button class="btn" data-act="edit" data-id="${q.id}">&#9998;</button><button class="btn btn-danger" data-act="del" data-id="${q.id}">&#128465;</button></td>
+    </tr>`).join('');
+  }
+
+  setTimeout(initQMap,200);resetQuest();renderQTable(quests);
+  $('newQuestBtn')?.addEventListener('click',resetQuest);$('questResetBtn')?.addEventListener('click',resetQuest);
+  $('questSearch')?.addEventListener('input',e=>{const q=e.target.value.toLowerCase();renderQTable(quests.filter(x=>(x.title?.ru+' '+x.title?.kz+' '+x.desc?.ru).toLowerCase().includes(q)));});
+
+  $('questSaveBtn')?.addEventListener('click',async()=>{
+    const g=id=>$(id)?.value?.trim()||'';
+    const draft={id:editQuestId||uid('quest'),icon:g('questIcon')||'&#129513;',
+      title:{ru:g('questTitleRu'),kz:g('questTitleKz')},description:{ru:g('questDescRu'),kz:g('questDescKz')},
+      address:{ru:g('questAddressRu'),kz:g('questAddressKz')},geo:questGeo,
+      points:Number($('questPoints')?.value||0),deadline_hours:Number($('questDeadlineH')?.value||72),
+      is_new:$('questIsNew')?.checked,repeatable:$('questRep')?.checked!==false,is_active:true};
+    if(!draft.title.ru){$('questMsg').textContent='Введите название (RU)';return;}
+    if(!draft.title.kz){$('questMsg').textContent='Введите название (KZ)';return;}
+    if(!draft.points){$('questMsg').textContent='Укажите баллы';return;}
+    try{await EcoBalaDB.saveTeenQuest(draft);showToast('&#10003; Квест сохранён');renderTeenQuests();}
+    catch(e){$('questMsg').textContent='Ошибка: '+e.message;}
+  });
+
+  $('mainBody').addEventListener('click',async e=>{
+    const btn=e.target.closest('button[data-act]');if(!btn)return;
+    const act=btn.getAttribute('data-act'),id=btn.getAttribute('data-id');
+    if(act==='edit'){const q=quests.find(x=>x.id===id);if(q){fillQuest(q);window.scrollTo({top:0,behavior:'smooth'});}}
+    if(act==='del'){if(!confirm('Удалить квест?'))return;await EcoBalaDB.deleteTeenQuest(id);showToast('&#10003; Удалён');renderTeenQuests();}
+  });
+}
+
+// ── Teen Reports ──────────────────────────────────────────────────────────
+async function renderTeenReports(){
+  let reports=[];try{reports=(await EcoBalaDB.getTeenReports())||[];}catch(e){}
+
+  const cnt=s=>reports.filter(r=>r.status===s).length;
+  setMain('Teen: Отчёты','',`
+    <div class="row" style="margin-bottom:12px;">
+      <select class="input" id="rFilter" style="width:230px;">
+        <option value="">Все (${reports.length})</option>
+        <option value="pending">&#9203; Ожидают (${cnt('pending')})</option>
+        <option value="approved">&#10003; Одобрено (${cnt('approved')})</option>
+        <option value="rejected">&#10007; Отклонено (${cnt('rejected')})</option>
+      </select>
+      <span class="pill teen">Teen отчёты</span>
+    </div>
+    <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,0.1);max-height:520px;">
+      <table><thead><tr><th>Пользователь</th><th>Квест</th><th>Дата</th><th>Описание</th><th>Фото</th><th>Статус</th><th></th></tr></thead>
+      <tbody id="reportsTbody"></tbody></table>
+    </div>
+    <div id="rMsg" style="margin-top:10px;color:var(--muted);font-size:13px;"></div>`);
+
+  function pill(s){const cfg={pending:['&#9203; Ожидает','rgba(255,207,90,0.2)'],approved:['&#10003; Одобрено','rgba(46,204,113,0.2)'],rejected:['&#10007; Отклонено','rgba(255,92,122,0.2)']};const[l,bg]=cfg[s]||['—',''];return`<span class="pill" style="background:${bg}">${l}</span>`;}
+
+  function renderRows(arr){
+    const t=$('reportsTbody');if(!t)return;
+    t.innerHTML=arr.map(r=>{
+      const photos=[r.photo_url,...(r.photo_urls||[])].filter(Boolean);
+      const dt=r.created_at?new Date(r.created_at).toLocaleDateString('ru-RU'):'—';
+      return`<tr>
+        <td><small>${escapeHtml((r.user_id||'').slice(0,8))}&#8230;</small></td>
+        <td><small>${escapeHtml((r.quest_id||'').slice(0,12))}</small></td>
+        <td><small>${dt}</small></td>
+        <td><small>${escapeHtml((r.description||r.text||'').slice(0,80))}</small></td>
+        <td>${photos.map(u=>`<a href="${escapeHtml(u)}" target="_blank" class="pill">&#128247;</a>`).join(' ')||'—'}</td>
+        <td>${pill(r.status)}</td>
+        <td style="white-space:nowrap;">
+          <button class="btn" data-act="approve" data-id="${r.id}">&#10003;</button>
+          <button class="btn btn-danger" data-act="reject" data-id="${r.id}">&#10007;</button>
+          <button class="btn" data-act="del" data-id="${r.id}">&#128465;</button>
+        </td></tr>`;}).join('');
+  }
+
+  function applyFilter(){const f=$('rFilter')?.value||'';renderRows(f?reports.filter(r=>r.status===f):reports);}
+  applyFilter();
+  $('rFilter')?.addEventListener('change',applyFilter);
+
+  $('mainBody').addEventListener('click',async e=>{
+    const btn=e.target.closest('button[data-act]');if(!btn)return;
+    const act=btn.getAttribute('data-act'),id=btn.getAttribute('data-id');
+    try{
+      if(act==='approve'){
+        await EcoBalaDB.saveTeenReport({id,status:'approved'});
+        const rep=reports.find(x=>x.id===id);
+        if(rep){
+          rep.status='approved';
+          // Начислить баллы
+          const sb=_sb();
+          if(sb&&rep.user_id&&rep.quest_id){
+            const{data:quest}=await sb.from('teen_quests').select('points').eq('id',rep.quest_id).single();
+            if(quest?.points){const{data:user}=await sb.from('users').select('points').eq('id',rep.user_id).single();if(user)await sb.from('users').update({points:(user.points||0)+quest.points}).eq('id',rep.user_id);}
+          }
+        }
+        showToast('&#10003; Одобрено + баллы начислены');
+      }
+      if(act==='reject'){
+        const reason=window.prompt('Причина отклонения:','')||'';
+        await EcoBalaDB.saveTeenReport({id,status:'rejected',admin_comment:reason});
+        const rep=reports.find(x=>x.id===id);if(rep)rep.status='rejected';
+        showToast('&#10007; Отклонено');
+      }
+      if(act==='del'){
+        if(!confirm('Удалить отчёт?'))return;
+        await EcoBalaDB.deleteTeenReport(id);reports.splice(reports.findIndex(x=>x.id===id),1);showToast('&#10003; Удалён');
+      }
+      applyFilter();
+    }catch(e){$('rMsg').textContent='Ошибка: '+e.message;}
+  });
+}
+
+// ── Supabase Data ─────────────────────────────────────────────────────────
+async function renderSupabaseData(){
+  setMain('Данные БД',`<button class="btn" id="exportCsvBtn">&#8681; CSV</button>`,`
+    <div class="row" style="margin-bottom:14px;gap:8px;">
+      <button class="btn" data-table="users">&#128101; Пользователи</button>
+      <button class="btn" data-table="teen_quests">&#129513; Квесты</button>
+      <button class="btn" data-table="teen_reports">&#129534; Отчёты</button>
+      <button class="btn" data-table="kids_lessons">&#128218; Уроки</button>
+    </div>
+    <div id="dbStatus" style="color:var(--muted);margin-bottom:12px;">Выберите таблицу</div>
+    <div id="dbContainer" style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,0.1);min-height:160px;"></div>`);
+
+  window._tData=null;
+  document.querySelectorAll('[data-table]').forEach(btn=>btn.addEventListener('click',()=>loadTable(btn.getAttribute('data-table'))));
+  $('exportCsvBtn')?.addEventListener('click',exportCsv);
+
+  async function loadTable(name){
+    const st=$('dbStatus'),ct=$('dbContainer');
+    st.textContent=`&#8987; Загрузка ${name}&#8230;`;st.style.color='var(--accent2)';
+    try{
+      const sb=_sb();const{data,error}=await sb.from(name).select('*').limit(500);
+      if(error)throw error;
+      window._tData={name,data:data||[]};
+      st.textContent=`&#10003; ${(data||[]).length} записей из ${name}`;st.style.color='var(--accent)';
+      if(!data?.length){ct.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted);">Пусто</div>';return;}
+      const cols=Object.keys(data[0]);
+      ct.innerHTML=`<table><thead><tr><th>#</th>${cols.map(c=>`<th>${escapeHtml(c)}</th>`).join('')}</tr></thead>
+        <tbody>${data.map((row,i)=>`<tr><td style="color:var(--accent);font-weight:700;">${i+1}</td>${cols.map(c=>{let v=row[c];if(v===null||v===undefined)return'<td><span style="color:var(--muted);">—</span></td>';if(typeof v==='object')v='[JSON]';v=String(v);if(v.length>80)v=v.slice(0,80)+'&#8230;';return`<td>${escapeHtml(v)}</td>`;}).join('')}</tr>`).join('')}</tbody></table>`;
+    }catch(e){st.textContent='Ошибка: '+e.message;st.style.color='var(--danger)';}
+  }
+
+  function exportCsv(){
+    if(!window._tData){alert('Сначала загрузите таблицу');return;}
+    const{name,data}=window._tData;if(!data.length){alert('Нет данных');return;}
+    const cols=Object.keys(data[0]);
+    const csv=[cols.join(','),...data.map(row=>cols.map(c=>{let v=row[c]??'';if(typeof v==='object')v=JSON.stringify(v);v=String(v).replace(/"/g,'""');return v.includes(',')||v.includes('\n')?`"${v}"`:v;}).join(','))].join('\n');
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}));
+    a.download=`ecobala_${name}_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+  }
+}
+
+// ── Banners ───────────────────────────────────────────────────────────────
+async function renderBanners(){
+  setMain('&#128444;&#65039; Баннеры сайта',`<button class="btn btn-primary" onclick="openBannerForm(null)">+ Добавить</button>`,`
+    <p style="color:var(--muted);font-size:13px;margin-bottom:14px;">Видео и фото на главной странице.</p>
+    <div id="bannersGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;"></div>
+    <div id="bannerFormWrap" style="display:none;margin-top:20px;"></div>`);
+  loadBanners();
+}
+
+async function loadBanners(){
+  const g=$('bannersGrid');if(!g)return;
+  g.innerHTML='<div style="color:var(--muted);">&#8987; Загружаем...</div>';
+  try{
+    const sb=_sb();const{data,error}=await sb.from('site_banners').select('*').order('sort_order').order('created_at',{ascending:false});
+    if(error)throw error;
+    if(!data?.length){g.innerHTML='<div style="color:var(--muted);padding:20px;text-align:center;">Нет баннеров</div>';return;}
+    g.innerHTML=data.map(b=>{
+      const title=typeof b.title==='object'?b.title.ru:(b.title||'—');
+      const ytId=b.youtube_url?(b.youtube_url.match(/(?:v=|embed\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/)||[])[1]:'';
+      const thumb=ytId?`https://img.youtube.com/vi/${ytId}/mqdefault.jpg`:(b.image_url||'');
+      const bJson=JSON.stringify(b).replace(/'/g,'&apos;');
+      return`<div class="card" style="padding:0;overflow:hidden;">
+        ${thumb?`<img src="${thumb}" style="width:100%;aspect-ratio:16/9;object-fit:cover;">`:`<div style="width:100%;aspect-ratio:16/9;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;font-size:40px;">${b.type==='video'?'&#127908;':'&#128444;&#65039;'}</div>`}
+        <div style="padding:12px;">
+          <div style="font-weight:800;font-size:14px;margin-bottom:4px;">${escapeHtml(title)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">${b.type==='video'?'YouTube':'Изображение'} &bull; ${b.is_active?'&#10003; Активен':'&#9646; Скрыт'}</div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn" onclick='openBannerForm(${bJson.replace(/&apos;/g,"'")} )' style="flex:1;font-size:12px;">&#9998;</button>
+            <button class="btn" onclick="toggleBanner('${b.id}',${!b.is_active})" style="font-size:12px;">${b.is_active?'&#9646;':'&#9654;'}</button>
+            <button class="btn btn-danger" onclick="deleteBanner('${b.id}')" style="font-size:12px;">&#128465;</button>
+          </div>
+        </div>
+      </div>`;}).join('');
+  }catch(e){g.innerHTML=`<div style="color:var(--danger);padding:20px;">Ошибка: ${escapeHtml(e.message)}</div>`;}
+}
+
+let bannerEditId=null;
+window.openBannerForm=function(item){
+  bannerEditId=item?.id||null;
+  const wrap=$('bannerFormWrap');if(!wrap)return;
+  wrap.style.display='block';
+  const tr=item?.title,tRu=typeof tr==='object'?tr.ru:(tr||''),tKz=typeof tr==='object'?tr.kz:'';
+  wrap.innerHTML=`<div class="card"><div class="head"><h3>${item?'Редактировать':'Добавить'} баннер</h3></div>
+    <div class="body" style="display:grid;gap:12px;">
+      <div style="display:flex;gap:8px;">
+        <button id="bVid" class="btn btn-primary" onclick="setBT('video')" style="flex:1;">&#127908; YouTube</button>
+        <button id="bImg" class="btn" onclick="setBT('image')" style="flex:1;">&#128444; Изображение</button>
+      </div>
+      <input id="bRu" class="inp" value="${escapeHtml(tRu)}" placeholder="Заголовок (RU)"/>
+      <input id="bKz" class="inp" value="${escapeHtml(tKz)}" placeholder="Заголовок (KZ)"/>
+      <div id="bVF"><input id="bYt" class="inp" value="${escapeHtml(item?.youtube_url||'')}" placeholder="YouTube ссылка"/></div>
+      <div id="bIF" style="display:none;"><input id="bIu" class="inp" value="${escapeHtml(item?.image_url||'')}" placeholder="URL изображения"/></div>
+      <div style="display:flex;gap:8px;">
+        <input id="bTag" class="inp" value="${escapeHtml(item?.tag||'Kids')}" placeholder="Тег" style="flex:1;"/>
+        <input id="bDur" class="inp" value="${escapeHtml(item?.duration||'')}" placeholder="Длит." style="flex:1;"/>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary" onclick="saveBanner()" style="flex:1;">&#128190; Сохранить</button>
+        <button class="btn" onclick="document.getElementById('bannerFormWrap').style.display='none'">Отмена</button>
+      </div>
+    </div></div>`;
+  if(item?.type==='image')setBT('image');
+};
+window.setBT=function(type){$('bVF').style.display=type==='video'?'':'none';$('bIF').style.display=type==='image'?'':'none';$('bVid').className='btn'+(type==='video'?' btn-primary':'');$('bImg').className='btn'+(type==='image'?' btn-primary':'');};
+window.saveBanner=async function(){
+  const tRu=$('bRu')?.value.trim();if(!tRu){alert('Введите заголовок');return;}
+  const isV=$('bVF')?.style.display!=='none';
+  const rec={title:{ru:tRu,kz:$('bKz')?.value.trim()||tRu},type:isV?'video':'image',youtube_url:isV?($('bYt')?.value.trim()||null):null,image_url:!isV?($('bIu')?.value.trim()||null):null,tag:$('bTag')?.value.trim()||'Kids',duration:$('bDur')?.value.trim()||null,is_active:true};
+  try{const sb=_sb();if(bannerEditId){await sb.from('site_banners').update(rec).eq('id',bannerEditId);}else{await sb.from('site_banners').insert([rec]);}
+  $('bannerFormWrap').style.display='none';showToast('&#10003; Баннер сохранён');await loadBanners();}catch(e){alert('Ошибка: '+e.message);}
+};
+window.toggleBanner=async function(id,active){const sb=_sb();await sb.from('site_banners').update({is_active:active}).eq('id',id);loadBanners();};
+window.deleteBanner=async function(id){if(!confirm('Удалить баннер?'))return;const sb=_sb();await sb.from('site_banners').delete().eq('id',id);loadBanners();};
+
+// ── Router ────────────────────────────────────────────────────────────────
+function setTab(tab){
+  document.querySelectorAll('#tabs .tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===tab));
+  if(tab!=='dashboard')destroyCharts();
+  const map={dashboard:renderDashboard,users:renderUsers,kids_lessons:renderKidsLessons,kids_games:renderKidsGames,teen_quests:renderTeenQuests,teen_reports:renderTeenReports,leaderboard:renderLeaderboard,school_rating:renderSchoolRating,supabase_data:renderSupabaseData,banners:renderBanners};
+  if(map[tab])map[tab]();
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────
+async function boot(){
+  const ok=await checkAuth();
+  setLoggedInUI(ok);
+  if(!ok)return;
+  $('adminSubtitle').textContent='Dashboard \u2022 Supabase';
+  document.querySelectorAll('#tabs .tab').forEach(el=>el.addEventListener('click',()=>setTab(el.dataset.tab)));
+  renderDashboard();
+}
+
+$('goHomeBtn')?.addEventListener('click',()=>location.href='index.html');
+$('logoutBtn')?.addEventListener('click',logout);
+$('loginBtn')?.addEventListener('click',login);
+$('passInput')?.addEventListener('keydown',e=>{if(e.key==='Enter')login();});
+$('loginInput')?.addEventListener('keydown',e=>{if(e.key==='Enter')login();});
+
+(function(){
+  const b=$('adminBanner'),c=$('adminBannerClose'),K='ecobalaAdminBannerHidden';
+  if(!b||!c)return;
+  if(localStorage.getItem(K)==='1')b.style.display='none';
+  c.addEventListener('click',()=>{localStorage.setItem(K,'1');b.style.display='none';});
+})();
+
+boot();
+
+// ── Leaf cursor ───────────────────────────────────────────────────────────
+(function(){
+  const el=$('leafCursor');if(!el)return;
+  let mx=-100,my=-100,cx=-100,cy=-100,rot=-30;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+  document.addEventListener('mouseleave',()=>el.style.opacity='0');
+  document.addEventListener('mouseenter',()=>el.style.opacity='1');
+  (function a(){cx+=(mx-cx)*0.25;cy+=(my-cy)*0.25;el.style.left=cx+'px';el.style.top=cy+'px';requestAnimationFrame(a);})();
+  document.addEventListener('mousedown',()=>{rot+=45;el.style.transform=`translate(-50%,-50%) rotate(${rot}deg) scale(1.3)`;});
+  document.addEventListener('mouseup',()=>{el.style.transform=`translate(-50%,-50%) rotate(${rot}deg) scale(1)`;});
+  document.addEventListener('mouseover',e=>{if(e.target.matches('button,a,.tab,.btn')){el.style.transform=`translate(-50%,-50%) rotate(${rot+20}deg) scale(1.2)`;el.style.filter='brightness(1.3)';}});
+  document.addEventListener('mouseout',e=>{if(e.target.matches('button,a,.tab,.btn')){el.style.transform=`translate(-50%,-50%) rotate(${rot}deg) scale(1)`;el.style.filter='';}});
+})();
+</script>
+</body>
+</html>

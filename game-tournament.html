@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>EcoBala — Эко-чемпион</title>
+<link rel="icon" href="iconca.jpg" type="image/jpeg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Unbounded:wght@700;900&family=Noto+Sans:wght@400;700;800&display=swap&subset=cyrillic,cyrillic-ext" rel="stylesheet">
+<style>
+*, body { font-family: 'Nunito', 'Noto Sans', sans-serif; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --g: #2E7D32; --gd: #1B5E20; --gm: #43A047; --gl: #C8E6C9; --gp: #E8F5E9;
+  --b: #1565C0; --bl: #E3F2FD; --amber: #F57F17; --ambl: #FFF8E1;
+  --red: #C62828; --redl: #FFEBEE;
+  --gold: #F9A825; --silver: #90A4AE; --bronze: #A1887F;
+  --text: #1a2e1a; --muted: #5a7a5a; --white: #fff;
+  --r: 14px;
+}
+
+html, body { height: 100%; overflow: hidden; background: linear-gradient(160deg, #0D1F0D 0%, #1B3A1B 60%, #0F2A1F 100%); }
+
+/* ── SCREENS ── */
+.screen { display: none; position: fixed; inset: 0; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+.screen.active { display: flex; }
+
+/* ── SETUP SCREEN ── */
+#setupScreen {
+  background: linear-gradient(160deg, #0D1F0D, #1B3A1B);
+}
+.setup-card {
+  background: rgba(255,255,255,0.07); border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: 24px; padding: 40px 36px; width: 100%; max-width: 620px;
+  backdrop-filter: blur(10px);
+}
+.game-logo {
+  text-align: center; margin-bottom: 32px;
+}
+.game-logo-icon { font-size: 52px; margin-bottom: 8px; }
+.game-logo-title {
+  font-family: 'Unbounded', 'Noto Sans', sans-serif;
+  font-size: clamp(22px, 4vw, 32px); font-weight: 900;
+  color: #fff; text-shadow: 0 2px 20px rgba(46,204,113,0.5);
+}
+.game-logo-sub { font-size: 14px; color: rgba(255,255,255,0.6); margin-top: 4px; font-weight: 600; }
+
+.setup-label { font-size: 13px; font-weight: 800; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+.teams-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.team-input-wrap { position: relative; }
+.team-color-dot { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; border-radius: 50%; }
+.team-input {
+  width: 100%; padding: 12px 14px 12px 34px; border-radius: 12px;
+  border: 1.5px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08);
+  color: #fff; font-family: 'Nunito','Noto Sans',sans-serif; font-size: 14px; font-weight: 700;
+  outline: none; transition: all 0.2s;
+}
+.team-input::placeholder { color: rgba(255,255,255,0.35); }
+.team-input:focus { border-color: rgba(46,204,113,0.6); background: rgba(255,255,255,0.12); }
+
+.q-count-row { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+.q-btn {
+  padding: 8px 18px; border-radius: 50px; border: 1.5px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7);
+  font-family: 'Nunito',sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; transition: all 0.2s;
+}
+.q-btn.on { background: rgba(46,204,113,0.3); border-color: rgba(46,204,113,0.6); color: #fff; }
+
+.lang-row { display: flex; gap: 8px; margin-bottom: 24px; }
+.lang-btn2 {
+  flex: 1; padding: 10px; border-radius: 12px; border: 1.5px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7);
+  font-family: 'Nunito',sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; transition: all 0.2s;
+}
+.lang-btn2.on { background: rgba(46,204,113,0.3); border-color: rgba(46,204,113,0.6); color: #fff; }
+
+.start-btn {
+  width: 100%; padding: 16px; border-radius: 50px; border: none;
+  background: linear-gradient(135deg, #2E7D32, #43A047); color: #fff;
+  font-family: 'Unbounded','Noto Sans',sans-serif; font-size: 16px; font-weight: 900;
+  cursor: pointer; transition: all 0.2s; box-shadow: 0 8px 30px rgba(46,125,50,0.4);
+}
+.start-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(46,125,50,0.5); }
+
+/* ── TOURNAMENT SCREEN ── */
+#tournamentScreen {
+  background: linear-gradient(160deg, #0D1F0D, #1B3A1B);
+  justify-content: flex-start; overflow-y: auto; padding: 16px;
+}
+
+.t-header {
+  width: 100%; max-width: 1200px; display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; flex-shrink: 0;
+}
+.t-logo { font-family: 'Unbounded','Noto Sans',sans-serif; font-size: 18px; font-weight: 900; color: #fff; }
+.t-round-badge {
+  background: rgba(46,204,113,0.2); border: 1px solid rgba(46,204,113,0.4);
+  border-radius: 50px; padding: 6px 16px; font-size: 13px; font-weight: 800; color: #fff;
+}
+.t-exit { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; padding: 6px 14px; font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.7); cursor: pointer; }
+
+/* Bracket */
+.bracket-wrap { width: 100%; max-width: 1200px; overflow-x: auto; }
+.bracket { display: flex; gap: 40px; align-items: center; min-width: max-content; padding: 20px 0; }
+.round-col { display: flex; flex-direction: column; gap: 20px; align-items: center; }
+.round-title { font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+
+.match-card {
+  background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 14px; overflow: hidden; width: 180px; cursor: pointer;
+  transition: all 0.2s; position: relative;
+}
+.match-card:hover { border-color: rgba(46,204,113,0.5); background: rgba(255,255,255,0.09); transform: translateY(-2px); }
+.match-card.active-match { border-color: rgba(46,204,113,0.8); box-shadow: 0 0 20px rgba(46,204,113,0.3); animation: pulse-border 1.5s infinite; }
+@keyframes pulse-border { 0%,100%{box-shadow:0 0 20px rgba(46,204,113,0.3)} 50%{box-shadow:0 0 30px rgba(46,204,113,0.6)} }
+.match-card.done { opacity: 0.6; cursor: default; }
+
+.team-slot {
+  display: flex; align-items: center; gap: 8px; padding: 11px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.team-slot:last-child { border-bottom: none; }
+.team-slot.winner { background: rgba(46,204,113,0.15); }
+.team-slot.loser { opacity: 0.5; }
+.slot-color { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.slot-name { flex: 1; font-size: 13px; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.slot-score { font-size: 15px; font-weight: 900; color: rgba(255,255,255,0.5); }
+.slot-score.winning { color: #69F0AE; }
+.slot-tbd { font-size: 11px; color: rgba(255,255,255,0.35); font-weight: 600; font-style: italic; }
+
+.match-vs { text-align: center; padding: 4px; font-size: 10px; font-weight: 900; color: rgba(255,255,255,0.3); background: rgba(0,0,0,0.2); }
+
+/* Connector lines */
+.round-connector { display: flex; flex-direction: column; justify-content: space-around; }
+.connector-line { width: 40px; height: 2px; background: rgba(255,255,255,0.15); }
+
+/* ── QUESTION SCREEN ── */
+#questionScreen {
+  background: linear-gradient(160deg, #0a1a0a, #1a3a1a);
+}
+
+.q-screen-inner { width: 100%; max-width: 900px; }
+
+.q-match-info {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
+}
+.q-team-badge {
+  display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+  background: rgba(255,255,255,0.08); border-radius: 50px; border: 1.5px solid rgba(255,255,255,0.15);
+}
+.q-team-dot { width: 12px; height: 12px; border-radius: 50%; }
+.q-team-name { font-size: 14px; font-weight: 800; color: #fff; }
+.q-score-display {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(0,0,0,0.3); border-radius: 50px; padding: 8px 20px;
+}
+.q-score-num { font-family: 'Unbounded','Noto Sans',sans-serif; font-size: 22px; font-weight: 900; color: #fff; }
+.q-score-sep { font-size: 18px; color: rgba(255,255,255,0.3); }
+
+/* Progress */
+.q-progress-wrap { margin-bottom: 16px; }
+.q-progress-info { display: flex; justify-content: space-between; font-size: 12px; color: rgba(255,255,255,0.5); font-weight: 700; margin-bottom: 6px; }
+.q-progress-bar { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+.q-progress-fill { height: 100%; background: linear-gradient(90deg, #2E7D32, #69F0AE); border-radius: 3px; transition: width 0.4s; }
+
+/* Timer */
+.timer-ring-wrap { display: flex; justify-content: center; margin-bottom: 20px; }
+.timer-ring {
+  width: 80px; height: 80px; position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.timer-svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.timer-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 5; }
+.timer-arc { fill: none; stroke: #69F0AE; stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 0.5s; }
+.timer-arc.urgent { stroke: #FF5252; }
+.timer-num { font-family: 'Unbounded','Noto Sans',sans-serif; font-size: 24px; font-weight: 900; color: #fff; position: relative; z-index: 1; }
+
+/* Question card */
+.q-card {
+  background: rgba(255,255,255,0.07); border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 20px; padding: 28px; margin-bottom: 20px; text-align: center;
+}
+.q-num-label { font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+.q-text { font-size: clamp(16px, 3vw, 24px); font-weight: 800; color: #fff; line-height: 1.4; }
+.q-emoji { font-size: 36px; margin-bottom: 12px; }
+
+/* Options */
+.q-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.q-opt {
+  padding: 16px 18px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06); color: #fff;
+  font-family: 'Nunito','Noto Sans',sans-serif; font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; text-align: left;
+  display: flex; align-items: center; gap: 10px;
+}
+.q-opt:hover { border-color: rgba(46,204,113,0.5); background: rgba(46,204,113,0.1); }
+.q-opt.correct { border-color: #69F0AE; background: rgba(105,240,174,0.15); animation: correct-flash 0.5s; }
+.q-opt.wrong { border-color: #FF5252; background: rgba(255,82,82,0.15); }
+.q-opt.selected { border-color: #FFD740; background: rgba(255,215,64,0.1); }
+.q-opt-letter { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; flex-shrink: 0; }
+.q-opt.correct .q-opt-letter { background: #69F0AE; color: #0a1a0a; }
+.q-opt.wrong .q-opt-letter { background: #FF5252; color: #fff; }
+@keyframes correct-flash { 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
+
+.q-next-btn {
+  width: 100%; padding: 14px; border-radius: 50px; border: none;
+  background: linear-gradient(135deg, #2E7D32, #43A047); color: #fff;
+  font-family: 'Unbounded','Noto Sans',sans-serif; font-size: 15px; font-weight: 900;
+  cursor: pointer; transition: all 0.2s; display: none;
+  box-shadow: 0 6px 20px rgba(46,125,50,0.35);
+}
+.q-next-btn:hover { transform: translateY(-1px); }
+
+/* ── WINNER SCREEN ── */
+#winnerScreen {
+  background: linear-gradient(160deg, #0D1F0D, #1B3A1B);
+}
+.winner-content { text-align: center; }
+.winner-trophy { font-size: 80px; margin-bottom: 16px; animation: trophy-bounce 1s ease-in-out infinite alternate; }
+@keyframes trophy-bounce { from{transform:translateY(0)} to{transform:translateY(-12px)} }
+.winner-label { font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+.winner-name { font-family: 'Unbounded','Noto Sans',sans-serif; font-size: clamp(28px,5vw,48px); font-weight: 900; color: #69F0AE; margin-bottom: 24px; text-shadow: 0 0 30px rgba(105,240,174,0.5); }
+.winner-score { font-size: 18px; color: rgba(255,255,255,0.7); font-weight: 700; margin-bottom: 32px; }
+
+.podium { display: flex; align-items: flex-end; justify-content: center; gap: 12px; margin-bottom: 32px; }
+.podium-place { text-align: center; }
+.podium-bar { border-radius: 10px 10px 0 0; width: 80px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px; }
+.podium-1 { height: 120px; background: linear-gradient(to top, #F9A825, #FFD740); }
+.podium-2 { height: 90px; background: linear-gradient(to top, #78909C, #90A4AE); }
+.podium-3 { height: 70px; background: linear-gradient(to top, #8D6E63, #A1887F); }
+.podium-medal { font-size: 24px; }
+.podium-team-name { font-size: 12px; font-weight: 800; color: rgba(255,255,255,0.8); margin-top: 6px; }
+.podium-team-score { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+.play-again-btn {
+  padding: 14px 36px; border-radius: 50px; border: none;
+  background: linear-gradient(135deg, #2E7D32, #43A047); color: #fff;
+  font-family: 'Unbounded','Noto Sans',sans-serif; font-size: 15px; font-weight: 900;
+  cursor: pointer; transition: all 0.2s; box-shadow: 0 8px 30px rgba(46,125,50,0.4);
+}
+
+/* Confetti */
+.confetti-piece {
+  position: fixed; width: 10px; height: 10px; border-radius: 2px;
+  animation: confetti-fall linear forwards;
+  pointer-events: none; z-index: 9999;
+}
+@keyframes confetti-fall {
+  0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+@media(max-width: 600px) {
+  .teams-grid { grid-template-columns: 1fr; }
+  .q-options { grid-template-columns: 1fr; }
+  .match-card { width: 150px; }
+  .bracket { gap: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── SETUP ── -->
+<div class="screen active" id="setupScreen">
+  <div class="setup-card">
+    <div class="game-logo">
+      <div class="game-logo-icon">🏆</div>
+      <div class="game-logo-title" id="glTitle">Эко-чемпион</div>
+      <div class="game-logo-sub" id="glSub">Турнирная игра для класса</div>
+    </div>
+
+    <div class="lang-row">
+      <button class="lang-btn2 on" data-l="ru" onclick="setLang('ru')">🇷🇺 Русский</button>
+      <button class="lang-btn2" data-l="kz" onclick="setLang('kz')">🇰🇿 Қазақша</button>
+    </div>
+
+    <div class="setup-label" id="teamsLabel">Название команд</div>
+    <div class="teams-grid" id="teamsGrid">
+      <div class="team-input-wrap">
+        <div class="team-color-dot" style="background:#69F0AE"></div>
+        <input class="team-input" id="t1" placeholder="Команда 1" value="Зелёные">
+      </div>
+      <div class="team-input-wrap">
+        <div class="team-color-dot" style="background:#40C4FF"></div>
+        <input class="team-input" id="t2" placeholder="Команда 2" value="Синие">
+      </div>
+      <div class="team-input-wrap">
+        <div class="team-color-dot" style="background:#FFD740"></div>
+        <input class="team-input" id="t3" placeholder="Команда 3" value="Жёлтые">
+      </div>
+      <div class="team-input-wrap">
+        <div class="team-color-dot" style="background:#FF6E6E"></div>
+        <input class="team-input" id="t4" placeholder="Команда 4" value="Красные">
+      </div>
+    </div>
+
+    <div class="setup-label" id="qCountLabel">Вопросов в матче</div>
+    <div class="q-count-row">
+      <button class="q-btn" onclick="setQCount(3)">3</button>
+      <button class="q-btn on" onclick="setQCount(5)">5</button>
+      <button class="q-btn" onclick="setQCount(7)">7</button>
+    </div>
+
+    <button class="start-btn" onclick="startTournament()" id="startBtn">
+      🏆 Начать турнир
+    </button>
+  </div>
+</div>
+
+<!-- ── TOURNAMENT BRACKET ── -->
+<div class="screen" id="tournamentScreen">
+  <div class="t-header">
+    <div class="t-logo">🏆 <span id="tLogoText">Эко-чемпион</span></div>
+    <div class="t-round-badge" id="tRoundBadge">Полуфинал</div>
+    <button class="t-exit" onclick="showSetup()">✕ <span id="tExitText">Выход</span></button>
+  </div>
+  <div class="bracket-wrap">
+    <div class="bracket" id="bracketEl"></div>
+  </div>
+  <div id="matchPrompt" style="margin-top:20px;font-size:14px;font-weight:700;color:rgba(255,255,255,0.6);text-align:center;"></div>
+</div>
+
+<!-- ── QUESTION ── -->
+<div class="screen" id="questionScreen">
+  <div class="q-screen-inner">
+    <div class="q-match-info">
+      <div class="q-team-badge">
+        <div class="q-team-dot" id="qt1Color"></div>
+        <span class="q-team-name" id="qt1Name">Зелёные</span>
+      </div>
+      <div class="q-score-display">
+        <span class="q-score-num" id="qScore1">0</span>
+        <span class="q-score-sep">—</span>
+        <span class="q-score-num" id="qScore2">0</span>
+      </div>
+      <div class="q-team-badge">
+        <div class="q-team-dot" id="qt2Color"></div>
+        <span class="q-team-name" id="qt2Name">Синие</span>
+      </div>
+    </div>
+
+    <div class="q-progress-wrap">
+      <div class="q-progress-info">
+        <span id="qProgressLabel">Вопрос 1 из 5</span>
+        <span id="qProgressRight"></span>
+      </div>
+      <div class="q-progress-bar"><div class="q-progress-fill" id="qProgressFill" style="width:20%"></div></div>
+    </div>
+
+    <div class="timer-ring-wrap">
+      <div class="timer-ring">
+        <svg class="timer-svg" viewBox="0 0 80 80">
+          <circle class="timer-bg" cx="40" cy="40" r="35"/>
+          <circle class="timer-arc" id="timerArc" cx="40" cy="40" r="35"
+            stroke-dasharray="219.9" stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-num" id="timerNum">20</div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-emoji" id="qEmoji">🌿</div>
+      <div class="q-num-label" id="qNumLabel">Вопрос 1</div>
+      <div class="q-text" id="qText">Загрузка...</div>
+    </div>
+
+    <div class="q-options" id="qOptions"></div>
+    <button class="q-next-btn" id="qNextBtn" onclick="nextQuestion()">
+      <span id="qNextText">Следующий вопрос →</span>
+    </button>
+  </div>
+</div>
+
+<!-- ── WINNER ── -->
+<div class="screen" id="winnerScreen">
+  <div class="winner-content">
+    <div class="winner-trophy">🏆</div>
+    <div class="winner-label" id="wLabel">Чемпион класса</div>
+    <div class="winner-name" id="wName">Зелёные</div>
+    <div class="winner-score" id="wScore">5 : 2</div>
+    <div class="podium" id="podium"></div>
+    <button class="play-again-btn" onclick="showSetup()">
+      🔄 <span id="wPlayAgain">Сыграть снова</span>
+    </button>
+  </div>
+</div>
+
+<script>
+// ── TRANSLATIONS ────────────────────────────────────────────────────────────
+const L = {
+  ru: {
+    title:'Эко-чемпион', sub:'Турнирная игра для класса',
+    teams:'Название команд', qcount:'Вопросов в матче', start:'🏆 Начать турнир',
+    semifinal:'Полуфинал', final:'Финал', thirdplace:'За 3-е место',
+    champion:'Чемпион класса', playAgain:'🔄 Сыграть снова',
+    exit:'Выход', clickMatch:'Нажмите на матч чтобы начать',
+    qof:'Вопрос {n} из {t}', next:'Следующий вопрос →', finish:'Завершить матч ✓',
+    t1:'Зелёные', t2:'Синие', t3:'Жёлтые', t4:'Красные',
+    correct:'Правильно! +1 очко', wrong:'Неверно',
+    medals:['🥇 Чемпион','🥈 2-е место','🥉 3-е место'],
+  },
+  kz: {
+    title:'Эко-чемпион', sub:'Сынып үшін турнирлік ойын',
+    teams:'Команда атаулары', qcount:'Матчтегі сұрақтар', start:'🏆 Турнирді бастау',
+    semifinal:'Жартыфинал', final:'Финал', thirdplace:'3-ші орын үшін',
+    champion:'Сынып чемпионы', playAgain:'🔄 Қайта ойнау',
+    exit:'Шығу', clickMatch:'Матчты бастау үшін басыңыз',
+    qof:'Сұрақ {n} / {t}', next:'Келесі сұрақ →', finish:'Матчты аяқтау ✓',
+    t1:'Жасылдар', t2:'Көктер', t3:'Сарылар', t4:'Қызылдар',
+    correct:'Дұрыс! +1 ұпай', wrong:'Қате',
+    medals:['🥇 Чемпион','🥈 2-ші орын','🥉 3-ші орын'],
+  }
+};
+
+// ── QUESTIONS (RU + KZ) ─────────────────────────────────────────────────────
+const QUESTIONS = {
+  ru: [
+    {e:'💧',q:'Сколько % воды на Земле является пресной?',opts:['3%','30%','50%','70%'],correct:0},
+    {e:'♻️',q:'Что означает символ трёх стрелок на упаковке?',opts:['Хрупко','Перерабатываемый материал','Сделано в России','Пищевой пластик'],correct:1},
+    {e:'🌳',q:'Сколько CO₂ поглощает одно дерево за год?',opts:['1 кг','22 кг','100 кг','500 кг'],correct:1},
+    {e:'🌍',q:'Какой газ является главной причиной парникового эффекта?',opts:['Кислород','Азот','Углекислый газ','Водород'],correct:2},
+    {e:'🗑️',q:'Сколько лет разлагается пластиковая бутылка?',opts:['5 лет','50 лет','450 лет','1000 лет'],correct:2},
+    {e:'☀️',q:'Что такое солнечная энергия?',opts:['Энергия ветра','Энергия воды','Энергия от Солнца','Ядерная энергия'],correct:2},
+    {e:'🐝',q:'Почему пчёлы важны для экосистемы?',opts:['Производят мёд','Опыляют растения','Поедают вредителей','Очищают воду'],correct:1},
+    {e:'🌊',q:'Что такое кислотный дождь?',opts:['Дождь с кислотой из завода','Загрязнённый воздухом дождь','Морская вода','Снег весной'],correct:1},
+    {e:'🌿',q:'Что такое фотосинтез?',opts:['Движение воды','Размножение растений','Превращение света в питательные вещества','Рост корней'],correct:2},
+    {e:'🔋',q:'Какой источник энергии самый экологичный?',opts:['Уголь','Нефть','Солнце и ветер','Газ'],correct:2},
+    {e:'🐘',q:'Почему биоразнообразие важно?',opts:['Для красоты','Экосистемы устойчивее','Животные вкуснее','Для туризма'],correct:1},
+    {e:'💡',q:'Что потребляет меньше энергии?',opts:['Лампа накаливания','LED-лампа','Люминесцентная лампа','Все одинаково'],correct:1},
+    {e:'🚲',q:'Что самое экологичное для коротких поездок?',opts:['Машина','Автобус','Велосипед','Мотоцикл'],correct:2},
+    {e:'🌱',q:'Что такое компост?',opts:['Вид удобрения из отходов','Пестицид','Вид семян','Тип почвы'],correct:0},
+    {e:'🐟',q:'Что больше всего вредит океанам?',opts:['Рыбная ловля','Пластиковый мусор','Дождевая вода','Солнечный свет'],correct:1},
+  ],
+  kz: [
+    {e:'💧',q:'Жердегі тұщы судың %-ы қанша?',opts:['3%','30%','50%','70%'],correct:0},
+    {e:'♻️',q:'Қаптамадағы үш көрсеткі не білдіреді?',opts:['Сынғыш','Қайта өңделетін','Ресейде жасалған','Тамақ пластигі'],correct:1},
+    {e:'🌳',q:'Бір ағаш жылына қанша CO₂ сіңіреді?',opts:['1 кг','22 кг','100 кг','500 кг'],correct:1},
+    {e:'🌍',q:'Жылыжай эффектісінің негізгі себебі?',opts:['Оттегі','Азот','Көмірқышқыл газ','Сутегі'],correct:2},
+    {e:'🗑️',q:'Пластик бутылка қанша жыл ыдырайды?',opts:['5 жыл','50 жыл','450 жыл','1000 жыл'],correct:2},
+    {e:'☀️',q:'Күн энергиясы дегеніміз не?',opts:['Жел энергиясы','Су энергиясы','Күннен алынатын энергия','Ядролық энергия'],correct:2},
+    {e:'🐝',q:'Аралардың экожүйе үшін маңызы?',opts:['Бал береді','Өсімдіктерді тозаңдандырады','Зиянкестерді жейді','Суды тазалайды'],correct:1},
+    {e:'🌊',q:'Қышқыл жаңбыр дегеніміз не?',opts:['Зауыттан қышқыл','Ластанған ауадан жаңбыр','Теңіз суы','Көктемгі қар'],correct:1},
+    {e:'🌿',q:'Фотосинтез дегеніміз не?',opts:['Судың қозғалысы','Өсімдіктердің көбеюі','Жарықты қоректік заттарға айналдыру','Тамырдың өсуі'],correct:2},
+    {e:'🔋',q:'Ең экологиялық таза энергия көзі?',opts:['Көмір','Мұнай','Күн мен жел','Газ'],correct:2},
+    {e:'🐘',q:'Биологиялық алуантүрлілік неліктен маңызды?',opts:['Сұлулық үшін','Экожүйелер тұрақты болады','Аңдар дәмді','Туризм үшін'],correct:1},
+    {e:'💡',q:'Қайсысы аз энергия жұмсайды?',opts:['Қыздыру шамы','LED шам','Люминесцентті шам','Барлығы бірдей'],correct:1},
+    {e:'🚲',q:'Қысқа сапарлар үшін ең экологиялық?',opts:['Көлік','Автобус','Велосипед','Мотоцикл'],correct:2},
+    {e:'🌱',q:'Компост дегеніміз не?',opts:['Қалдықтардан тыңайтқыш','Пестицид','Тұқым түрі','Топырақ түрі'],correct:0},
+    {e:'🐟',q:'Мұхиттарға ең зиянды нәрсе?',opts:['Балық аулау','Пластик қалдықтар','Жаңбыр суы','Күн сәулесі'],correct:1},
+  ]
+};
+
+// ── STATE ───────────────────────────────────────────────────────────────────
+let lang = localStorage.getItem('selectedLanguage') || 'ru';
+let qCount = 5;
+const TEAM_COLORS = ['#69F0AE','#40C4FF','#FFD740','#FF6E6E'];
+let teams = [], tournament = {}, currentMatch = null, timer = null;
+
+// ── LANG ────────────────────────────────────────────────────────────────────
+function setLang(l) {
+  lang = l;
+  localStorage.setItem('selectedLanguage', l);
+  document.querySelectorAll('.lang-btn2').forEach(b => b.classList.toggle('on', b.dataset.l === l));
+  const t = L[l];
+  document.getElementById('glTitle').textContent = t.title;
+  document.getElementById('glSub').textContent = t.sub;
+  document.getElementById('teamsLabel').textContent = t.teams;
+  document.getElementById('qCountLabel').textContent = t.qcount;
+  document.getElementById('startBtn').textContent = t.start;
+  // Update default team names
+  ['t1','t2','t3','t4'].forEach((id,i) => {
+    const inp = document.getElementById(id);
+    const defaultNames = {ru:['Зелёные','Синие','Жёлтые','Красные'],kz:['Жасылдар','Көктер','Сарылар','Қызылдар']};
+    if (Object.values({ru:['Зелёные','Синие','Жёлтые','Красные'],kz:['Жасылдар','Көктер','Сарылар','Қызылдар']}).flat().includes(inp.value)) {
+      inp.value = defaultNames[l][i];
+    }
+  });
+}
+
+function setQCount(n) {
+  qCount = n;
+  document.querySelectorAll('.q-btn').forEach(b => b.classList.toggle('on', parseInt(b.textContent) === n));
+}
+
+// ── TOURNAMENT LOGIC ────────────────────────────────────────────────────────
+function startTournament() {
+  teams = ['t1','t2','t3','t4'].map((id,i) => ({
+    id: i, name: document.getElementById(id).value.trim() || `Команда ${i+1}`,
+    color: TEAM_COLORS[i], wins: 0, totalScore: 0
+  }));
+
+  // Bracket: SF1: 0v2, SF2: 1v3 → Final + 3rd place
+  tournament = {
+    sf1: { t1: teams[0], t2: teams[2], score1: 0, score2: 0, done: false, winner: null },
+    sf2: { t1: teams[1], t2: teams[3], score1: 0, score2: 0, done: false, winner: null },
+    final: { t1: null, t2: null, score1: 0, score2: 0, done: false, winner: null },
+    third: { t1: null, t2: null, score1: 0, score2: 0, done: false, winner: null },
+  };
+
+  showScreen('tournamentScreen');
+  renderBracket();
+}
+
+function renderBracket() {
+  const t = L[lang];
+  const br = document.getElementById('bracketEl');
+  const allDone = tournament.sf1.done && tournament.sf2.done && tournament.final.done;
+
+  document.getElementById('tRoundBadge').textContent =
+    tournament.final.done ? t.final :
+    tournament.sf1.done && tournament.sf2.done ? t.final :
+    t.semifinal;
+  document.getElementById('tLogoText').textContent = t.title;
+  document.getElementById('tExitText').textContent = t.exit;
+  document.getElementById('matchPrompt').textContent = allDone ? '' : t.clickMatch;
+
+  br.innerHTML = `
+    <div class="round-col">
+      <div class="round-title">${t.semifinal}</div>
+      ${matchCard('sf1')}
+      ${matchCard('sf2')}
+    </div>
+    <div style="display:flex;flex-direction:column;justify-content:center;gap:20px;">
+      <div style="width:32px;height:2px;background:rgba(255,255,255,0.15)"></div>
+      <div style="width:32px;height:2px;background:rgba(255,255,255,0.15)"></div>
+    </div>
+    <div class="round-col" style="justify-content:center;">
+      <div class="round-title">${t.final}</div>
+      ${matchCard('final')}
+      <div style="height:20px"></div>
+      <div class="round-title" style="margin-top:8px;">${t.thirdplace}</div>
+      ${matchCard('third')}
+    </div>
+  `;
+
+  // Click handlers
+  ['sf1','sf2','final','third'].forEach(key => {
+    const el = document.getElementById('mc-'+key);
+    if (el) el.onclick = () => tryStartMatch(key);
+  });
+}
+
+function matchCard(key) {
+  const m = tournament[key];
+  const isActive = canPlay(key);
+  const isDone = m.done;
+  const cls = isDone ? 'done' : isActive ? 'active-match' : '';
+
+  const slot = (team, score, isWinner) => {
+    if (!team) return `<div class="team-slot"><span class="slot-tbd">TBD</span></div>`;
+    const winCls = isDone ? (isWinner ? 'winner' : 'loser') : '';
+    const scoreCls = isDone && isWinner ? 'winning' : '';
+    return `<div class="team-slot ${winCls}">
+      <div class="slot-color" style="background:${team.color}"></div>
+      <span class="slot-name">${team.name}</span>
+      <span class="slot-score ${scoreCls}">${isDone || score > 0 ? score : ''}</span>
+    </div>`;
+  };
+
+  const w1 = isDone && m.winner === m.t1;
+  const w2 = isDone && m.winner === m.t2;
+
+  return `<div class="match-card ${cls}" id="mc-${key}">
+    ${slot(m.t1, m.score1, w1)}
+    <div class="match-vs">VS</div>
+    ${slot(m.t2, m.score2, w2)}
+  </div>`;
+}
+
+function canPlay(key) {
+  const m = tournament[key];
+  if (m.done) return false;
+  if (key === 'sf1' || key === 'sf2') return m.t1 && m.t2;
+  if (key === 'final' || key === 'third') return !m.done && m.t1 && m.t2;
+  return false;
+}
+
+function tryStartMatch(key) {
+  if (!canPlay(key)) return;
+  currentMatch = key;
+  const m = tournament[key];
+  startMatch(m.t1, m.t2);
+}
+
+// ── MATCH/QUESTION ──────────────────────────────────────────────────────────
+let matchState = { qIndex: 0, score1: 0, score2: 0, team1: null, team2: null, questions: [], answered: false, timerVal: 20, timerInterval: null };
+
+function startMatch(t1, t2) {
+  // Shuffle questions
+  const pool = [...QUESTIONS[lang]].sort(() => Math.random()-0.5);
+  const chosen = pool.slice(0, qCount);
+
+  matchState = { qIndex: 0, score1: 0, score2: 0, team1: t1, team2: t2, questions: chosen, answered: false };
+
+  document.getElementById('qt1Name').textContent = t1.name;
+  document.getElementById('qt2Name').textContent = t2.name;
+  document.getElementById('qt1Color').style.background = t1.color;
+  document.getElementById('qt2Color').style.background = t2.color;
+
+  showScreen('questionScreen');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const s = matchState;
+  const q = s.questions[s.qIndex];
+  const t = L[lang];
+
+  document.getElementById('qScore1').textContent = s.score1;
+  document.getElementById('qScore2').textContent = s.score2;
+  document.getElementById('qEmoji').textContent = q.e;
+  document.getElementById('qNumLabel').textContent = t.qof.replace('{n}', s.qIndex+1).replace('{t}', s.questions.length);
+  document.getElementById('qProgressLabel').textContent = t.qof.replace('{n}', s.qIndex+1).replace('{t}', s.questions.length);
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('qProgressFill').style.width = ((s.qIndex+1)/s.questions.length*100)+'%';
+  document.getElementById('qNextBtn').style.display = 'none';
+  document.getElementById('qNextText').textContent = s.qIndex < s.questions.length-1 ? t.next : t.finish;
+  s.answered = false;
+
+  // Options
+  const letters = ['A','B','C','D'];
+  document.getElementById('qOptions').innerHTML = q.opts.map((opt, i) =>
+    `<button class="q-opt" onclick="answerQ(${i})" id="qopt-${i}">
+      <span class="q-opt-letter">${letters[i]}</span>${opt}
+    </button>`
+  ).join('');
+
+  startTimer();
+}
+
+function startTimer() {
+  if (matchState.timerInterval) clearInterval(matchState.timerInterval);
+  matchState.timerVal = 20;
+  updateTimerUI(20);
+
+  matchState.timerInterval = setInterval(() => {
+    matchState.timerVal--;
+    updateTimerUI(matchState.timerVal);
+    if (matchState.timerVal <= 0) {
+      clearInterval(matchState.timerInterval);
+      if (!matchState.answered) timeOut();
+    }
+  }, 1000);
+}
+
+function updateTimerUI(val) {
+  const circumference = 219.9;
+  const offset = circumference * (1 - val/20);
+  const arc = document.getElementById('timerArc');
+  const num = document.getElementById('timerNum');
+  if (!arc || !num) return;
+  arc.style.strokeDashoffset = offset;
+  num.textContent = val;
+  arc.classList.toggle('urgent', val <= 5);
+}
+
+function timeOut() {
+  if (matchState.answered) return;
+  matchState.answered = true;
+  // Highlight correct
+  const q = matchState.questions[matchState.qIndex];
+  document.querySelectorAll('.q-opt').forEach((el,i) => {
+    if (i === q.correct) el.classList.add('correct');
+  });
+  document.getElementById('qNextBtn').style.display = 'block';
+}
+
+function answerQ(idx) {
+  if (matchState.answered) return;
+  matchState.answered = true;
+  clearInterval(matchState.timerInterval);
+
+  const q = matchState.questions[matchState.qIndex];
+  const opts = document.querySelectorAll('.q-opt');
+
+  opts.forEach((el,i) => {
+    if (i === q.correct) el.classList.add('correct');
+    else if (i === idx) el.classList.add('wrong');
+    el.onclick = null;
+  });
+
+  // Alternate who gets the point — odd questions team1, even team2
+  const isTeam1Turn = matchState.qIndex % 2 === 0;
+  if (idx === q.correct) {
+    if (isTeam1Turn) matchState.score1++;
+    else matchState.score2++;
+    document.getElementById('qScore1').textContent = matchState.score1;
+    document.getElementById('qScore2').textContent = matchState.score2;
+  }
+
+  document.getElementById('qNextBtn').style.display = 'block';
+}
+
+function nextQuestion() {
+  matchState.qIndex++;
+  if (matchState.qIndex >= matchState.questions.length) {
+    endMatch();
+  } else {
+    renderQuestion();
+  }
+}
+
+function endMatch() {
+  clearInterval(matchState.timerInterval);
+  const m = tournament[currentMatch];
+  m.score1 = matchState.score1;
+  m.score2 = matchState.score2;
+  m.done = true;
+
+  const winner = matchState.score1 >= matchState.score2 ? m.t1 : m.t2;
+  const loser  = matchState.score1 >= matchState.score2 ? m.t2 : m.t1;
+  m.winner = winner;
+
+  // Assign next rounds
+  if (currentMatch === 'sf1') {
+    tournament.final.t1 = winner;
+    tournament.third.t1 = loser;
+  } else if (currentMatch === 'sf2') {
+    tournament.final.t2 = winner;
+    tournament.third.t2 = loser;
+  } else if (currentMatch === 'final') {
+    // Tournament over after final and third place
+    checkTournamentEnd();
+    return;
+  } else if (currentMatch === 'third') {
+    checkTournamentEnd();
+    return;
+  }
+
+  showScreen('tournamentScreen');
+  renderBracket();
+}
+
+function checkTournamentEnd() {
+  if (tournament.final.done && tournament.third.done) {
+    showWinner();
+  } else {
+    showScreen('tournamentScreen');
+    renderBracket();
+  }
+}
+
+function showWinner() {
+  const t = L[lang];
+  const champion = tournament.final.winner;
+  const second   = tournament.final.winner === tournament.final.t1 ? tournament.final.t2 : tournament.final.t1;
+  const third    = tournament.third.winner;
+
+  document.getElementById('wLabel').textContent = t.champion;
+  document.getElementById('wName').textContent = champion.name;
+  document.getElementById('wScore').textContent =
+    `${tournament.final.score1} : ${tournament.final.score2}`;
+  document.getElementById('wPlayAgain').textContent = t.playAgain.replace('🔄 ','');
+
+  // Podium: order is 2nd, 1st, 3rd
+  const podiumOrder = [
+    { team: second, height: '90px', bg: 'linear-gradient(to top,#78909C,#90A4AE)', medal: '🥈', label: t.medals[1] },
+    { team: champion, height: '120px', bg: 'linear-gradient(to top,#F9A825,#FFD740)', medal: '🥇', label: t.medals[0] },
+    { team: third, height: '70px', bg: 'linear-gradient(to top,#8D6E63,#A1887F)', medal: '🥉', label: t.medals[2] },
+  ];
+  document.getElementById('podium').innerHTML = podiumOrder.map(p => `
+    <div class="podium-place">
+      <div style="font-size:14px;font-weight:800;color:rgba(255,255,255,0.8);margin-bottom:4px;">${p.team.name}</div>
+      <div class="podium-bar" style="height:${p.height};background:${p.bg};">
+        <span style="font-size:26px;">${p.medal}</span>
+      </div>
+      <div class="podium-team-score">${p.label}</div>
+    </div>`).join('');
+
+  showScreen('winnerScreen');
+  launchConfetti();
+}
+
+function launchConfetti() {
+  const colors = ['#69F0AE','#40C4FF','#FFD740','#FF6E6E','#fff'];
+  for (let i = 0; i < 80; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.cssText = `left:${Math.random()*100}vw;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${2+Math.random()*2}s;animation-delay:${Math.random()*0.5}s;transform:rotate(${Math.random()*360}deg);width:${6+Math.random()*10}px;height:${6+Math.random()*10}px;`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }, i * 30);
+  }
+}
+
+// ── UTILS ───────────────────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function showSetup() {
+  clearInterval(matchState.timerInterval);
+  showScreen('setupScreen');
+}
+
+// Init
+setLang(lang);
+setQCount(5);
+</script>
+</body>
+</html>

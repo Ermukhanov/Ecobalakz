@@ -931,14 +931,26 @@ function closeModal(id){
 }
 async function saveProfile(){
   const name=document.getElementById('editNameInput').value.trim();
+  if (name && typeof _enforceNoProfanitySb === 'function') {
+    try { _enforceNoProfanitySb([name]); }
+    catch (e) { showToast((e && e.message) ? e.message : profanityMsg(lang)); return; }
+  }
   if(name && containsProfanity(name)){showToast(profanityMsg(lang));return;}
   if(name){
     document.getElementById('profileName').textContent=name;
     if(cu){cu.nickname=name;}
     try{const sb=window.getSupabaseClient();if(sb&&cu)await sb.from('users').update({nickname:name}).eq('id',cu.id);}catch(e){console.warn(e);}
   }
-  document.getElementById('profileAva').textContent=selectedAva;
-  document.querySelector('.topbar-avatar').textContent=selectedAva;
+  // Do not overwrite uploaded photo avatar
+  if (!(cu && cu.avatar_url)) {
+    document.getElementById('profileAva').textContent=selectedAva;
+    document.querySelector('.topbar-avatar').textContent=selectedAva;
+    if (cu) { cu.avatar = selectedAva; }
+    try {
+      const sb2 = window.getSupabaseClient();
+      if (sb2 && cu) await sb2.from('users').update({ avatar: selectedAva }).eq('id', cu.id);
+    } catch(e) { console.warn(e); }
+  }
   closeModal('editModal');
   showToast(lang==='ru'?'✅ Профиль обновлён':'✅ Профиль жаңартылды');
 }

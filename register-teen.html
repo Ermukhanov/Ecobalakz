@@ -262,6 +262,12 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
   if (submitting) return;
   const t = T[lang];
   const fd = new FormData(this);
+  const fullName = String(fd.get('fullName') || '').trim();
+  const nickname = String(fd.get('nickname') || '').trim();
+  if ((fullName && containsProfanity(fullName)) || (nickname && containsProfanity(nickname))) {
+    se(profanityMsg(lang));
+    return;
+  }
   const pass = fd.get('password'), pass2 = fd.get('confirm_password');
   if (pass.length < 6) { se(t.errShort); return; }
   if (pass !== pass2) { se(t.errPw); return; }

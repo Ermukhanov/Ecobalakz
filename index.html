@@ -1949,14 +1949,21 @@ function setLang(lang) {
   document.body.classList.toggle('kz', lang === 'kz');
   document.querySelectorAll('.lang-btn').forEach(b => {
     const oc = b.getAttribute('onclick') || '';
-    b.classList.toggle('active', oc.includes(`'${lang}'`));
+    b.classList.toggle('active', oc.includes(`setLang('${lang}')`));
   });
+
+  // Update chat placeholder
+  const inp = document.getElementById('indexChatInput');
+  if (inp) inp.placeholder = lang === 'kz' ? 'Хомяктан сұра...' : 'Спроси хомяка...';
+  window._indexChatLang = lang;
+
+  // FAQ
   renderFAQ();
-  document.querySelectorAll('[data-ru]').forEach(el => { el.style.display = lang === 'ru' ? '' : 'none'; });
-  document.querySelectorAll('[data-kz]').forEach(el => { el.style.display = lang === 'kz' ? '' : 'none'; });
-  // Update hamster chat placeholder
-  const ci = document.getElementById('indexChatInput');
-  if (ci) ci.placeholder = lang === 'kz' ? 'Хомяктан сұра...' : 'Спроси хомяка...';
+
+  // Banners / video carousel title language
+  if (typeof renderVideoCarousel === 'function') {
+    try { renderVideoCarousel(); } catch(e) {}
+  }
 }
 
 // Stars

@@ -2476,12 +2476,36 @@ async function loadIndexStats() {
 }
 // Load supabase and call stats - with retry
 (function(){
-  if (window.supabase) { loadIndexStats(); return; }
+  function loadSupabase2AndInit() {
+    if (window.getSupabaseClient && typeof window.getSupabaseClient === 'function') {
+      loadIndexStats();
+      loadVideoLessons();
+      return;
+    }
+    const s2 = document.createElement('script');
+    s2.src = 'supabase2.js';
+    s2.onload = function() {
+      loadIndexStats();
+      loadVideoLessons();
+    };
+    s2.onerror = function() {
+      console.warn('supabase2.js failed to load; using limited supabase client');
+      loadIndexStats();
+      loadVideoLessons();
+    };
+    document.head.appendChild(s2);
+  }
+
+  if (window.supabase) {
+    loadSupabase2AndInit();
+    return;
+  }
+
   const s = document.createElement('script');
   s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
   s.onload = function() {
     // Small delay to ensure supabase is fully initialized
-    setTimeout(function(){ loadIndexStats(); loadVideoLessons(); }, 100);
+    setTimeout(loadSupabase2AndInit, 50);
   };
   s.onerror = function() { console.warn('Supabase CDN failed, retrying...'); };
   document.head.appendChild(s);

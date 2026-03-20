@@ -594,7 +594,7 @@ async function renderKidsGames(){
 }
 
 // ── Teen Quests ───────────────────────────────────────────────────────────
-function mapQuest(x){return{id:String(x.id||''),icon:x.icon||'&#129513;',title:typeof x.title==='object'?x.title:{ru:x.title||'',kz:''},desc:typeof x.description==='object'?x.description:{ru:x.description||'',kz:''},address:typeof x.address==='object'?x.address:{ru:x.address||'',kz:''},geo:x.geo||null,points:Number(x.points||0),deadlineHours:Number(x.deadline_hours||x.deadlineHours||72),isNew:!!x.is_new,repeatable:x.repeatable!==false};}
+function mapQuest(x){return{id:String(x.id||''),icon:x.icon||'&#129513;',title:typeof x.title==='object'?x.title:{ru:x.title||'',kz:''},desc:typeof x.description==='object'?x.description:{ru:x.description||'',kz:''},location_name:typeof x.location_name==='object'?x.location_name:{ru:x.location_name||'',kz:''},geo:x.geo||null,points:Number(x.points||0),deadlineHours:Number(x.deadline_hours||x.deadlineHours||72),isNew:!!x.is_new,repeatable:x.repeatable!==false};}
 
 async function renderTeenQuests(){
   let quests=[];try{quests=(await EcoBalaDB.getTeenQuests()).map(mapQuest);}catch(e){}
@@ -658,7 +658,7 @@ async function renderTeenQuests(){
     editQuestId=q.id;$('questFormTitle').textContent='Редактировать';$('questIcon').value=q.icon;
     $('questTitleRu').value=q.title?.ru||'';$('questTitleKz').value=q.title?.kz||'';
     $('questDescRu').value=q.desc?.ru||'';$('questDescKz').value=q.desc?.kz||'';
-    $('questAddressRu').value=q.address?.ru||'';$('questAddressKz').value=q.address?.kz||'';
+    $('questAddressRu').value=q.location_name?.ru||'';$('questAddressKz').value=q.location_name?.kz||'';
     $('questPoints').value=q.points||'';$('questDeadlineH').value=q.deadlineHours||72;
     $('questIsNew').checked=!!q.isNew;$('questRep').checked=q.repeatable!==false;
     questGeo=q.geo||null;if(questMap&&questGeo){if(questMarker)questMap.removeLayer(questMarker);questMarker=L.marker([questGeo.lat,questGeo.lng]).addTo(questMap);questMap.setView([questGeo.lat,questGeo.lng],14);}
@@ -668,7 +668,7 @@ async function renderTeenQuests(){
     const t=$('questsTbody');if(!t)return;
     t.innerHTML=arr.map(q=>`<tr>
       <td><div style="font-weight:800;">${escapeHtml(q.icon)} ${escapeHtml(q.title?.ru||'—')}</div><small>${escapeHtml(q.desc?.ru?.slice(0,60)||'')}</small></td>
-      <td><small>${escapeHtml(q.address?.ru||'—')}</small>${q.geo?'<br><span class="pill">&#128205;</span>':''}</td>
+      <td><small>${escapeHtml(q.location_name?.ru||'—')}</small>${q.geo?'<br><span class="pill">&#128205;</span>':''}</td>
       <td>${fmt(q.points)}</td>
       <td>${q.deadlineHours}ч</td>
       <td style="white-space:nowrap;"><button class="btn" data-act="edit" data-id="${q.id}">&#9998;</button><button class="btn btn-danger" data-act="del" data-id="${q.id}">&#128465;</button></td>
@@ -683,7 +683,7 @@ async function renderTeenQuests(){
     const g=id=>$(id)?.value?.trim()||'';
     const draft={id:editQuestId||uid('quest'),icon:g('questIcon')||'&#129513;',
       title:{ru:g('questTitleRu'),kz:g('questTitleKz')},description:{ru:g('questDescRu'),kz:g('questDescKz')},
-      address:{ru:g('questAddressRu'),kz:g('questAddressKz')},geo:questGeo,
+      location_name:{ru:g('questAddressRu'),kz:g('questAddressKz')},geo:questGeo,
       points:Number($('questPoints')?.value||0),deadline_hours:Number($('questDeadlineH')?.value||72),
       is_new:$('questIsNew')?.checked,repeatable:$('questRep')?.checked!==false,is_active:true};
     if(!draft.title.ru){$('questMsg').textContent='Введите название (RU)';return;}

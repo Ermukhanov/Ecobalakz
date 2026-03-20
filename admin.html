@@ -594,7 +594,7 @@ async function renderKidsGames(){
 }
 
 // ── Teen Quests ───────────────────────────────────────────────────────────
-function mapQuest(x){return{id:String(x.id||''),icon:x.icon||'&#129513;',title:typeof x.title==='object'?x.title:{ru:x.title||'',kz:''},desc:typeof x.description==='object'?x.description:{ru:x.description||'',kz:''},location_name:typeof x.location_name==='object'?x.location_name:{ru:x.location_name||'',kz:''},geo:x.geo||null,points:Number(x.points||0),deadlineHours:Number(x.deadline_hours||x.deadlineHours||72),isNew:!!x.is_new,repeatable:x.repeatable!==false};}
+function mapQuest(x){return{id:String(x.id||''),icon:x.icon||'&#129513;',title:typeof x.title==='object'?x.title:{ru:x.title||'',kz:''},desc:typeof x.description==='object'?x.description:{ru:x.description||'',kz:''},location_name:typeof x.location_name==='object'?x.location_name:{ru:x.location_name||'',kz:''},geo:x.geo||null,points:Number(x.points||0),deadlineHours:Number(x.deadline||x.deadlineHours||72),isNew:!!x.is_new,repeatable:x.repeatable!==false};}
 
 async function renderTeenQuests(){
   let quests=[];try{quests=(await EcoBalaDB.getTeenQuests()).map(mapQuest);}catch(e){}
@@ -684,7 +684,7 @@ async function renderTeenQuests(){
     const draft={id:editQuestId||uid('quest'),icon:g('questIcon')||'&#129513;',
       title:{ru:g('questTitleRu'),kz:g('questTitleKz')},description:{ru:g('questDescRu'),kz:g('questDescKz')},
       location_name:{ru:g('questAddressRu'),kz:g('questAddressKz')},geo:questGeo,
-      points:Number($('questPoints')?.value||0),deadline_hours:Number($('questDeadlineH')?.value||72),
+      points:Number($('questPoints')?.value||0),deadline:Number($('questDeadlineH')?.value||72),
       is_new:$('questIsNew')?.checked,repeatable:$('questRep')?.checked!==false,is_active:true};
     if(!draft.title.ru){$('questMsg').textContent='Введите название (RU)';return;}
     if(!draft.title.kz){$('questMsg').textContent='Введите название (KZ)';return;}

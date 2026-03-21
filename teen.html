@@ -844,6 +844,20 @@ function renderQuestsFromDB(){
 }
 function renderQuests(){renderQuestsFromDB();}
 
+function _decodeHtmlEntities(v){
+  try{
+    if(v==null) return '';
+    let s=String(v);
+    for(let i=0;i<2;i++){
+      if(!/[&][#a-zA-Z]/.test(s)) break;
+      const ta=document.createElement('textarea');
+      ta.innerHTML=s;
+      s=ta.value;
+    }
+    return s;
+  }catch(e){return String(v||'');}
+}
+
 function _fmtQuestDeadline(val) {
   try {
     if (!val) return { full: (lang==='ru'?'Без срока':'Мерзімі жоқ'), short: (lang==='ru'?'Без срока':'Мерзімі жоқ') };
@@ -1315,7 +1329,7 @@ async function loadQuestsFromDB() {
     // Конвертируем в наш формат
     const converted = arr.map(q => ({
       id: q.id,
-      icon: q.icon || '🌿',
+      icon: _decodeHtmlEntities(q.icon || '🌿'),
       title: typeof q.title === 'object' ? q.title : { ru: q.title||'Квест', kz: q.title||'Квест' },
       desc:  typeof q.description === 'object' ? q.description : { ru: q.description||'', kz: q.description||'' },
       pts:   q.points || 50,
@@ -1339,7 +1353,7 @@ async function loadQuestsFromDB() {
       return `
       <div class="quest-card" onclick="openQuestDB('${q.id}')">
         <div class="qc-top">
-          <div class="qc-icon">${q.icon}</div>
+          <div class="qc-icon">${_decodeHtmlEntities(q.icon)}</div>
           <div class="qc-right">
             <div class="qc-title">${q.title[lang]||q.title.ru}</div>
             <div class="qc-desc">${(q.desc[lang]||q.desc.ru).substring(0,80)}${(q.desc[lang]||q.desc.ru).length>80?'…':''}</div>
@@ -1357,7 +1371,7 @@ async function loadQuestsFromDB() {
 
     // Обновляем select в new report modal
     const sel = document.getElementById('reportQuestSelect');
-    if (sel) sel.innerHTML = converted.map(q => `<option value="${q.id}">${q.icon} ${q.title[lang]||q.title.ru}</option>`).join('');
+    if (sel) sel.innerHTML = converted.map(q => `<option value="${q.id}">${_decodeHtmlEntities(q.icon)} ${q.title[lang]||q.title.ru}</option>`).join('');
 
     // Recent quests на профиле
     renderRecentQuestsDB(converted);
@@ -1372,7 +1386,7 @@ function renderRecentQuestsDB(arr) {
   if (!el) return;
   el.innerHTML = arr.slice(0,3).map(q => `
     <div style="background:#fff;border-radius:12px;padding:14px;border:1px solid var(--green-light);margin-bottom:10px;display:flex;align-items:center;gap:12px;">
-      <span style="font-size:26px;">${q.icon}</span>
+      <span style="font-size:26px;">${_decodeHtmlEntities(q.icon)}</span>
       <div style="flex:1;"><div style="font-size:13px;font-weight:800;">${q.title[lang]||q.title.ru}</div><div style="font-size:11px;color:var(--text-muted);">+${q.pts} Eco Pts</div></div>
       <span style="font-size:12px;font-weight:800;color:var(--text-muted);">${lang==='ru'?'Активен':'Белсенді'}</span>
     </div>`).join('');

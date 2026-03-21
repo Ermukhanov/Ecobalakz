@@ -107,7 +107,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .qc-right{flex:1;min-width:0;}
 .qc-bottom{padding:9px 13px;background:linear-gradient(135deg,var(--green-pale),#F1FBF1);display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid var(--green-light);}
 .qc-pts{font-size:13px;font-weight:800;color:var(--green);}
-.qc-deadline{font-size:12px;color:var(--text-muted);}
+.qc-deadline{font-size:12px;color:var(--text-muted);flex:1;min-width:170px;}
 .qc-status{margin-left:auto;}
 .qc-btn{background:var(--green);color:#fff;border:none;border-radius:50px;padding:7px 16px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all 0.2s;}
 .qc-btn:hover{background:var(--green-dark);}
@@ -275,15 +275,20 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   .qf-btn { padding: 6px 11px; font-size: 11px; }
 
   /* Quest cards - компактные */
-  .quest-card { margin-bottom: 9px; border-radius: 14px; }
-  .qc-top { padding: 13px 12px; gap: 10px; }
+  .quest-card { border-radius: 14px; }
+  .qc-top { padding: 12px 12px 8px; }
   .qc-icon { width: 44px; height: 44px; font-size: 22px; border-radius: 12px; }
   .qc-title { font-size: 14px; margin-bottom: 3px; }
   .qc-desc { font-size: 12px; }
   .qc-bottom { padding: 9px 12px; flex-wrap: wrap; gap: 6px; }
   .qc-pts { font-size: 12px; }
-  .qc-deadline { font-size: 11px; }
-  .qc-btn { padding: 6px 13px; font-size: 12px; }
+  .qc-deadline { font-size: 11px; flex-basis:100%; min-width:0; }
+  .qc-status { width:100%; margin-left:0; }
+  .qc-btn { width:100%; padding: 8px 14px; font-size: 12px; }
+
+  .qs-body { padding: 16px; }
+  .qs-meta { gap: 7px; }
+  .qs-meta-pill { padding: 6px 10px; font-size: 11px; }
 
   /* Quest screen */
   .qs-header { padding: 12px 14px; }
@@ -821,23 +826,60 @@ function filterQuests(f){
   renderQuestsFromDB();
 }
 function renderQuestsFromDB(){
-  const allQ = window._dbQuests||[];
-  let list = allQ;
-  if(questFilter==='active') list=allQ.filter(q=>!q.done);
-  if(questFilter==='done') list=allQ.filter(q=>q.done);
+  const list=window._dbQuests||[];
   const el=document.getElementById('questsList');
   if(!el) return;
   if(!list.length){el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--text-muted)"><div style="font-size:48px;margin-bottom:12px">🗺️</div><div style="font-size:15px;font-weight:700">${lang==='kz'?'Квесттер жүктелуде...':'Квесты загружаются...'}</div></div>`;return;}
-  el.innerHTML=list.map(q=>`<div class="quest-card" onclick="openQuestDB('${q.id}')">
+  el.innerHTML=list.map(q=>{
+    const dl=_fmtQuestDeadline(q.expires_at);
+    return `<div class="quest-card" onclick="openQuestDB('${q.id}')">
     <div class="qc-top"><div class="qc-icon">${q.icon}</div>
     <div class="qc-right"><div class="qc-title">${q.title[lang]||q.title.ru}</div>
     <div class="qc-desc">${(q.desc[lang]||q.desc.ru||'').substring(0,80)}</div></div></div>
     <div class="qc-bottom"><span class="qc-pts">⭐ +${q.pts} Eco Pts</span>
-    <span class="qc-deadline">📅 ${q.deadline||''}</span>
+    <span class="qc-deadline">📅 ${dl.full}</span>
     <div class="qc-status"><button class="qc-btn" onclick="event.stopPropagation();openQuestDB('${q.id}')">${lang==='ru'?'Выполнить →':'Орындау →'}</button></div></div>
-  </div>`).join('');
+  </div>`;
+  }).join('');
 }
 function renderQuests(){renderQuestsFromDB();}
+
+function _fmtQuestDeadline(val) {
+  try {
+    if (!val) return { full: (lang==='ru'?'Без срока':'Мерзімі жоқ'), short: (lang==='ru'?'Без срока':'Мерзімі жоқ') };
+    const d = new Date(val);
+    if (isNaN(d)) return { full: String(val), short: String(val) };
+    const now = new Date();
+    const diffMs = d.getTime() - now.getTime();
+
+    const dateText = d.toLocaleString(lang==='kz'?'kk-KZ':'ru-RU', {
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit'
+    });
+
+    if (diffMs <= 0) {
+      const full = `${dateText} - ${lang==='ru'?'срок истёк':'мерзімі өтті'}`;
+      const short = `${lang==='ru'?'Срок истёк':'Мерзімі өтті'}`;
+      return { full, short };
+    }
+
+    const mins = Math.floor(diffMs / 60000);
+    const days = Math.floor(mins / (60 * 24));
+    const hours = Math.floor((mins - days * 60 * 24) / 60);
+    const minLeft = mins - days * 60 * 24 - hours * 60;
+
+    let leftText = '';
+    if (days > 0) leftText = lang==='ru' ? `осталось ${days}д ${hours}ч` : `${days}к ${hours}сағ қалды`;
+    else if (hours > 0) leftText = lang==='ru' ? `осталось ${hours}ч ${minLeft}м` : `${hours}сағ ${minLeft}мин қалды`;
+    else leftText = lang==='ru' ? `осталось ${minLeft}м` : `${minLeft}мин қалды`;
+
+    const full = `${dateText} - ${leftText}`;
+    const short = `⏳ ${leftText}`;
+    return { full, short };
+  } catch (e) {
+    return { full: String(val||''), short: String(val||'') };
+  }
+}
 
 function openQuest(id){openQuestDB(id);}
 function closeQuestScreen(){document.getElementById('questScreen').classList.remove('open');}
@@ -1277,7 +1319,7 @@ async function loadQuestsFromDB() {
       title: typeof q.title === 'object' ? q.title : { ru: q.title||'Квест', kz: q.title||'Квест' },
       desc:  typeof q.description === 'object' ? q.description : { ru: q.description||'', kz: q.description||'' },
       pts:   q.points || 50,
-      deadline: q.deadline || q.expires_at || '—',
+      expires_at: q.expires_at || null,
       done: false,
       loc: q.location || q.location_name || 'Хромтау',
       repeatable: q.repeatable !== false
@@ -1292,7 +1334,9 @@ async function loadQuestsFromDB() {
     // Рендерим
     questFilter = 'all';
     const el = document.getElementById('questsList');
-    el.innerHTML = converted.map(q => `
+    el.innerHTML = converted.map(q => {
+      const dl = _fmtQuestDeadline(q.expires_at);
+      return `
       <div class="quest-card" onclick="openQuestDB('${q.id}')">
         <div class="qc-top">
           <div class="qc-icon">${q.icon}</div>
@@ -1303,12 +1347,13 @@ async function loadQuestsFromDB() {
         </div>
         <div class="qc-bottom">
           <span class="qc-pts">⭐ +${q.pts} Eco Pts</span>
-          <span class="qc-deadline">📅 ${q.deadline}</span>
+          <span class="qc-deadline">📅 ${dl.full}</span>
           <div class="qc-status">
             <button class="qc-btn" onclick="event.stopPropagation();openQuestDB('${q.id}')">${lang==='ru'?'Выполнить →':'Орындау →'}</button>
           </div>
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
 
     // Обновляем select в new report modal
     const sel = document.getElementById('reportQuestSelect');
@@ -1337,12 +1382,13 @@ function openQuestDB(id) {
   const arr = window._dbQuests || [];
   const q = arr.find(x => String(x.id) === String(id));
   if (!q) return;
+  const dl = _fmtQuestDeadline(q.expires_at);
   document.getElementById('qsTitle').textContent = q.title[lang]||q.title.ru;
   document.getElementById('qsIcon').textContent = q.icon;
   document.getElementById('qsPts').textContent = `⭐ +${q.pts} Eco Points`;
   document.getElementById('qsDesc').textContent = q.desc[lang]||q.desc.ru;
   document.getElementById('qsMeta').innerHTML = [
-    `<span class="qs-meta-pill">📅 ${q.deadline}</span>`,
+    `<span class="qs-meta-pill">📅 ${dl.full}</span>`,
     `<span class="qs-meta-pill">📍 ${q.loc}</span>`,
     `<span class="qs-meta-pill">⭐ +${q.pts} pts</span>`,
   ].join('');
